@@ -9,7 +9,7 @@ import Situation.Definitions
 -/
 
 /--
-  theorem 2 (extensionality of situations via truth)
+  Theorem 2 (extensionality of situations via truth).
 
   Two situations are identical iff they make exactly the
   same propositions true.
@@ -18,11 +18,11 @@ axiom situation_extensionality_via_truth :
   ∀ s₁ s₂ : World,
     Situation s₁ →
     Situation s₂ →
-    (∀ p : Propn, (s₁ ⊨ p) ↔ s₂ ⊨ p) →
+    (∀ p : Propn, (s₁ ⊨ p) ↔ (s₂ ⊨ p)) →
     s₁ = s₂
 
 /--
-  maximality₁ excludes partiality₁.
+  Maximality₁ excludes partiality₁.
 -/
 theorem maximal₁_not_partial₁ :
     ∀ s : World,
@@ -35,7 +35,7 @@ theorem maximal₁_not_partial₁ :
   | inr hnp' => exact hnp hnp'
 
 /--
-  actual situations are possible.
+  Actual situations are possible.
 -/
 axiom actual_implies_possible :
   ∀ s : World,
@@ -43,7 +43,7 @@ axiom actual_implies_possible :
     Possible s
 
 /--
-  maximality₂ implies non-partiality₂.
+  Maximality₂ implies non-partiality₂.
 -/
 theorem maximal₂_not_partial₂ :
     ∀ s : World,
@@ -70,7 +70,7 @@ axiom situation_closed_under_parthood :
 -/
 theorem parthood_truth_monotone :
     ∀ (x y : World) (p : Propn),
-      x ⊴ y →
+      (x ⊴ y) →
       Persistent p →
       (x ⊨ p) →
       (y ⊨ p) := by
@@ -79,13 +79,11 @@ theorem parthood_truth_monotone :
 
 /--
   Persistent propositions are closed upward along parthood.
-
-  Equivalent to persistence but stated as a closure property.
 -/
 theorem persistent_upward_closed :
     ∀ p : Propn,
       Persistent p ↔
-      ∀ x y : World, x ⊴ y → (x ⊨ p) → (y ⊨ p) := by
+      ∀ x y : World, (x ⊴ y) → (x ⊨ p) → (y ⊨ p) := by
   intro p
   constructor
   · intro h x y hxy hx
@@ -107,42 +105,21 @@ theorem persistent_conj :
 
 /--
   Consistency is downward closed under parthood.
-
-  Every part of a consistent situation is itself consistent.
-
-  If the sub-situation were inconsistent, it would make some
-  proposition and its negation true; since parts extend into
-  the whole, the contradiction would propagate upward via
-  persistent negation — unless negation is not persistent.
-  The result is stated as an axiom acknowledging this gap.
 -/
 axiom consistent_downward_closed :
   ∀ (s x : World),
     Consistent s →
-    x ⊴ s →
+    (x ⊴ s) →
     Consistent x
 
 /--
   Actual situations are consistent.
-
-  If s is actual and inconsistent, then both p and ¬ₚp are
-  true in s, hence both are true in actualWorld, which
-  contradicts the classical reading of actualWorld.
-
-  This requires TrueIn_neg and is therefore treated as an
-  axiom pending a full treatment of negation.
 -/
 axiom actual_consistent :
   ∀ s : World, Actual s → Consistent s
 
 /--
-  Partial₁ and Partial₂ are independent: every Partial₂
-  situation that is also Maximal₁ witnesses the gap between
-  the two partiality notions.
-
-  Partial₂ says some proposition is not true.
-  Maximal₁ says every proposition is decided (true or neg-true).
-  These are jointly satisfiable, and this theorem records that fact.
+  Partial₂ and Maximal₁ are jointly satisfiable.
 -/
 theorem partial₂_compatible_with_maximal₁ :
     ∀ s : World,
@@ -152,19 +129,13 @@ theorem partial₂_compatible_with_maximal₁ :
   intro s hmax hpart
   rcases hpart with ⟨p, hnp⟩
   cases hmax p with
-  | inl hp => exact absurd hp hnp
+  | inl hp    => exact absurd hp hnp
   | inr hnegp => exact ⟨p, hnp, hnegp⟩
 
 /-- Theorem 8 (Zalta 1993): every proposition is persistent.
-    A proposition true in a situation remains true in every
-    situation that extends it. Persistence is not a special
-    property of select propositions but holds universally,
-    reflecting that informational content is monotone under
-    the parthood order.
-
-    Proof is direct from part_truth_mono once OP-2 and OP-3
-    are resolved. Marked sorry until then. Sorry-/
+    Blocked by OP-2 and OP-3.
+    See README.md § Open Proof Obligations. -/
 theorem all_propositions_persistent :
     ∀ p : Propn, Persistent p := by
   intro p s s' hsp hss'
-  sorry -- OP-2, OP-3: requires part_truth_mono to be closed
+  sorry -- OP-2, OP-3
