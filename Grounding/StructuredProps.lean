@@ -95,13 +95,13 @@ theorem SitJoin_comm (s s' : World)
       exact (parthood_iff_truth_inclusion (SitJoin s s') (SitJoin s' s)
               (SitJoin_situation s s' hs hs')
               (SitJoin_situation s' s hs' hs)).mp
-            (SitJoin_minimal s' s (SitJoin s s')
-              (SitJoin_right s s') (SitJoin_left s s')) p h
+            (SitJoin_minimal s s' (SitJoin s' s)
+              (SitJoin_right s' s) (SitJoin_left s' s)) p h
     · intro h
       exact (parthood_iff_truth_inclusion (SitJoin s' s) (SitJoin s s')
               (SitJoin_situation s' s hs' hs)
               (SitJoin_situation s s' hs hs')).mp
-            (SitJoin_minimal s s' (SitJoin s' s)
-              (SitJoin_right s' s) (SitJoin_left s' s)) p h
+            (SitJoin_minimal s' s (SitJoin s s')
+              (SitJoin_right s s') (SitJoin_left s s')) p h
 
 end StructuredSemantics
