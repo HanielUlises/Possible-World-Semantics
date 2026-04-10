@@ -92,15 +92,15 @@ theorem SitJoin_comm (s s' : World)
   · intro p
     constructor
     · intro h
-      exact (parthood_iff_truth_inclusion _ _
-              (SitJoin_situation s' s hs' hs)
-              (SitJoin_situation s s' hs hs')).mp
+      exact (parthood_iff_truth_inclusion (SitJoin s s') (SitJoin s' s)
+              (SitJoin_situation s s' hs hs')
+              (SitJoin_situation s' s hs' hs)).mp
             (SitJoin_minimal s' s (SitJoin s s')
               (SitJoin_right s s') (SitJoin_left s s')) p h
     · intro h
-      exact (parthood_iff_truth_inclusion _ _
-              (SitJoin_situation s s' hs hs')
-              (SitJoin_situation s' s hs' hs)).mp
+      exact (parthood_iff_truth_inclusion (SitJoin s' s) (SitJoin s s')
+              (SitJoin_situation s' s hs' hs)
+              (SitJoin_situation s s' hs hs')).mp
             (SitJoin_minimal s s' (SitJoin s' s)
               (SitJoin_right s' s) (SitJoin_left s' s)) p h
 
