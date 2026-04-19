@@ -51,3 +51,13 @@ axiom Encp : World → Propn → Prop
   vacuous abstraction operator.
 -/
 axiom VAC : Propn → Property
+
+/--
+  every situation is an object.
+
+  in Zalta's abstract object theory, situations are a species
+  of abstract object. Object and Situation are both primitive
+  predicates here, so their inclusion cannot be derived —
+  it must be postulated. This closes OP-3.
+-/
+axiom situation_is_object : ∀ s : World, Situation s → Object s
