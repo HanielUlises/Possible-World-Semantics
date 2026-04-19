@@ -74,3 +74,5 @@ rubber.cache
 ## Build tool directories for auxiliary files
 # latexrun
 latex.out/
+
+.lake/
