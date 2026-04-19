@@ -20,22 +20,30 @@ theorem partOf_antisymm_enc (x y : World) (hxy : x ⊴ y) (hyx : y ⊴ x) (F : P
 
 /-
   Open proof obligation OP-2: Parthood via truth-monotonicity.
-  Open proof obligation OP-3: Situations are objects.
-  See README.md § Open Proof Obligations.
+  See README.md § Open Proof Obligations, OP-2.
 -/
 
 /-- Auxiliary: parthood implies truth-monotonicity.
-    Blocked by OP-3. -/
+    If s ⊴ s' then every proposition true in s is true in s'.
+    Resolves OP-3 via situation_is_object. -/
 theorem part_truth_mono (s s' : World)
     (hs   : Situation s)
     (hs'  : Situation s')
     (hss' : s ⊴ s')
     (p    : Propn)
     (hp   : s ⊨ p) : s' ⊨ p := by
-  sorry -- OP-3
+  have hobs  : Object s  := situation_is_object s hs
+  have hobs' : Object s' := situation_is_object s' hs'
+  rw [TrueIn_def s' p hobs']
+  rw [TrueIn_def s p hobs] at hp
+  rw [Encp_def s p hobs] at hp
+  rw [Encp_def s' p hobs']
+  obtain ⟨F, hF, henc⟩ := hp
+  exact ⟨F, hF, hss' F henc⟩
 
 /-- Theorem 4 (Zalta 1993): parthood is equivalent to truth inclusion.
-    Blocked by OP-2 and OP-3. -/
+    The (<=) direction requires truth_mono_to_part (OP-2).
+    Blocked by OP-2. See README.md § Open Proof Obligations. -/
 theorem parthood_iff_truth_inclusion (s s' : World)
     (hs  : Situation s)
     (hs' : Situation s') :
@@ -44,10 +52,10 @@ theorem parthood_iff_truth_inclusion (s s' : World)
   · intro h p hp
     exact part_truth_mono s s' hs hs' h p hp
   · intro h
-    sorry -- OP-2
+    sorry -- OP-2: requires truth_mono_to_part
 
 /-- Theorem 5 (Zalta 1993): mutual parthood entails identity.
-    Blocked by OP-2 and OP-3. -/
+    Blocked by OP-2. -/
 theorem parthood_antisymm (s s' : World)
     (hs   : Situation s)
     (hs'  : Situation s')
@@ -59,7 +67,7 @@ theorem parthood_antisymm (s s' : World)
      part_truth_mono s' s hs' hs hs's p⟩⟩
 
 /-- Theorem 6 (Zalta 1993): same parts entails identity.
-    Follows from Theorem 5 once OP-2 and OP-3 are resolved. -/
+    Follows from Theorem 5 once OP-2 is resolved. -/
 theorem same_parts_identity (s s' : World)
     (hs  : Situation s)
     (hs' : Situation s')
