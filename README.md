@@ -14,20 +14,18 @@ The central primitive is encoding (`Enc`). A situation encodes the properties th
 
 Modal operators are axiomatic rather than reduced to Kripke frames. The S5 schemas are postulated directly:
 
+```
 □(φ → ψ) → □φ → □ψ        (K)
-
 □φ → φ                      (T)
-
 □φ → □□φ                    (4)
-
 ◊φ → □◊φ                    (5)
-
+```
 
 `Modality/Frames.lean` provides the corresponding frame-level conditions — reflexivity, transitivity, and symmetry of the accessibility relation R — as a potential semantic grounding, but these are not wired to `Box` by default. The modal strength of the system is fixed axiomatically, leaving the surrounding theory of situations neutral with respect to frame semantics.
 
-Extensionality is a postulate (not a theorem). Situations are individuated by propositional content according to the principle:
+Extensionality is a postulate, not a theorem. Situations are individuated by propositional content according to the principle:
 
-```math
+```
 Situation(s) ∧ Situation(s') ∧ (∀p, s ⊨ p ↔ s' ⊨ p) → s = s'
 ```
 
@@ -39,13 +37,14 @@ This cannot be derived from purely intensional primitives and must be stipulated
 
 | Axiom | File | Status |
 |---|---|---|
-| `World`, `Property`, `Propn` | `Basic/Ontology` | primitive type |
-| `Object`, `Situation` | `Basic/Ontology` | primitive predicate |
-| `Enc`, `Encp`, `VAC` | `Basic/Ontology` | primitive relation / operator |
-| `neg` (¬ₚ) | `Basic/Propositions` | primitive connective |
-| `TrueIn` (⊨) | `Basic/Truth` | primitive relation |
-| `Encp_def` | `Basic/Truth` | Prover9-verified metatheorem |
-| `TrueIn_def` | `Basic/Truth` | Prover9-verified metatheorem |
+| `World`, `Property`, `Propn` | `Grounding/Ontology` | primitive type |
+| `Object`, `Situation` | `Grounding/Ontology` | primitive predicate |
+| `Enc`, `Encp`, `VAC` | `Grounding/Ontology` | primitive relation / operator |
+| `situation_is_object` | `Grounding/Ontology` | predicate inclusion postulate |
+| `neg` (¬ₚ) | `Grounding/Propositions` | primitive connective |
+| `TrueIn` (⊨) | `Grounding/Truth` | primitive relation |
+| `Encp_def` | `Grounding/Truth` | Prover9-verified metatheorem |
+| `TrueIn_def` | `Grounding/Truth` | Prover9-verified metatheorem |
 | `R`, `R_refl`, `R_trans`, `R_symm` | `Modality/Frames` | S5 frame conditions |
 | `Box` (□) | `Modality/Operators` | primitive modal operator |
 | `K`, `T`, `Four`, `Five` | `Modality/Operators` | S5 axioms |
@@ -61,14 +60,11 @@ This cannot be derived from purely intensional primitives and must be stipulated
 
 ## Open Proof Obligations
 
-These are genuine gaps in the axiom inventory. Each one blocks one or more theorems downstream. They are marked with `sorry` in the source and tracked here until resolved.
-
 Every `sorry` in this codebase corresponds to exactly one entry in this table. No `sorry` is left without a corresponding open problem entry.
 
 | ID | Obligation | Blocks | File |
 |---|---|---|---|
-| OP-2 | `truth_mono_to_part` | `parthood_iff_truth_inclusion` (←), Theorems 4–6 | `Basic/Parthood.lean` |
-| OP-3 | `situation_is_object` | `part_truth_mono`, all theorems applying `TrueIn_def` to a situation | `Basic/Ontology.lean` |
+| OP-2 | `truth_mono_to_part` | `parthood_iff_truth_inclusion` (←), Theorems 4–6, `all_propositions_persistent` | `Grounding/Parthood.lean` |
 
 ### OP-2 — Parthood via truth-monotonicity
 
@@ -96,25 +92,11 @@ and the same-parts identity principle (Theorem 6, Zalta 1993):
 Situation(s) ∧ Situation(s') ∧ (∀s'', s'' ⊴ s ↔ s'' ⊴ s') → s = s'
 ```
 
-both of which depend on the full equivalence. Metatheoretic justification: Prover9 proof in `theorem4.in` at peoppenheimer.org/cm/worlds/, corresponding to Theorem 4 of Zalta (1993).
+Metatheoretic justification: Prover9 proof in `theorem4.in` at peoppenheimer.org/cm/worlds/, corresponding to Theorem 4 of Zalta (1993).
 
 ```lean
 axiom truth_mono_to_part :
   ∀ s s' : World, (∀ p : Propn, s ⊨ p → s' ⊨ p) → s ⊴ s'
-```
-
-### OP-3 — Situations are objects
-
-`TrueIn_def` and `Encp_def` both carry an `Object x` hypothesis. `Situation` and `Object` are independent predicates in `Basic/Ontology.lean` and nothing in the current inventory forces their extensions to overlap. Any theorem that evaluates truth inside a situation therefore requires the bridge
-
-```
-Situation(s) → Object(s)
-```
-
-as an additional premise. In Zalta's abstract object theory this inclusion is constitutive: situations are a species of abstract object and the predicate inclusion holds by definition. It must be postulated explicitly here because `Object` and `Situation` are both taken as primitive.
-
-```lean
-axiom situation_is_object : ∀ s : World, Situation s → Object s
 ```
 
 ---
@@ -126,6 +108,14 @@ axiom situation_is_object : ∀ s : World, Situation s → Object s
 The necessitation rule `(∀w, φw) → ∀w, □φw` and the S5 collapse `◊□φ → □φ` were not derivable from K, T, 4, and 5 alone. Necessitation is admissible in every normal modal logic but is not a substitution instance of any of the four schemas. The collapse `◊□φ → □φ` holds in all S5 frames by the euclidean character of the accessibility relation but requires either a frame-level reduction or a direct postulate in a purely axiomatic development.
 
 Both were closed by postulating `Nec` and `PossNec` in `Modality/Operators.lean`. The alternative — deriving them from `Modality/Frames.lean` — remains available but is not imposed, preserving the neutrality of the modal layer with respect to frame semantics.
+
+### OP-3 — Situations are objects
+
+`TrueIn_def` and `Encp_def` both carry an `Object x` hypothesis. `Situation` and `Object` are independent predicates in `Grounding/Ontology.lean` and nothing in the inventory forced their extensions to overlap. Any theorem that evaluated truth inside a situation therefore required the bridge `Situation(s) → Object(s)` as an additional premise.
+
+The axiom `situation_is_object` was postulated in `Grounding/Ontology.lean`. In Zalta's abstract object theory this inclusion is constitutive: situations are a species of abstract object and the predicate inclusion holds by definition. It must be postulated explicitly here because `Object` and `Situation` are both taken as primitive.
+
+With `situation_is_object` in place, `part_truth_mono` closes without `sorry`: the direction `s ⊴ s' → (s ⊨ p → s' ⊨ p)` is now fully derived by unfolding `TrueIn_def` and `Encp_def` on both sides and applying the encoding-monotonicity of `PartOf` directly.
 
 ---
 
