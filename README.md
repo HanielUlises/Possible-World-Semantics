@@ -10,7 +10,7 @@ The development follows the Zalta–Fine tradition. Worlds and situations are no
 
 The central primitive is encoding (`Enc`). A situation encodes the properties that constitute its informational content. Parthood is defined encoding-first: `s ⊴ s'` holds iff every property encoded by `s` is also encoded by `s'`, matching the mereology of Barwise–Perry and the abstract object theory of Zalta.
 
-Modal operators are axiomatic, not reduced to Kripke frames. The S5 schemas are postulated directly:
+Modal operators are axiomatic, and not reduced to Kripke frames. The S5 schemas are postulated directly:
 
 ```
 □(φ → ψ) → □φ → □ψ        (K)
@@ -55,7 +55,7 @@ This cannot be derived from purely intensional primitives and must be stipulated
 
 ## Open Proof Obligations
 
-Every `sorry` in the codebase corresponds to exactly one entry in this table. No `sorry` is left without a corresponding entry.
+Every `sorry` in the codebase corresponds to exactly one entry in this table.
 
 | ID | Obligation | Blocks | File |
 |---|---|---|---|
