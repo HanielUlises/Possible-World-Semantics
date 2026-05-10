@@ -1,18 +1,16 @@
 # Possible-World-Semantics
 
-A formal development of possible-world and situation semantics in Lean 4, following the higher-order modal and situation-theoretic tradition of Zalta, Fine, and Barwise–Perry.
+A Lean 4 formalization of possible-world and situation semantics, following the higher-order modal and situation-theoretic tradition of Zalta, Fine, and Barwise–Perry.
 
-All ontological primitives are taken as axioms. Every defined notion is built from them without appeal to set theory or Mathlib. Metatheoretic results proven externally in Prover9 are recorded as axioms with explicit documentation of the proof obligation.
-
----
+Everything is built from scratch — no Mathlib, no set theory, just primitives and axioms. Metatheoretic results proven externally in Prover9 are recorded as axioms with documentation of the proof obligation.
 
 ## Theoretical Background
 
-The development follows the Zalta–Fine tradition, in which worlds and situations are not distinguished at the type level. `World` is the single domain; `Situation` and `Object` are predicates over it, not separate types.
+The development follows the Zalta–Fine tradition. Worlds and situations are not distinguished at the type level: `World` is the single domain, and `Situation` and `Object` are predicates over it.
 
-The central primitive is encoding (`Enc`). A situation encodes the properties that constitute its informational content. Parthood is defined encoding-first: `s ⊴ s'` holds iff every property encoded by `s` is also encoded by `s'`, which matches the mereology of informational situations in Barwise–Perry and the abstract object theory of Zalta.
+The central primitive is encoding (`Enc`). A situation encodes the properties that constitute its informational content. Parthood is defined encoding-first: `s ⊴ s'` holds iff every property encoded by `s` is also encoded by `s'`, matching the mereology of Barwise–Perry and the abstract object theory of Zalta.
 
-Modal operators are axiomatic rather than reduced to Kripke frames. The S5 schemas are postulated directly:
+Modal operators are axiomatic, not reduced to Kripke frames. The S5 schemas are postulated directly:
 
 ```
 □(φ → ψ) → □φ → □ψ        (K)
@@ -21,17 +19,15 @@ Modal operators are axiomatic rather than reduced to Kripke frames. The S5 schem
 ◊φ → □◊φ                    (5)
 ```
 
-`Modality/Frames.lean` provides the corresponding frame-level conditions — reflexivity, transitivity, and symmetry of the accessibility relation R — as a potential semantic grounding, but these are not wired to `Box` by default. The modal strength of the system is fixed axiomatically, leaving the surrounding theory of situations neutral with respect to frame semantics.
+`Modality/Frames.lean` provides the frame-level conditions as a potential semantic grounding, but they are not wired to `Box` by default. The modal layer stays neutral with respect to frame semantics.
 
-Extensionality is a postulate, not a theorem. Situations are individuated by propositional content according to the principle:
+Extensionality is a postulate, not a theorem. Situations are individuated by propositional content:
 
 ```
 Situation(s) ∧ Situation(s') ∧ (∀p, s ⊨ p ↔ s' ⊨ p) → s = s'
 ```
 
-This cannot be derived from purely intensional primitives and must be stipulated, matching the standard move in both situation semantics and abstract object theory.
-
----
+This cannot be derived from purely intensional primitives and must be stipulated, which is the standard move in both situation semantics and abstract object theory.
 
 ## Axiom Inventory
 
@@ -55,38 +51,40 @@ This cannot be derived from purely intensional primitives and must be stipulated
 | `situation_extensionality_via_truth` | `Situation/Theorems` | Prover9 Theorem 2 |
 | `actual_implies_possible` | `Situation/Theorems` | modal postulate |
 | `situation_closed_under_parthood` | `Situation/Theorems` | Prover9 Theorem 3 |
-
----
+| `meet`, `meet_situation`, `TrueIn_meet` | `Situation/Infimum` | meet existence and truth conditions |
 
 ## Open Proof Obligations
 
-Every `sorry` in this codebase corresponds to exactly one entry in this table. No `sorry` is left without a corresponding open problem entry.
+Every `sorry` in the codebase corresponds to exactly one entry in this table. No `sorry` is left without a corresponding entry.
 
 | ID | Obligation | Blocks | File |
 |---|---|---|---|
 | OP-2 | `truth_mono_to_part` | `parthood_iff_truth_inclusion` (←), Theorems 4–6, `all_propositions_persistent` | `Grounding/Parthood.lean` |
+| OP-2b | `parthood_implies_depends` | derivation that `s ⊴ s' → s ≺ s'` | `Grounding/Dependence.lean` |
+| OP-4 | `meet_le_left`, `meet_le_right`, `meet_greatest` | full lattice structure of meet | `Situation/Infimum.lean` |
+| OP-5 | `no_strict_subworld` | strict subworld exclusion | `Situation/Worlds.lean` |
 
 ### OP-2 — Parthood via truth-monotonicity
 
-`PartOf` is defined over `Enc` while `TrueIn` is an independent primitive. There is no axiom in the current inventory connecting the two orderings. The direction
+`PartOf` is defined over `Enc` while `TrueIn` is an independent primitive. There is no axiom connecting the two orderings, so the direction
 
 ```
 (∀p, s ⊨ p → s' ⊨ p) → s ⊴ s'
 ```
 
-is therefore not derivable, leaving the biconditional
+is not derivable. This leaves the biconditional
 
 ```
 Situation(s) ∧ Situation(s') → (s ⊴ s' ↔ ∀p, s ⊨ p → s' ⊨ p)
 ```
 
-half-proved. This blocks the antisymmetry of parthood (Theorem 5, Zalta 1993):
+half-proved, and blocks antisymmetry of parthood (Theorem 5, Zalta 1993):
 
 ```
 Situation(s) ∧ Situation(s') ∧ s ⊴ s' ∧ s' ⊴ s → s = s'
 ```
 
-and the same-parts identity principle (Theorem 6, Zalta 1993):
+and same-parts identity (Theorem 6, Zalta 1993):
 
 ```
 Situation(s) ∧ Situation(s') ∧ (∀s'', s'' ⊴ s ↔ s'' ⊴ s') → s = s'
@@ -99,25 +97,31 @@ axiom truth_mono_to_part :
   ∀ s s' : World, (∀ p : Propn, s ⊨ p → s' ⊨ p) → s ⊴ s'
 ```
 
----
+### OP-2b — Parthood implies dependence
+
+`parthood_implies_depends` states that if `s ⊴ s'` and `s'` depends on `s''`, then `s` depends on `s''`. The proof requires converting `s ⊴ s'` into `s ≺ s'` (ontological dependence), which in turn requires connecting parthood to truth — blocked by OP-2.
+
+### OP-4 — Lattice structure of meet
+
+`meet_le_left`, `meet_le_right`, and `meet_greatest` all need to connect `TrueIn_meet` (which governs truth at the meet) to `PartOf` (which is defined over `Enc`). This bridge doesn't exist without `truth_mono_to_part`. All three reduce to OP-2.
+
+### OP-5 — No strict subworld
+
+`no_strict_subworld` states that no proper part of a world is itself a world. The two `sorry` markers in the proof correspond to steps that require propagating truth across the parthood relation again blocked by the monster OP-2 its so unreal.
 
 ## Resolved Proof Obligations
 
 ### OP-1 — Necessitation and possible-necessity collapse
 
-The necessitation rule `(∀w, φw) → ∀w, □φw` and the S5 collapse `◊□φ → □φ` were not derivable from K, T, 4, and 5 alone. Necessitation is admissible in every normal modal logic but is not a substitution instance of any of the four schemas. The collapse `◊□φ → □φ` holds in all S5 frames by the euclidean character of the accessibility relation but requires either a frame-level reduction or a direct postulate in a purely axiomatic development.
+The necessitation rule `(∀w, φw) → ∀w, □φw` and the S5 collapse `◊□φ → □φ` are not derivable from K, T, 4, and 5 alone. Necessitation is admissible in every normal modal logic but is not a substitution instance of any of the schemas. The collapse holds in all S5 frames by euclideanity but requires a frame-level reduction or a direct postulate in a purely axiomatic development.
 
-Both were closed by postulating `Nec` and `PossNec` in `Modality/Operators.lean`. The alternative — deriving them from `Modality/Frames.lean` — remains available but is not imposed, preserving the neutrality of the modal layer with respect to frame semantics.
+Both were closed by postulating `Nec` and `PossNec` in `Modality/Operators.lean`. Deriving them from `Modality/Frames.lean` remains possible but is not imposed.
 
 ### OP-3 — Situations are objects
 
-`TrueIn_def` and `Encp_def` both carry an `Object x` hypothesis. `Situation` and `Object` are independent predicates in `Grounding/Ontology.lean` and nothing in the inventory forced their extensions to overlap. Any theorem that evaluated truth inside a situation therefore required the bridge `Situation(s) → Object(s)` as an additional premise.
+`TrueIn_def` and `Encp_def` both require an `Object x` hypothesis. `Situation` and `Object` are independent predicates with nothing forcing their extensions to overlap. The bridge `Situation(s) → Object(s)` was postulated as `situation_is_object` in `Grounding/Ontology.lean`.
 
-The axiom `situation_is_object` was postulated in `Grounding/Ontology.lean`. In Zalta's abstract object theory this inclusion is constitutive: situations are a species of abstract object and the predicate inclusion holds by definition. It must be postulated explicitly here because `Object` and `Situation` are both taken as primitive.
-
-With `situation_is_object` in place, `part_truth_mono` closes without `sorry`: the direction `s ⊴ s' → (s ⊨ p → s' ⊨ p)` is now fully derived by unfolding `TrueIn_def` and `Encp_def` on both sides and applying the encoding-monotonicity of `PartOf` directly.
-
----
+With this in place, `part_truth_mono` closes without `sorry`: the direction `s ⊴ s' → (s ⊨ p → s' ⊨ p)` is fully derived by unfolding `TrueIn_def` and `Encp_def` on both sides and applying encoding-monotonicity of `PartOf` directly.
 
 ## References
 
@@ -125,6 +129,6 @@ Zalta, E. *Intensional Logic and the Metaphysics of Intentionality*. MIT Press, 
 
 Fine, K. "Ontological Dependence." *Proceedings of the Aristotelian Society*, 1995.
 
-Barwise, J. & Perry, J. *Situations and Attitudes*. MIT Press, 1983.
+Barwise, J. and Perry, J. *Situations and Attitudes*. MIT Press, 1983.
 
-Oppenheimer, P. & Zalta, E. "The Computational Theory of Possible Worlds." peoppenheimer.org/cm/worlds/
+Oppenheimer, P. and Zalta, E. "The Computational Theory of Possible Worlds." peoppenheimer.org/cm/worlds/
