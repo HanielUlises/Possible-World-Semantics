@@ -39,25 +39,25 @@ theorem depends_trans (s s' s'' : World)
 theorem part_implies_depends (s s' s'' : World)
     (hpart : s ⊴ s')
     (hdep  : s' ≺ s'') : s ≺ s'' :=
-  fun u hu hsu => hdep u hu (partOf_trans s s' u hpart hsu)
+  fun u hu hsu => hdep u hu (partOf_trans s' u s'' (h u hu hsu) hdep)
 
 /-- Mutual dependence without identity.
     Two situations can each require the other without being identical.
     This captures ontological co-dependence, as in the Fine
     notion of reciprocal essence. -/
 def MutuallyDependent (s s' : World) : Prop :=
-  s ≺ s' ∧ s' ≺ s
+  (s ≺ s') ∧ (s' ≺ s)
 
 /-- A situation is foundational when it depends on no situation
     other than those it already contains.
     Foundational situations are the ontological bedrock of the
     theory — they obtain unconditionally. -/
 def Foundational (s : World) : Prop :=
-  ∀ s' : World, s ≺ s' → (s ⊴ s')
+  ∀ s' : World, (s ≺ s') → (s ⊴ s')
 
 /-- A situation is derivative when there exists a distinct situation
     it depends on that it does not already contain.
     Derivative situations have their being grounded in something
     external to themselves. -/
 def Derivative (s : World) : Prop :=
-  ∃ s' : World, s ≺ s' ∧ ¬ (s ⊴ s')
+  ∃ s' : World, (s ≺ s') ∧ ¬ (s ⊴ s')
