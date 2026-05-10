@@ -32,14 +32,23 @@ theorem depends_trans (s s' s'' : World)
     (h' : s' ≺ s'') : s ≺ s'' :=
   fun u hu hsu => h' u hu (h u hu hsu)
 
-/-- Parthood implies dependence inheritance.
-    If s is a part of s', then s depends on every situation
-    that s' depends on — s inherits the dependence profile of
-    its containing situation. -/
+/-- Parthood implies dependence inheritance, given a dependence from s to s'.
+    The version with bare parthood requires OP-2 to connect ⊴ to ≺. -/
 theorem part_implies_depends (s s' s'' : World)
+    (hdep_ss' : s ≺ s')
+    (hdep     : s' ≺ s'') : s ≺ s'' :=
+  depends_trans s s' s'' hdep_ss' hdep
+
+/-- If s is a part of s' and s' depends on s'', then s depends on s''.
+    Blocked by OP-2: deriving s ≺ s' from s ⊴ s' requires
+    truth_mono_to_part. Marked sorry until OP-2 is resolved.
+    See README.md § Open Proof Obligations, OP-2. -/
+theorem parthood_implies_depends (s s' s'' : World)
     (hpart : s ⊴ s')
-    (hdep  : s' ≺ s'') : s ≺ s'' :=
-  fun u hu hsu => hdep u hu (partOf_trans s' u s'' (h u hu hsu) hdep)
+    (hdep  : s' ≺ s'') : s ≺ s'' := by
+  apply depends_trans s s' s'' _ hdep
+  intro u hu hsu
+  sorry -- OP-2: need s ⊴ s' → s ≺ s' which requires truth_mono_to_part
 
 /-- Mutual dependence without identity.
     Two situations can each require the other without being identical.
