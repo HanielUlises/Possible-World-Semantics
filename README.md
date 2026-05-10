@@ -21,7 +21,7 @@ Modal operators are axiomatic, and not reduced to Kripke frames. The S5 schemas 
 
 `Modality/Frames.lean` provides the frame-level conditions as a potential semantic grounding, but they are not wired to `Box` by default. The modal layer stays neutral with respect to frame semantics.
 
-Extensionality is a postulate, not a theorem. Situations are individuated by propositional content:
+Extensionality is a postulate. Situations are individuated by propositional content:
 
 ```
 Situation(s) ∧ Situation(s') ∧ (∀p, s ⊨ p ↔ s' ⊨ p) → s = s'
