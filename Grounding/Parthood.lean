@@ -97,3 +97,10 @@ theorem truth_mono_to_part (s s' : World)
   rw [Encp_def s' p hobs'] at hs'p
   obtain ⟨F', hF', henc⟩ := hs'p
   rwa [← hF'] at henc
+
+theorem parthood_iff_truth_inclusion (s s' : World)
+    (hs  : Situation s)
+    (hs' : Situation s') :
+    (s ⊴ s') ↔ (∀ p : Propn, (s ⊨ p) → (s' ⊨ p)) :=
+  ⟨fun h p hp => part_truth_mono s s' hs hs' h p hp,
+   fun h      => truth_mono_to_part s s' hs hs' h⟩
