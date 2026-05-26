@@ -52,6 +52,15 @@ axiom Encp : World → Propn → Prop
 -/
 axiom VAC : Propn → Property
 
+/-- Every property encoded by a situation is the vacuous abstraction
+    of some proposition. This is constitutive of situationhood in
+    Zalta's abstract object theory: situations encode only properties
+    of the form VAC p, distinguishing them from arbitrary objects
+    which may encode any property. -/
+axiom Enc_VAC_complete :
+  ∀ (s : World) (F : Property),
+    Situation s → Enc s F → ∃ p : Propn, F = VAC p
+
 /--
   every situation is an object.
 
