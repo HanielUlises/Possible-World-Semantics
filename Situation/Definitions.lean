@@ -30,11 +30,13 @@ axiom actualWorld : World
   situation cannot be lost when the situation is enlarged.
 -/
 def Persistent (p : Propn) : Prop :=
-  ∀ s : World, ∀ s' : World,
+  ∀ s s' : World,
+    Situation s →
+    Situation s' →
     (s ⊨ p) →
     (s ⊴ s') →
     (s' ⊨ p)
-
+    
 /--
   Actuality of a situation.
 
