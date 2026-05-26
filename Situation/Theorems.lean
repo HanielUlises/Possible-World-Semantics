@@ -139,3 +139,12 @@ theorem all_propositions_persistent :
     ∀ p : Propn, Persistent p := by
   intro p s s' hsp hss'
   sorry -- OP-2, OP-3
+
+theorem all_propositions_persistent :
+    ∀ p : Propn, Persistent p := by
+  intro p s s' hsp hss'
+  have hss : Situation s := situation_closed_under_parthood s' s
+    (by sorry) hss' -- >:(
+  exact part_truth_mono s s' hss
+    (situation_closed_under_parthood s' s (by sorry) hss')
+    hss' p hsp
