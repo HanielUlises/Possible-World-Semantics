@@ -137,8 +137,8 @@ theorem partial₂_compatible_with_maximal₁ :
     See README.md § Open Proof Obligations. -/
 theorem all_propositions_persistent :
     ∀ p : Propn, Persistent p := by
-  intro p s s' hsp hss'
-  sorry -- OP-2, OP-3
+  intro p s s' hs hs' hsp hss'
+  exact part_truth_mono s s' hs hs' hss' p hsp
 
 theorem all_propositions_persistent :
     ∀ p : Propn, Persistent p := by
