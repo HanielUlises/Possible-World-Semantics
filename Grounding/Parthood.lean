@@ -104,3 +104,21 @@ theorem parthood_iff_truth_inclusion (s s' : World)
     (s ⊴ s') ↔ (∀ p : Propn, (s ⊨ p) → (s' ⊨ p)) :=
   ⟨fun h p hp => part_truth_mono s s' hs hs' h p hp,
    fun h      => truth_mono_to_part s s' hs hs' h⟩
+
+theorem parthood_antisymm (s s' : World)
+    (hs   : Situation s)
+    (hs'  : Situation s')
+    (hss' : s ⊴ s')
+    (hs's : s' ⊴ s) : s = s' := by
+  apply situation_extensionality
+  exact ⟨hs, hs', fun p =>
+    ⟨part_truth_mono s s' hs hs' hss' p,
+     part_truth_mono s' s hs' hs hs's p⟩⟩
+
+theorem same_parts_identity (s s' : World)
+    (hs  : Situation s)
+    (hs' : Situation s')
+    (h   : ∀ s'' : World, (s'' ⊴ s) ↔ (s'' ⊴ s')) : s = s' :=
+  parthood_antisymm s s' hs hs'
+    ((h s).mp  (partOf_refl s))
+    ((h s').mpr (partOf_refl s'))
