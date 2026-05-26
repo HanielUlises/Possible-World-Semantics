@@ -122,3 +122,12 @@ theorem same_parts_identity (s s' : World)
   parthood_antisymm s s' hs hs'
     ((h s).mp  (partOf_refl s))
     ((h s').mpr (partOf_refl s'))
+
+    theorem all_propositions_persistent :
+    ∀ p : Propn, Persistent p := by
+  intro p s s' hsp hss'
+  have hss : Situation s := situation_closed_under_parthood s' s
+    (by sorry) hss' -- needs Situation s'
+  exact part_truth_mono s s' hss
+    (situation_closed_under_parthood s' s (by sorry) hss')
+    hss' p hsp
