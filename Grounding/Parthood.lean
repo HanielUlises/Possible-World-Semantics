@@ -18,11 +18,6 @@ theorem partOf_antisymm_enc (x y : World) (hxy : x ⊴ y) (hyx : y ⊴ x) (F : P
     Enc x F ↔ Enc y F :=
   ⟨fun h => hxy F h, fun h => hyx F h⟩
 
-/-
-  Open proof obligation OP-2: Parthood via truth-monotonicity.
-  See README.md § Open Proof Obligations, OP-2.
--/
-
 /-- Auxiliary: parthood implies truth-monotonicity.
     If s ⊴ s' then every proposition true in s is true in s'.
     Resolves OP-3 via situation_is_object. -/
@@ -41,45 +36,8 @@ theorem part_truth_mono (s s' : World)
   obtain ⟨F, hF, henc⟩ := hp
   exact ⟨F, hF, hss' F henc⟩
 
-/-- Theorem 4 (Zalta 1993): parthood is equivalent to truth inclusion.
-    The (<=) direction requires truth_mono_to_part (OP-2).
-    Blocked by OP-2. See README.md § Open Proof Obligations. -/
-theorem parthood_iff_truth_inclusion (s s' : World)
-    (hs  : Situation s)
-    (hs' : Situation s') :
-    (s ⊴ s') ↔ (∀ p : Propn, (s ⊨ p) → (s' ⊨ p)) := by
-  constructor
-  · intro h p hp
-    exact part_truth_mono s s' hs hs' h p hp
-  · intro h
-    sorry -- OP-2: requires truth_mono_to_part
-
-/-- Theorem 5 (Zalta 1993): mutual parthood entails identity.
-    Blocked by OP-2. -/
-theorem parthood_antisymm (s s' : World)
-    (hs   : Situation s)
-    (hs'  : Situation s')
-    (hss' : s ⊴ s')
-    (hs's : s' ⊴ s) : s = s' := by
-  apply situation_extensionality
-  exact ⟨hs, hs', fun p =>
-    ⟨part_truth_mono s s' hs hs' hss' p,
-     part_truth_mono s' s hs' hs hs's p⟩⟩
-
-/-- Theorem 6 (Zalta 1993): same parts entails identity.
-    Follows from Theorem 5 once OP-2 is resolved. -/
-theorem same_parts_identity (s s' : World)
-    (hs  : Situation s)
-    (hs' : Situation s')
-    (h   : ∀ s'' : World, (s'' ⊴ s) ↔ (s'' ⊴ s')) : s = s' := by
-  apply parthood_antisymm s s' hs hs'
-  · exact (h s).mp (partOf_refl s)
-  · exact (h s').mpr (partOf_refl s')
-
-    /-- If every proposition true in s is true in s', then s is a part of s'.
-    This closes OP-2. The proof unfolds TrueIn through Encp_def and
-    Enc_VAC_complete to show that every property encoded by s is of
-    the form VAC p, and therefore also encoded by s'. -/
+/-- If every proposition true in s is true in s', then s is a part of s'.
+    Closes OP-2 via Enc_VAC_complete. -/
 theorem truth_mono_to_part (s s' : World)
     (hs  : Situation s)
     (hs' : Situation s')
@@ -96,8 +54,9 @@ theorem truth_mono_to_part (s s' : World)
   rw [TrueIn_def s' p hobs'] at hs'p
   rw [Encp_def s' p hobs'] at hs'p
   obtain ⟨F', hF', henc⟩ := hs'p
-  rwa [← hF'] at henc
+  rwa [hF'] at henc
 
+/-- Theorem 4 (Zalta 1993): parthood is equivalent to truth inclusion. -/
 theorem parthood_iff_truth_inclusion (s s' : World)
     (hs  : Situation s)
     (hs' : Situation s') :
@@ -105,6 +64,7 @@ theorem parthood_iff_truth_inclusion (s s' : World)
   ⟨fun h p hp => part_truth_mono s s' hs hs' h p hp,
    fun h      => truth_mono_to_part s s' hs hs' h⟩
 
+/-- Theorem 5 (Zalta 1993): mutual parthood entails identity. -/
 theorem parthood_antisymm (s s' : World)
     (hs   : Situation s)
     (hs'  : Situation s')
@@ -115,6 +75,7 @@ theorem parthood_antisymm (s s' : World)
     ⟨part_truth_mono s s' hs hs' hss' p,
      part_truth_mono s' s hs' hs hs's p⟩⟩
 
+/-- Theorem 6 (Zalta 1993): same parts entails identity. -/
 theorem same_parts_identity (s s' : World)
     (hs  : Situation s)
     (hs' : Situation s')

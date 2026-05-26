@@ -21,106 +21,76 @@ axiom situation_extensionality_via_truth :
     (∀ p : Propn, (s₁ ⊨ p) ↔ (s₂ ⊨ p)) →
     s₁ = s₂
 
-/--
-  Maximality₁ excludes partiality₁.
--/
+/-- Maximality₁ excludes partiality₁. -/
 theorem maximal₁_not_partial₁ :
-    ∀ s : World,
-      Maximal₁ s →
-      ¬ Partial₁ s := by
+    ∀ s : World, Maximal₁ s → ¬ Partial₁ s := by
   intro s hmax hpart
   rcases hpart with ⟨p, hp, hnp⟩
   cases hmax p with
   | inl hp' => exact hp hp'
   | inr hnp' => exact hnp hnp'
 
-/--
-  Actual situations are possible.
--/
+/-- Actual situations are possible. -/
 axiom actual_implies_possible :
-  ∀ s : World,
-    Actual s →
-    Possible s
+  ∀ s : World, Actual s → Possible s
 
-/--
-  Maximality₂ implies non-partiality₂.
--/
+/-- Maximality₂ implies non-partiality₂. -/
 theorem maximal₂_not_partial₂ :
-    ∀ s : World,
-      Maximal₂ s →
-      ¬ Partial₂ s := by
+    ∀ s : World, Maximal₂ s → ¬ Partial₂ s := by
   intro s hmax hpart
   rcases hpart with ⟨p, hp⟩
   exact hp (hmax p)
 
-/--
-  Every part of a situation is itself a situation.
--/
+/-- Every part of a situation is itself a situation. -/
 axiom situation_closed_under_parthood :
-  ∀ s x : World,
-    Situation s →
-    (x ⊴ s) →
-    Situation x
+  ∀ s x : World, Situation s → (x ⊴ s) → Situation x
 
-/--
-  Parthood is monotone with respect to truth.
-
-  If x is a part of y, and p is persistent, then
-  truth of p transfers from x to y.
--/
+/-- Parthood is monotone with respect to truth.
+    If x is a part of y and p is persistent, truth of p
+    transfers from x to y. -/
 theorem parthood_truth_monotone :
     ∀ (x y : World) (p : Propn),
+      Situation x →
+      Situation y →
       (x ⊴ y) →
       Persistent p →
       (x ⊨ p) →
       (y ⊨ p) := by
-  intro x y p hxy hpers hxp
-  exact hpers x y hxp hxy
+  intro x y p hx hy hxy hpers hxp
+  exact hpers x y hx hy hxp hxy
 
-/--
-  Persistent propositions are closed upward along parthood.
--/
+/-- Persistent propositions are closed upward along parthood. -/
 theorem persistent_upward_closed :
     ∀ p : Propn,
       Persistent p ↔
-      ∀ x y : World, (x ⊴ y) → (x ⊨ p) → (y ⊨ p) := by
+      ∀ x y : World, Situation x → Situation y →
+        (x ⊴ y) → (x ⊨ p) → (y ⊨ p) := by
   intro p
   constructor
-  · intro h x y hxy hx
-    exact h x y hx hxy
-  · intro h x y hx hxy
-    exact h x y hxy hx
+  · intro h x y hx hy hxy hxp
+    exact h x y hx hy hxp hxy
+  · intro h x y hx hy hxp hxy
+    exact h x y hx hy hxy hxp
 
-/--
-  The conjunction of two persistent propositions is persistent.
--/
+/-- The conjunction of two persistent propositions is persistent. -/
 theorem persistent_conj :
     ∀ p q : Propn,
       Persistent p →
       Persistent q →
       Persistent (p ∧ₚ q) := by
-  intro p q hp hq s s' hpq hss'
+  intro p q hp hq s s' hs hs' hpq hss'
   rw [TrueIn_conj] at hpq ⊢
-  exact ⟨hp s s' hpq.1 hss', hq s s' hpq.2 hss'⟩
+  exact ⟨hp s s' hs hs' hpq.1 hss', hq s s' hs hs' hpq.2 hss'⟩
 
-/--
-  Consistency is downward closed under parthood.
--/
+/-- Consistency is downward closed under parthood. -/
 axiom consistent_downward_closed :
-  ∀ (s x : World),
-    Consistent s →
-    (x ⊴ s) →
-    Consistent x
+  ∀ (s x : World), Consistent s → (x ⊴ s) → Consistent x
 
-/--
-  Actual situations are consistent.
--/
+/-- Actual situations are consistent. -/
 axiom actual_consistent :
   ∀ s : World, Actual s → Consistent s
 
-/--
-  Partial₂ and Maximal₁ are jointly satisfiable.
--/
+/-- Partial₂ and Maximal₁ are jointly satisfiable. -/
 theorem partial₂_compatible_with_maximal₁ :
     ∀ s : World,
       Maximal₁ s →
@@ -133,18 +103,9 @@ theorem partial₂_compatible_with_maximal₁ :
   | inr hnegp => exact ⟨p, hnp, hnegp⟩
 
 /-- Theorem 8 (Zalta 1993): every proposition is persistent.
-    Blocked by OP-2 and OP-3.
-    See README.md § Open Proof Obligations. -/
+    Follows directly from part_truth_mono once OP-2 and OP-3
+    are resolved. -/
 theorem all_propositions_persistent :
     ∀ p : Propn, Persistent p := by
   intro p s s' hs hs' hsp hss'
   exact part_truth_mono s s' hs hs' hss' p hsp
-
-theorem all_propositions_persistent :
-    ∀ p : Propn, Persistent p := by
-  intro p s s' hsp hss'
-  have hss : Situation s := situation_closed_under_parthood s' s
-    (by sorry) hss' -- >:(
-  exact part_truth_mono s s' hss
-    (situation_closed_under_parthood s' s (by sorry) hss')
-    hss' p hsp
