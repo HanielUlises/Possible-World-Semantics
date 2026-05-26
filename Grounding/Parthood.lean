@@ -75,3 +75,25 @@ theorem same_parts_identity (s s' : World)
   apply parthood_antisymm s s' hs hs'
   · exact (h s).mp (partOf_refl s)
   · exact (h s').mpr (partOf_refl s')
+
+    /-- If every proposition true in s is true in s', then s is a part of s'.
+    This closes OP-2. The proof unfolds TrueIn through Encp_def and
+    Enc_VAC_complete to show that every property encoded by s is of
+    the form VAC p, and therefore also encoded by s'. -/
+theorem truth_mono_to_part (s s' : World)
+    (hs  : Situation s)
+    (hs' : Situation s')
+    (h   : ∀ p : Propn, (s ⊨ p) → (s' ⊨ p)) : (s ⊴ s') := by
+  intro F hF
+  obtain ⟨p, rfl⟩ := Enc_VAC_complete s F hs hF
+  have hobs  := situation_is_object s hs
+  have hobs' := situation_is_object s' hs'
+  have hsp : s ⊨ p := by
+    rw [TrueIn_def s p hobs]
+    rw [Encp_def s p hobs]
+    exact ⟨VAC p, rfl, hF⟩
+  have hs'p := h p hsp
+  rw [TrueIn_def s' p hobs'] at hs'p
+  rw [Encp_def s' p hobs'] at hs'p
+  obtain ⟨F', hF', henc⟩ := hs'p
+  rwa [← hF'] at henc
