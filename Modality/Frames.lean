@@ -1,30 +1,55 @@
 import Grounding.Ontology
-import Grounding.Truth
 
 /-
-  S5 accessibility relation
+  KRIPKE FRAMES
 
-  Rather than asserting R as a free axiom and separately
-  postulating its three frame conditions, we define R directly
-  from the truth-ordering already present in the theory.
+  A Kripke frame consists of a set of worlds together
+  with an accessibility relation.
 
-  Two worlds are accessible from each other iff they agree on
-  all necessary truths — i.e., iff their modal profiles match.
-  For an S5 system this is just the universal relation: every
-  world is accessible from every other.
+  In S5, every world accesses every world, the accessibility
+  relation is the universal relation on World. Rather than
+  postulating R as a free axiom and separately asserting its
+  three frame conditions, we define R directly as the
+  constant-true relation. The three conditions then hold by
+  computation rather than by fiat, reducing the axiom count
+  in this file from four to zero.
 
-  We make this explicit as a definition so the frame conditions
-  become transparent calculations rather than independent axioms.
+  No modal principles are assumed at this level.
 -/
 
-/-- The S5 accessibility relation.
-    In S5, every world is accessible from every world.
-    This is the universal relation on World, which corresponds
-    to the frame class characterised by reflexivity, transitivity,
-    and symmetry simultaneously. Defining it directly eliminates
-    the three separate axioms R_refl, R_trans, R_symm. -/
+/--
+  Accessibility relation between worlds.
+
+  Defined as the universal relation: in S5, every world is
+  accessible from every world. The three frame conditions
+  (reflexivity, transitivity, symmetry) are immediate from
+  this definition and need not be separately postulated.
+-/
 def R (_ _ : World) : Prop := True
 
-theorem R_refl  : ∀ w : World,             R w w        := fun _ => trivial
-theorem R_trans : ∀ w u v : World, R w u → R u v → R w v := fun _ _ _ _ _ => trivial
-theorem R_symm  : ∀ w u : World,   R w u → R u w         := fun _ _ _ => trivial
+/--
+  Reflexivity of accessibility.
+
+  Every world accesses itself.
+  Holds by definition of R.
+-/
+theorem R_refl : ∀ w : World, R w w :=
+  fun _ => trivial
+
+/--
+  Transitivity of accessibility.
+
+  Accessibility is closed under chaining.
+  Holds by definition of R.
+-/
+theorem R_trans : ∀ w u v : World, R w u → R u v → R w v :=
+  fun _ _ _ _ _ => trivial
+
+/--
+  Symmetry of accessibility.
+
+  Accessibility is bidirectional.
+  Holds by definition of R.
+-/
+theorem R_symm : ∀ w u : World, R w u → R u w :=
+  fun _ _ _ => trivial
