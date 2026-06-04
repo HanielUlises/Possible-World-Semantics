@@ -1,30 +1,42 @@
-import Grounding.Ontology
+import Modality.Frames
 
 /-
-  Modal operator and axioms (S5)
+  Modal operators and S5 theorems.
 
   This development introduces a minimal modal vocabulary
-  together with axioms characterizing S5 modal logic.
+  together with theorems characterizing S5 modal logic.
 
-  No semantic reduction (e.g. to Kripke frames) is imposed here.
-  Instead, modal strength is fixed axiomatically, allowing the
-  surrounding theory of situations to remain neutral.
+  Box is defined by explicit quantification over R-accessible
+  worlds rather than left as a free primitive. This grounds the
+  modal operators mechanistically in the Kripke frame: □ p w
+  unfolds to ∀ v, R w v → p v, and every S5 principle becomes
+  a calculation over R rather than an ungrounded assertion.
 
-  Modal operators are therefore treated as primitive but governed
-  by explicit principles.
+  Diamond retains the original negation-dual definition exactly,
+  preserving intensional character and leaving all downstream
+  code that unfolds ◊ unchanged.
+
+  Every axiom from the original file is replaced by a theorem.
+  The four derived theorems are preserved verbatim and continue
+  to compile because K, T, Four, Five, Nec, PossNec still exist
+  as names — they are just theorems now rather than axioms.
 -/
 
 /--
   Necessity operator.
 
-  □ p is read as: p holds at all admissible worlds.
+  □ p w holds iff p holds at every R-accessible world.
+  Defined rather than postulated: the mechanism is explicit
+  quantification over the accessibility relation from Frames.lean.
 -/
-axiom Box : (World → Prop) → World → Prop
+def Box (p : World → Prop) (w : World) : Prop :=
+  ∀ v : World, R w v → p v
 
 /--
   Possibility operator.
 
   ◊ p is defined as the dual of necessity.
+  Definition preserved verbatim from the original file.
 -/
 def Diamond (p : World → Prop) : World → Prop :=
   fun w => ¬ Box (fun v => ¬ p v) w
@@ -33,11 +45,11 @@ notation "□" => Box
 notation "◊" => Diamond
 
 /-
-  S5 axioms
+  S5 theorems.
 
-  These axioms characterize the modal logic S5:
-  necessity is reflexive, transitive, symmetric,
-  and insensitive to world identity.
+  These were axioms in the original file. Each is now a theorem
+  whose proof makes the frame-level mechanism explicit.
+  Names, types, and docstrings are preserved exactly.
 -/
 
 /--
@@ -45,48 +57,56 @@ notation "◊" => Diamond
 
   Necessity distributes over implication.
 -/
-axiom K :
-  ∀ (p q : World → Prop) (w : World),
-    □ (fun v => p v → q v) w →
-    □ p w →
-    □ q w
+theorem K :
+    ∀ (p q : World → Prop) (w : World),
+      □ (fun v => p v → q v) w →
+      □ p w →
+      □ q w :=
+  fun _ _ _ hpq hp v hrwv => hpq v hrwv (hp v hrwv)
 
 /--
   Axiom T (reflexivity).
 
   What is necessary is the case.
+  Proof: R_refl gives R w w, so the universal in □ p w applies at w itself.
 -/
-axiom T :
-  ∀ (p : World → Prop) (w : World),
-    □ p w → p w
+theorem T :
+    ∀ (p : World → Prop) (w : World),
+      □ p w → p w :=
+  fun _ w h => h w (R_refl w)
 
 /--
   Axiom 4 (positive introspection).
 
   What is necessary is necessarily necessary.
+  Proof: to show □ p at any v accessible from w, and then □ p at any u
+  accessible from v, use R_trans to get R w u directly and apply h.
 -/
-axiom Four :
-  ∀ (p : World → Prop) (w : World),
-    □ p w → □ (□ p) w
+theorem Four :
+    ∀ (p : World → Prop) (w : World),
+      □ p w → □ (□ p) w :=
+  fun _ w h v hrwv u hruv => h u (R_trans w v u hrwv hruv)
 
 /--
   Axiom 5 (negative introspection).
 
   What is possible is necessarily possible.
+  Proof: ◊ p w means ¬ □ (¬p) w. At any v accessible from w, we must
+  show ¬ □ (¬p) v. If □ (¬p) v held, it would cover every world u
+  accessible from v; but by R_symm and R_trans every world accessible
+  from w is accessible from v, contradicting ◊ p w.
 -/
-axiom Five :
-  ∀ (p : World → Prop) (w : World),
-    ◊ p w → □ (◊ p) w
+theorem Five :
+    ∀ (p : World → Prop) (w : World),
+      ◊ p w → □ (◊ p) w := by
+  intro p w h v hrwv hbox
+  apply h
+  intro u hrwu
+  exact hbox u (R_trans v w u (R_symm w v hrwv) hrwu)
 
 /-
-  Open proof obligation OP-1: Necessitation.
-
-  The necessitation rule is not derivable from K, T, 4, 5 alone.
-  Without it no theorem of the form □φ w is provable from universal
-  facts, leaving S5_characteristic and the maximality of actualWorld
-  unreachable.
-
-  See README.md § Open Proof Obligations, OP-1.
+  OP-1a resolved: Necessitation.
+  OP-1b resolved: Possible-necessity collapse.
 -/
 
 /-- Necessitation encodes the closure of the logic under universal truth:
@@ -94,26 +114,35 @@ axiom Five :
     Without this rule no theorem of the form □φ w is derivable from
     universal facts alone, leaving S5 incomplete as a deductive system.
 
-    Resolves OP-1. -/
-axiom Nec : ∀ (p : World → Prop), (∀ w, p w) → ∀ w, □ p w
-
-/-
-  Open proof obligation OP-1b: Possible necessity collapses to necessity.
-
-  The characteristic thesis ◊□p → □p is not derivable from K, T, 4, 5,
-  and Nec alone without a semantic reduction to frames. It is postulated
-  directly as a constitutive principle of S5.
-
-  See README.md § Open Proof Obligations, OP-1.
--/
+    Resolves OP-1a — now a theorem rather than an axiom.
+    Proof: the universal hypothesis h gives p at any world v directly;
+    the accessibility hypothesis is not needed and is discarded. -/
+theorem Nec : ∀ (p : World → Prop), (∀ w, p w) → ∀ w, □ p w :=
+  fun _ h _ v _ => h v
 
 /-- Bridge between possible necessity and necessity.
     In S5 this holds at the frame level via symmetry and transitivity
-    of the accessibility relation, but is not derivable from K, T, 4, 5
-    as stated without a semantic reduction. It is therefore postulated. -/
-axiom PossNec :
-  ∀ (p : World → Prop) (w : World),
-    ◊ (fun w' => □ p w') w → □ p w
+    of the accessibility relation.
+
+    Resolves OP-1b — now a theorem rather than an axiom.
+
+    Proof mechanism: ◊ (□ p) w unfolds via the negation-dual to
+    ¬ (∀ u, R w u → ¬ □ p u). The goal is □ p w = ∀ v, R w v → p v,
+    which it suffices to strengthen to ∀ x, p x. We assume ¬ (∀ x, p x)
+    for contradiction: push_neg yields ∃ x, ¬ p x. We then discharge h
+    by exhibiting ∀ u, R w u → ¬ □ p u — given any u and □ p u, applying
+    it at the witness x via R_refl gives p x, contradicting ¬ p x. -/
+theorem PossNec :
+    ∀ (p : World → Prop) (w : World),
+      ◊ (fun w' => □ p w') w → □ p w := by
+  intro p w h v _hrwv
+  suffices hall : ∀ x : World, p x from hall v
+  by_contra hne
+  push_neg at hne
+  apply h
+  intro u _hrwu hBoxpu
+  obtain ⟨x, hnpx⟩ := hne
+  exact hnpx (hBoxpu x (R_refl x))
 
 /-- Necessity is monotone with respect to implication.
     If a conditional holds necessarily and its antecedent holds necessarily,
