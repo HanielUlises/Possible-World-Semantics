@@ -13,7 +13,7 @@ The central primitive is encoding (`Enc`). A situation encodes the properties th
 Modal operators are axiomatic, and not reduced to Kripke frames. The S5 schemas are postulated directly:
 
 ```
-□(φ → ψ) → □φ → □ψ        (K)
+□(φ → ψ) → □φ → □ψ          (K)
 □φ → φ                      (T)
 □φ → □□φ                    (4)
 ◊φ → □◊φ                    (5)
@@ -59,57 +59,35 @@ Every `sorry` in the codebase corresponds to exactly one entry in this table.
 
 | ID | Obligation | Blocks | File |
 |---|---|---|---|
-| OP-2 | `truth_mono_to_part` | `parthood_iff_truth_inclusion` (←), Theorems 4–6, `all_propositions_persistent` | `Grounding/Parthood.lean` |
 | OP-2b | `parthood_implies_depends` | derivation that `s ⊴ s' → s ≺ s'` | `Grounding/Dependence.lean` |
 | OP-4 | `meet_le_left`, `meet_le_right`, `meet_greatest` | full lattice structure of meet | `Situation/Infimum.lean` |
 | OP-5 | `no_strict_subworld` | strict subworld exclusion | `Situation/Worlds.lean` |
 
+### OP-2b — Parthood implies dependence
+
+`parthood_implies_depends` states that if `s ⊴ s'` and `s'` depends on `s''`, then `s` depends on `s''`. The proof requires converting `s ⊴ s'` into `s ≺ s'` (ontological dependence). `truth_mono_to_part` (resolved as OP-2) is now available, but the conversion is not immediate: `OntologicallyDepends s s'` is `∀ u, Situation u → s ⊴ u → s' ⊴ u`, which is a claim about all containing situations, not just a truth-transfer statement. Whether this follows from `s ⊴ s'` alone or requires an additional postulate remains to be determined.
+
+### OP-4 — Lattice structure of meet
+
+`meet_le_left`, `meet_le_right`, and `meet_greatest` all need to connect `TrueIn_meet` (which governs truth at the meet) to `PartOf` (which is defined over `Enc`). `truth_mono_to_part` is now available (OP-2 resolved), so all three should be closeable by applying it to the truth conditions given by `TrueIn_meet`. No new axioms are expected to be needed.
+
+### OP-5 — No strict subworld
+
+`no_strict_subworld` states that no proper part of a world is itself a world. The two `sorry` markers correspond to steps that propagate truth across the parthood relation. Both are now unblocked by the resolution of OP-2 and should be closeable using `part_truth_mono` and `truth_mono_to_part`.
+
+## Resolved Proof Obligations
+
 ### OP-2 — Parthood via truth-monotonicity
 
-`PartOf` is defined over `Enc` while `TrueIn` is an independent primitive. There is no axiom connecting the two orderings, so the direction
+`PartOf` is defined over `Enc` while `TrueIn` is an independent primitive. The direction
 
 ```
 (∀p, s ⊨ p → s' ⊨ p) → s ⊴ s'
 ```
 
-is not derivable. This leaves the biconditional
+was not initially derivable, leaving the biconditional `s ⊴ s' ↔ ∀p, s ⊨ p → s' ⊨ p` half-proved and blocking antisymmetry (Theorem 5) and same-parts identity (Theorem 6) of Zalta (1993).
 
-```
-Situation(s) ∧ Situation(s') → (s ⊴ s' ↔ ∀p, s ⊨ p → s' ⊨ p)
-```
-
-half-proved, and blocks antisymmetry of parthood (Theorem 5, Zalta 1993):
-
-```
-Situation(s) ∧ Situation(s') ∧ s ⊴ s' ∧ s' ⊴ s → s = s'
-```
-
-and same-parts identity (Theorem 6, Zalta 1993):
-
-```
-Situation(s) ∧ Situation(s') ∧ (∀s'', s'' ⊴ s ↔ s'' ⊴ s') → s = s'
-```
-
-Metatheoretic justification: Prover9 proof in `theorem4.in` at peoppenheimer.org/cm/worlds/, corresponding to Theorem 4 of Zalta (1993).
-
-```lean
-axiom truth_mono_to_part :
-  ∀ s s' : World, (∀ p : Propn, s ⊨ p → s' ⊨ p) → s ⊴ s'
-```
-
-### OP-2b — Parthood implies dependence
-
-`parthood_implies_depends` states that if `s ⊴ s'` and `s'` depends on `s''`, then `s` depends on `s''`. The proof requires converting `s ⊴ s'` into `s ≺ s'` (ontological dependence), which in turn requires connecting parthood to truth — blocked by OP-2.
-
-### OP-4 — Lattice structure of meet
-
-`meet_le_left`, `meet_le_right`, and `meet_greatest` all need to connect `TrueIn_meet` (which governs truth at the meet) to `PartOf` (which is defined over `Enc`). This bridge doesn't exist without `truth_mono_to_part`. All three reduce to OP-2.
-
-### OP-5 — No strict subworld
-
-`no_strict_subworld` states that no proper part of a world is itself a world. The two `sorry` markers in the proof correspond to steps that require propagating truth across the parthood relation again blocked by the monster OP-2 its so unreal.
-
-## Resolved Proof Obligations
+Closed by `truth_mono_to_part` in `Grounding/Parthood.lean`. The proof goes via `Enc_VAC_complete`, where every property encoded by a situation is of the form `VAC p`, so truth-monotonicity in the `TrueIn` sense transfers back to encoding-monotonicity in the `Enc` sense, yielding `s ⊴ s'` directly. No new axioms were needed beyond `Enc_VAC_complete` and `situation_is_object` (OP-3). With this in place, `parthood_iff_truth_inclusion`, `parthood_antisymm`, `same_parts_identity`, and `all_propositions_persistent` all close without. Metatheoretic justification check Prover9 proof `theorem4.in` at peoppenheimer.org/cm/worlds/, Theorem 4 of Zalta (1993).
 
 ### OP-1 — Necessitation and possible-necessity collapse
 
