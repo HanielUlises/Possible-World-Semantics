@@ -77,12 +77,24 @@ theorem no_strict_subworld :
       cases hmw p with
       | inl h => exact h
       | inr h =>
+        -- h : w ⊨ ¬ₚp, but hxw : x ⊴ w and hp : x ⊨ p,
+        -- so part_truth_mono gives w ⊨ p, contradicting TrueIn_neg.mp h.
         exfalso
-        have hcx := world_consistent x hwx
-        apply hcx
-        exact ⟨p, hp, sorry⟩
+        exact absurd
+          (part_truth_mono x w (hwx).1 (hw).1 hxw p hp)
+          ((TrueIn_neg w p).mp h)
     · intro hp
-      exact hxw _ (by sorry)
+      -- hxw goes x ⊴ w, not w ⊴ x, so part_truth_mono cannot transfer hp
+      -- directly. Use maximality of x: x ⊨ p ∨ x ⊨ ¬ₚp. If x ⊨ ¬ₚp then
+      -- part_truth_mono gives w ⊨ ¬ₚp, so TrueIn_neg gives ¬(w ⊨ p),
+      -- contradicting hp. Hence x ⊨ p.
+      cases hmx p with
+      | inl h  => exact h
+      | inr h  =>
+        exfalso
+        exact absurd hp
+          ((TrueIn_neg w p).mp
+            (part_truth_mono x w (hwx).1 (hw).1 hxw (¬ₚ p) h))
 
 /--
   Any two distinct worlds disagree on at least one proposition.
