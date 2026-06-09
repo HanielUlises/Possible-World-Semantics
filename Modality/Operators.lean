@@ -138,10 +138,11 @@ theorem PossNec :
   intro p w h v _hrwv
   suffices hall : ∀ x : World, p x from hall v
   by_contra hne
-  push_neg at hne
+  -- hne : ¬ ∀ x, p x
+  -- Classical.not_forall unfolds this to ∃ x, ¬ p x without Mathlib
+  have ⟨x, hnpx⟩ := Classical.not_forall.mp hne
   apply h
   intro u _hrwu hBoxpu
-  obtain ⟨x, hnpx⟩ := hne
   exact hnpx (hBoxpu x (R_refl x))
 
 /-- Necessity is monotone with respect to implication.
