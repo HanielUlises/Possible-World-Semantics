@@ -134,16 +134,11 @@ theorem Nec : ∀ (p : World → Prop), (∀ w, p w) → ∀ w, □ p w :=
     it at the witness x via R_refl gives p x, contradicting ¬ p x. -/
 theorem PossNec :
     ∀ (p : World → Prop) (w : World),
-      ◊ (fun w' => □ p w') w → □ p w := by
-  intro p w h v _hrwv
-  suffices hall : ∀ x : World, p x from hall v
-  by_contra hne
-  -- hne : ¬ ∀ x, p x
-  -- Classical.not_forall unfolds this to ∃ x, ¬ p x without Mathlib
-  have ⟨x, hnpx⟩ := Classical.not_forall.mp hne
-  apply h
-  intro u _hrwu hBoxpu
-  exact hnpx (hBoxpu x (R_refl x))
+      ◊ (fun w' => □ p w') w → □ p w :=
+  fun p w h v _ =>
+    Classical.byContradiction (fun hnpv =>
+      h (fun u _ hBoxpu =>
+        hnpv (hBoxpu v (R_refl v))))
 
 /-- Necessity is monotone with respect to implication.
     If a conditional holds necessarily and its antecedent holds necessarily,
