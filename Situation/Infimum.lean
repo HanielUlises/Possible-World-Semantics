@@ -56,26 +56,42 @@ axiom TrueIn_meet :
 -/
 
 /-- The meet is a part of its left argument.
-    Blocked by OP-4 (requires OP-2). -/
+    Every proposition true at the meet is true at the left component
+    by definition of TrueIn_meet; truth_mono_to_part converts this
+    truth-inclusion into the required parthood. -/
 theorem meet_le_left :
-    ∀ (s s' : World), (meet s s' ⊴ s) := by
-  intro s s'
-  sorry -- OP-4: requires truth_mono_to_part
+    ∀ (s s' : World),
+      Situation s → Situation s' → (meet s s' ⊴ s) := by
+  intro s s' hs hs'
+  exact truth_mono_to_part (meet s s') s
+    (meet_situation s s' hs hs') hs
+    (fun p h => ((TrueIn_meet s s' p).mp h).1)
 
 /-- The meet is a part of its right argument.
-    Blocked by OP-4 (requires OP-2). -/
+    Symmetric to meet_le_left: take the right conjunct from TrueIn_meet. -/
 theorem meet_le_right :
-    ∀ (s s' : World), (meet s s' ⊴ s') := by
-  intro s s'
-  sorry -- OP-4: requires truth_mono_to_part
+    ∀ (s s' : World),
+      Situation s → Situation s' → (meet s s' ⊴ s') := by
+  intro s s' hs hs'
+  exact truth_mono_to_part (meet s s') s'
+    (meet_situation s s' hs hs') hs'
+    (fun p h => ((TrueIn_meet s s' p).mp h).2)
 
 /-- Any common lower bound is a part of the meet.
-    Blocked by OP-4 (requires OP-2). -/
+    If x is a part of both s and s', then every proposition true at x
+    is true at s (via part_truth_mono) and at s' (likewise), so true at
+    the meet by TrueIn_meet; truth_mono_to_part closes the parthood. -/
 theorem meet_greatest :
     ∀ (x s s' : World),
+      Situation x → Situation s → Situation s' →
       (x ⊴ s) → (x ⊴ s') → (x ⊴ meet s s') := by
-  intro x s s' _hxs _hxs'
-  sorry -- OP-4: requires truth_mono_to_part
+  intro x s s' hx hs hs' hxs hxs'
+  exact truth_mono_to_part x (meet s s') hx
+    (meet_situation s s' hs hs')
+    (fun p hxp =>
+      (TrueIn_meet s s' p).mpr
+        ⟨part_truth_mono x s hx hs hxs p hxp,
+         part_truth_mono x s' hx hs' hxs' p hxp⟩)
 
 /-- The meet of a situation with itself is itself. -/
 theorem meet_self :
