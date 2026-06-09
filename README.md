@@ -1,5 +1,6 @@
 # Possible-World-Semantics
 
+[![GitHub Pages](https://img.shields.io/badge/Live-Demo-blue)](https://hanielulises.github.io/Possible-World-Semantics/)
 A Lean 4 formalization of possible-world and situation semantics, following the higher-order modal and situation-theoretic tradition of Zalta, Fine, and Barwise–Perry.
 
 Everything is built from scratch — no Mathlib, no set theory, just primitives and axioms. Metatheoretic results proven externally in Prover9 are recorded as axioms with documentation of the proof obligation.
