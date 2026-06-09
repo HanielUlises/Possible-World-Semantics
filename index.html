@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Possible-World Semantics — A Mechanistic Formalization</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ink:    #1a1814;
+      --paper:  #f7f4ee;
+      --rule:   #c8c2b4;
+      --accent: #4a3f2f;
+      --dim:    #6e6357;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 17px; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'EB Garamond', Georgia, serif;
+      line-height: 1.75;
+      padding: 4rem 1.5rem 7rem;
+    }
+
+    .page { max-width: 700px; margin: 0 auto; }
+
+    /* ── Title block ── */
+    header {
+      border-top: 2px solid var(--ink);
+      padding-top: 2.4rem;
+      margin-bottom: 3.2rem;
+    }
+
+    h1 {
+      font-size: 1.95rem;
+      font-weight: 500;
+      line-height: 1.2;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      font-style: italic;
+      font-size: 1.08rem;
+      color: var(--dim);
+      margin-bottom: 1.6rem;
+    }
+
+    .meta {
+      font-size: 0.87rem;
+      color: var(--dim);
+      border-top: 1px solid var(--rule);
+      padding-top: 0.9rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem 2rem;
+    }
+
+    .meta a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--rule); }
+    .meta a:hover { border-color: var(--accent); }
+
+    /* ── Sections ── */
+    section { margin-bottom: 3.4rem; }
+
+    h2 {
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1.2rem;
+      padding-bottom: 0.45rem;
+      border-bottom: 1px solid var(--rule);
+    }
+
+    p { margin-bottom: 1.05rem; }
+    p:last-child { margin-bottom: 0; }
+
+    a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--rule); }
+    a:hover { border-color: var(--accent); }
+
+    /* ── Logic notation display ── */
+    .formula {
+      display: block;
+      margin: 1.1rem 0 1.1rem 2rem;
+      font-style: italic;
+      font-size: 1.02rem;
+      color: var(--ink);
+    }
+
+    /* ── Tables ── */
+    .table-wrap { overflow-x: auto; margin: 1.1rem 0; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.93rem;
+    }
+
+    thead tr {
+      border-top: 1.5px solid var(--ink);
+      border-bottom: 1px solid var(--ink);
+    }
+
+    tbody tr { border-bottom: 1px solid var(--rule); }
+    tbody tr:last-child { border-bottom: 1.5px solid var(--ink); }
+
+    th {
+      text-align: left;
+      font-weight: 600;
+      font-size: 0.76rem;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--accent);
+      padding: 0.55rem 1.2rem 0.55rem 0;
+    }
+
+    td {
+      padding: 0.52rem 1.2rem 0.52rem 0;
+      vertical-align: top;
+      line-height: 1.5;
+    }
+
+    td:last-child, th:last-child { padding-right: 0; }
+
+    td.form {
+      font-style: italic;
+      font-size: 1rem;
+    }
+
+    .st {
+      font-variant: small-caps;
+      font-size: 0.9em;
+      letter-spacing: 0.03em;
+    }
+    .prim   { color: #5a3e1b; }
+    .def    { color: #2b5040; }
+    .thm    { color: #1a3a5c; }
+    .post   { color: #5a1b1b; }
+    .open   { color: #8b3a0f; font-weight: 600; }
+    .closed { color: #2b5040; }
+
+    /* ── Obligation entries ── */
+    .ob { margin-bottom: 1.8rem; }
+    .ob-head {
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+    .ob-id {
+      font-variant: small-caps;
+      font-size: 0.88em;
+      color: var(--accent);
+      margin-right: 0.5rem;
+      letter-spacing: 0.05em;
+    }
+
+    /* ── References ── */
+    ol.refs { padding-left: 1.4rem; font-size: 0.93rem; }
+    ol.refs li { margin-bottom: 0.65rem; }
+
+    /* ── Notation table ── */
+    .notation { font-size: 0.92rem; }
+    .notation td:first-child { font-style: italic; width: 3.5rem; padding-right: 1rem; }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 4rem;
+      padding-top: 1.1rem;
+      border-top: 1px solid var(--rule);
+      font-size: 0.83rem;
+      color: var(--dim);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    @media (max-width: 520px) {
+      h1 { font-size: 1.55rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <h1>Possible-World Semantics</h1>
+    <p class="subtitle">A Mechanistic Formalization in Dependent Type Theory</p>
+    <div class="meta">
+      <span>Haniel Ulises</span>
+      <a href="https://github.com/HanielUlises/Possible-World-Semantics" target="_blank">Repository</a>
+      <span>Lean 4 · v4.26.0</span>
+    </div>
+  </header>
+
+  <!-- Abstract -->
+  <section>
+    <h2>Abstract</h2>
+    <p>
+      This project presents a formalization of possible-world and situation semantics
+      within Lean 4's dependent type theory, following the higher-order modal and
+      situation-theoretic tradition of Zalta, Fine, and Barwise–Perry. The development
+      proceeds entirely from primitive typed constants, without recourse to any
+      external mathematical library.
+    </p>
+    <p>
+      The distinguishing commitment of the formalization is mechanistic grounding:
+      wherever a logical principle admits derivation from antecedent definitions,
+      it is established as a theorem rather than postulated. This discipline is most
+      consequential in the modal layer, where the entirety of S5 — including the
+      necessitation rule and the characteristic collapse ◊□φ → □φ — is derived
+      from a single definitional choice in which the accessibility relation is the universal
+      relation on the domain of worlds.
+    </p>
+    <p>
+      The ontological core follows Zalta's abstract object theory. Situations and
+      worlds are not type-distinct; situationhood and worldhood are predicates
+      over a single domain. Encoding is the primitive relation from which parthood,
+      propositional truth, and the mereology of situations are all constructed.
+      The resulting theory proves Theorems 4–6 of Zalta (1993) — the equivalence
+      of parthood and truth-inclusion, antisymmetry of parthood, and same-parts
+      identity — as mechanically verified results.
+    </p>
+  </section>
+
+  <!-- Theoretical Framework -->
+  <section>
+    <h2>Theoretical Framework</h2>
+
+    <p>
+      The ontology is stratified into three typed domains: a domain of
+      <em>worlds</em> (which comprises both possible worlds and proper situations),
+      a domain of <em>properties</em>, and a domain of <em>propositions</em>.
+      The primitive predicate <em>Situation</em> carves out the sub-domain of
+      situations within the world domain; <em>Worldhood</em> further identifies
+      those situations that are maximal and consistent.
+    </p>
+
+    <p>
+      The central primitive is the <em>encoding</em> relation, written
+      enc(<em>s</em>, <em>F</em>), between a situation and a property. A situation
+      encodes exactly those properties of the form VAC(<em>p</em>) — the vacuous
+      abstraction of some proposition <em>p</em> — distinguishing situations from
+      arbitrary abstract objects in Zalta's sense. <em>Parthood</em> is defined
+      encoding-first:
+    </p>
+
+    <span class="formula">
+      <em>s</em> ⊴ <em>s</em>′ &nbsp;:⟺&nbsp; ∀<em>F</em>. enc(<em>s</em>, <em>F</em>) → enc(<em>s</em>′, <em>F</em>)
+    </span>
+
+    <p>
+      <em>Truth-in</em>, written <em>s</em> ⊨ <em>p</em>, is a separate primitive
+      governed by the reduction: a situation <em>s</em> makes <em>p</em> true if
+      and only if <em>s</em> encodes VAC(<em>p</em>). The bridge between the two
+      orderings — encoding-based parthood and truth-based inclusion — is the
+      content of Theorem 4:
+    </p>
+
+    <span class="formula">
+      <em>s</em> ⊴ <em>s</em>′ &nbsp;↔&nbsp; ∀<em>p</em>. (<em>s</em> ⊨ <em>p</em> → <em>s</em>′ ⊨ <em>p</em>)
+    </span>
+
+    <p>
+      Modal operators are grounded in a Kripke frame whose accessibility relation
+      <em>R</em> is the universal relation: <em>Rwv</em> holds for all worlds
+      <em>w</em>, <em>v</em>. This is the characteristic frame condition of S5.
+      Necessity and possibility are then defined semantically:
+    </p>
+
+    <span class="formula">
+      □<em>φ</em>(<em>w</em>) &nbsp;:⟺&nbsp; ∀<em>v</em>. <em>Rwv</em> → <em>φ</em>(<em>v</em>)
+    </span>
+    <span class="formula">
+      ◊<em>φ</em>(<em>w</em>) &nbsp;:⟺&nbsp; ¬□¬<em>φ</em>(<em>w</em>)
+    </span>
+
+    <p>
+      Because <em>R</em> is definitionally universal, □<em>φ</em>(<em>w</em>)
+      reduces to ∀<em>v</em>. <em>φ</em>(<em>v</em>), making the modal operators
+      fully transparent to the kernel. Reflexivity, transitivity, and symmetry of
+      <em>R</em> are consequences of its definition, not independent postulates.
+      All S5 schemas and the necessitation rule are theorems derivable from this
+      single definitional choice.
+    </p>
+
+    <p>
+      <em>Ontological dependence</em> is defined in the tradition of Fine and
+      Correia: a situation <em>s</em> depends on <em>s</em>′, written
+      <em>s</em> ≺ <em>s</em>′, when every situation that includes <em>s</em>
+      also includes <em>s</em>′:
+    </p>
+
+    <span class="formula">
+      <em>s</em> ≺ <em>s</em>′ &nbsp;:⟺&nbsp; ∀<em>u</em>. Sit(<em>u</em>) → <em>s</em> ⊴ <em>u</em> → <em>s</em>′ ⊴ <em>u</em>
+    </span>
+
+    <p>
+      The meet of two situations is their greatest lower bound under ⊴, characterised
+      by the principle that <em>s</em> ∧ <em>s</em>′ makes precisely the
+      propositions true that both <em>s</em> and <em>s</em>′ make true. The
+      three lattice properties — <em>s</em> ∧ <em>s</em>′ ⊴ <em>s</em>,
+      <em>s</em> ∧ <em>s</em>′ ⊴ <em>s</em>′, and the universal property — are
+      established as theorems once the equivalence of parthood and truth-inclusion
+      is available.
+    </p>
+  </section>
+
+  <!-- Axiom Inventory -->
+  <section>
+    <h2>Logical Inventory</h2>
+    <p>
+      The table below records every primitive, postulate, definition, and
+      principal theorem of the development. Primitives are uninterpreted
+      constants; postulates are constitutive assumptions that cannot be derived
+      from antecedent principles; definitions introduce no new content;
+      theorems are mechanically verified consequences.
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:36%">Principle</th>
+            <th style="width:46%">Logical form</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Domain of worlds</td>
+            <td class="form"><em>World</em> : Type</td>
+            <td><span class="st prim">Primitive</span></td>
+          </tr>
+          <tr>
+            <td>Domains of properties and propositions</td>
+            <td class="form"><em>Prop</em>, <em>Prop</em>𝓃 : Type</td>
+            <td><span class="st prim">Primitive</span></td>
+          </tr>
+          <tr>
+            <td>Objecthood and situationhood</td>
+            <td class="form">Obj, Sit : <em>World</em> → 𝔹</td>
+            <td><span class="st prim">Primitive</span></td>
+          </tr>
+          <tr>
+            <td>Encoding</td>
+            <td class="form">enc : <em>World</em> × <em>Prop</em> → 𝔹</td>
+            <td><span class="st prim">Primitive</span></td>
+          </tr>
+          <tr>
+            <td>Truth-in</td>
+            <td class="form">⊨ : <em>World</em> × <em>Prop</em>𝓃 → 𝔹</td>
+            <td><span class="st prim">Primitive</span></td>
+          </tr>
+          <tr>
+            <td>Vacuous abstraction</td>
+            <td class="form">VAC : <em>Prop</em>𝓃 → <em>Prop</em></td>
+            <td><span class="st prim">Primitive</span></td>
+          </tr>
+          <tr>
+            <td>Situations encode only abstractions</td>
+            <td class="form">Sit(<em>s</em>) ∧ enc(<em>s</em>, <em>F</em>) → ∃<em>p</em>. <em>F</em> = VAC(<em>p</em>)</td>
+            <td><span class="st post">Postulate</span></td>
+          </tr>
+          <tr>
+            <td>Situations are objects</td>
+            <td class="form">Sit(<em>s</em>) → Obj(<em>s</em>)</td>
+            <td><span class="st post">Postulate</span></td>
+          </tr>
+          <tr>
+            <td>Truth reduces to encoding</td>
+            <td class="form"><em>s</em> ⊨ <em>p</em> ↔ enc(<em>s</em>, VAC(<em>p</em>))</td>
+            <td><span class="st post">Postulate</span></td>
+          </tr>
+          <tr>
+            <td>Parthood</td>
+            <td class="form"><em>s</em> ⊴ <em>s</em>′ :⟺ ∀<em>F</em>. enc(<em>s</em>, <em>F</em>) → enc(<em>s</em>′, <em>F</em>)</td>
+            <td><span class="st def">Definition</span></td>
+          </tr>
+          <tr>
+            <td>Accessibility relation</td>
+            <td class="form"><em>Rwv</em> :⟺ ⊤</td>
+            <td><span class="st def">Definition</span></td>
+          </tr>
+          <tr>
+            <td>Necessity</td>
+            <td class="form">□<em>φ</em>(<em>w</em>) :⟺ ∀<em>v</em>. <em>Rwv</em> → <em>φ</em>(<em>v</em>)</td>
+            <td><span class="st def">Definition</span></td>
+          </tr>
+          <tr>
+            <td>Possibility</td>
+            <td class="form">◊<em>φ</em>(<em>w</em>) :⟺ ¬□¬<em>φ</em>(<em>w</em>)</td>
+            <td><span class="st def">Definition</span></td>
+          </tr>
+          <tr>
+            <td>Ontological dependence</td>
+            <td class="form"><em>s</em> ≺ <em>s</em>′ :⟺ ∀<em>u</em>. Sit(<em>u</em>) → <em>s</em> ⊴ <em>u</em> → <em>s</em>′ ⊴ <em>u</em></td>
+            <td><span class="st def">Definition</span></td>
+          </tr>
+          <tr>
+            <td>Reflexivity of <em>R</em></td>
+            <td class="form">∀<em>w</em>. <em>Rww</em></td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Transitivity of <em>R</em></td>
+            <td class="form">∀<em>w</em>, <em>u</em>, <em>v</em>. <em>Rwu</em> ∧ <em>Ruv</em> → <em>Rwv</em></td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Symmetry of <em>R</em></td>
+            <td class="form">∀<em>w</em>, <em>v</em>. <em>Rwv</em> → <em>Rvw</em></td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Distribution (K)</td>
+            <td class="form">□(<em>φ</em> → <em>ψ</em>) → □<em>φ</em> → □<em>ψ</em></td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Truth (T)</td>
+            <td class="form">□<em>φ</em> → <em>φ</em></td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Positive introspection (4)</td>
+            <td class="form">□<em>φ</em> → □□<em>φ</em></td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Negative introspection (5)</td>
+            <td class="form">◊<em>φ</em> → □◊<em>φ</em></td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Necessitation</td>
+            <td class="form">⊢ <em>φ</em> ⟹ ⊢ □<em>φ</em></td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>S5 characteristic thesis</td>
+            <td class="form">◊□<em>φ</em> → □<em>φ</em></td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Parthood–truth equivalence (Th. 4)</td>
+            <td class="form"><em>s</em> ⊴ <em>s</em>′ ↔ ∀<em>p</em>. <em>s</em> ⊨ <em>p</em> → <em>s</em>′ ⊨ <em>p</em></td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Antisymmetry of parthood (Th. 5)</td>
+            <td class="form"><em>s</em> ⊴ <em>s</em>′ ∧ <em>s</em>′ ⊴ <em>s</em> → <em>s</em> = <em>s</em>′</td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Same-parts identity (Th. 6)</td>
+            <td class="form">∀<em>u</em>. (<em>u</em> ⊴ <em>s</em> ↔ <em>u</em> ⊴ <em>s</em>′) → <em>s</em> = <em>s</em>′</td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Universal persistence (Th. 8)</td>
+            <td class="form">∀<em>p</em>. <em>s</em> ⊨ <em>p</em> ∧ <em>s</em> ⊴ <em>s</em>′ → <em>s</em>′ ⊨ <em>p</em></td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Worlds are maximal</td>
+            <td class="form">World(<em>w</em>) → ∀<em>p</em>. <em>w</em> ⊨ <em>p</em> ∨ <em>w</em> ⊨ ¬<em>p</em></td>
+            <td><span class="st post">Postulate</span></td>
+          </tr>
+          <tr>
+            <td>Worlds are consistent</td>
+            <td class="form">World(<em>w</em>) → ¬∃<em>p</em>. <em>w</em> ⊨ <em>p</em> ∧ <em>w</em> ⊨ ¬<em>p</em></td>
+            <td><span class="st post">Postulate</span></td>
+          </tr>
+          <tr>
+            <td>No strict subworld</td>
+            <td class="form">World(<em>w</em>) ∧ <em>s</em> ⊴ <em>w</em> ∧ <em>s</em> ≠ <em>w</em> → ¬World(<em>s</em>)</td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Extensionality</td>
+            <td class="form">Sit(<em>s</em>) ∧ Sit(<em>s</em>′) ∧ ∀<em>p</em>. <em>s</em> ⊨ <em>p</em> ↔ <em>s</em>′ ⊨ <em>p</em> → <em>s</em> = <em>s</em>′</td>
+            <td><span class="st post">Postulate</span></td>
+          </tr>
+          <tr>
+            <td>Meet existence</td>
+            <td class="form">∀<em>s</em>, <em>s</em>′. ∃ <em>s</em> ∧ <em>s</em>′. Sit(<em>s</em> ∧ <em>s</em>′)</td>
+            <td><span class="st post">Postulate</span></td>
+          </tr>
+          <tr>
+            <td>Meet characterisation</td>
+            <td class="form"><em>s</em> ∧ <em>s</em>′ ⊨ <em>p</em> ↔ <em>s</em> ⊨ <em>p</em> ∧ <em>s</em>′ ⊨ <em>p</em></td>
+            <td><span class="st post">Postulate</span></td>
+          </tr>
+          <tr>
+            <td>Meet is a lower bound</td>
+            <td class="form"><em>s</em> ∧ <em>s</em>′ ⊴ <em>s</em> &nbsp;∧&nbsp; <em>s</em> ∧ <em>s</em>′ ⊴ <em>s</em>′</td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+          <tr>
+            <td>Meet is greatest lower bound</td>
+            <td class="form"><em>u</em> ⊴ <em>s</em> ∧ <em>u</em> ⊴ <em>s</em>′ → <em>u</em> ⊴ <em>s</em> ∧ <em>s</em>′</td>
+            <td><span class="st thm">Theorem</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- Open obligations -->
+  <section>
+    <h2>Open Proof Obligations</h2>
+
+    <div class="ob">
+      <p class="ob-head"><span class="ob-id">OP-2b</span> Parthood implies dependence</p>
+      <p>
+        The remaining open obligation concerns the relationship between the
+        parthood ordering ⊴ and the ontological dependence relation ≺.
+        Specifically, the following principle has not yet been mechanically
+        established:
+      </p>
+      <span class="formula">
+        <em>s</em> ⊴ <em>s</em>′ ∧ <em>s</em>′ ≺ <em>s</em>″ → <em>s</em> ≺ <em>s</em>″
+      </span>
+      <p>
+        The proof requires deriving <em>s</em> ≺ <em>s</em>′ from <em>s</em> ⊴ <em>s</em>′ —
+        that is, showing that parthood entails dependence. While the equivalence
+        of parthood and truth-inclusion (Theorem 4) is now available, the passage
+        from the mereological to the dependence ordering involves a non-trivial
+        argument in the tradition of Fine and Correia that has not yet been
+        mechanised. The principle is plausible on the intended interpretation:
+        a situation that is part of another cannot obtain without the other also
+        obtaining in any containing situation.
+      </p>
+    </div>
+  </section>
+
+  <!-- Resolved obligations -->
+  <section>
+    <h2>Resolved Proof Obligations</h2>
+
+    <div class="ob">
+      <p class="ob-head"><span class="ob-id">OP-1</span> Necessitation and the S5 characteristic thesis</p>
+      <p>
+        The necessitation rule (⊢ <em>φ</em> ⟹ ⊢ □<em>φ</em>) and the S5 collapse
+        (◊□<em>φ</em> → □<em>φ</em>) are not derivable from the schemas K, T, 4, 5
+        alone. Both were initially postulated. They are now derived consequences
+        of the definitional choice <em>Rwv</em> :⟺ ⊤: necessitation holds because
+        □<em>φ</em>(<em>w</em>) reduces to ∀<em>v</em>. <em>φ</em>(<em>v</em>),
+        and the S5 collapse holds because any ◊-witness already has □<em>φ</em>,
+        which at the universal relation yields <em>φ</em> everywhere.
+      </p>
+    </div>
+
+    <div class="ob">
+      <p class="ob-head"><span class="ob-id">OP-2</span> Parthood–truth equivalence</p>
+      <p>
+        The direction ∀<em>p</em>. (<em>s</em> ⊨ <em>p</em> → <em>s</em>′ ⊨ <em>p</em>) → <em>s</em> ⊴ <em>s</em>′
+        was not derivable given that ⊴ is defined over encoding while ⊨ is an
+        independent primitive. The gap is closed by the principle that situations
+        encode only vacuous abstractions: given truth-inclusion, any property
+        encoded by <em>s</em> is of the form VAC(<em>p</em>), and truth-inclusion
+        then transfers encoding directly. This yields the full biconditional of
+        Theorem 4 and unlocks Theorems 5, 6, and 8.
+      </p>
+    </div>
+
+    <div class="ob">
+      <p class="ob-head"><span class="ob-id">OP-3</span> Situations are objects</p>
+      <p>
+        The reduction of truth to encoding requires the object predicate as a
+        hypothesis. Since situationhood and objecthood are independent primitives,
+        their overlap had to be postulated: Sit(<em>s</em>) → Obj(<em>s</em>).
+        With this in place, the monotonicity direction of Theorem 4 closes
+        without any open obligation.
+      </p>
+    </div>
+
+    <div class="ob">
+      <p class="ob-head"><span class="ob-id">OP-4</span> Lattice structure of meet</p>
+      <p>
+        The meet is characterised truth-theoretically: <em>s</em> ∧ <em>s</em>′ ⊨ <em>p</em>
+        iff <em>s</em> ⊨ <em>p</em> and <em>s</em>′ ⊨ <em>p</em>. The lattice
+        properties — that the meet is a lower bound and the greatest such — require
+        translating between the truth-based characterisation and the encoding-based
+        definition of ⊴. This translation is exactly the content of Theorem 4,
+        and all three lattice properties follow immediately once that theorem is
+        available.
+      </p>
+    </div>
+
+    <div class="ob">
+      <p class="ob-head"><span class="ob-id">OP-5</span> No strict subworld</p>
+      <p>
+        No proper part of a world is itself a world. The proof proceeds by
+        maximality: if <em>s</em> ⊴ <em>w</em> and both are worlds, then for
+        any proposition <em>p</em>, the maximality of <em>w</em> and the
+        monotonicity of truth under ⊴ force <em>s</em> and <em>w</em> to agree
+        on every proposition, whence extensionality yields <em>s</em> = <em>w</em>,
+        contradicting strict parthood. The two cases — forward and backward
+        agreement — each reduce to a single application of truth-monotonicity
+        or a classical argument through maximality.
+      </p>
+    </div>
+  </section>
+
+  <!-- References -->
+  <section>
+    <h2>References</h2>
+    <ol class="refs">
+      <li>Zalta, E. N. <em>Intensional Logic and the Metaphysics of Intentionality.</em> MIT Press, 1988.</li>
+      <li>Zalta, E. N. "Twenty-Five Basic Theorems in Situation and World Theory." <em>Journal of Philosophical Logic</em> 22 (1993), 385–428.</li>
+      <li>Fine, K. "Ontological Dependence." <em>Proceedings of the Aristotelian Society</em> 95 (1995), 269–290.</li>
+      <li>Barwise, J. and Perry, J. <em>Situations and Attitudes.</em> MIT Press, 1983.</li>
+      <li>Chellas, B. F. <em>Modal Logic: An Introduction.</em> Cambridge University Press, 1980.</li>
+      <li>Oppenheimer, P. and Zalta, E. N. "The Computational Theory of Possible Worlds." <a href="https://peoppenheimer.org/cm/worlds/" target="_blank">peoppenheimer.org/cm/worlds/</a></li>
+    </ol>
+  </section>
+
+  <footer>
+    <span>Possible-World Semantics · Lean 4 · v4.26.0</span>
+    <a href="https://github.com/HanielUlises/Possible-World-Semantics" target="_blank">GitHub</a>
+  </footer>
+
+</div>
+</body>
+</html>
