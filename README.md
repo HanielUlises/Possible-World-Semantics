@@ -4,8 +4,6 @@
 
 A Lean 4 formalization of possible-world and situation semantics, following the higher-order modal and situation-theoretic tradition of Zalta, Fine, and Barwise–Perry.
 
-Everything is built from scratch — no Mathlib, no set theory, just primitives and axioms. Metatheoretic results proven externally in Prover9 are recorded as axioms with documentation of the proof obligation.
-
 ## Theoretical Background
 
 The development follows the Zalta–Fine tradition. Worlds and situations are not distinguished at the type level: `World` is the single domain, and `Situation` and `Object` are predicates over it.
