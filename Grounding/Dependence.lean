@@ -33,31 +33,54 @@ theorem depends_trans (s s' s'' : World)
   fun u hu hsu => h' u hu (h u hu hsu)
 
 /-- Parthood implies dependence inheritance, given a dependence from s to s'.
-    The version with bare parthood requires OP-2 to connect ⊴ to ≺. -/
+    Reduces to depends_trans. -/
 theorem part_implies_depends (s s' s'' : World)
     (hdep_ss' : s ≺ s')
     (hdep     : s' ≺ s'') : s ≺ s'' :=
   depends_trans s s' s'' hdep_ss' hdep
 
 /-- If s is a part of s' and s' depends on s'', then s depends on s''.
-    Blocked by OP-2: deriving s ≺ s' from s ⊴ s' requires
-    truth_mono_to_part. Marked sorry until OP-2 is resolved.
-    See README.md § Open Proof Obligations, OP-2. -/
 
-  /-- Auxiliary postulate: parthood yields dependence.
-    If s ⊴ s' then s ≺ s': every situation containing s contains s'.
-    This does not follow from parthood alone under the current definition
-    of OntologicallyDepends; it requires that ⊴ be upward-closed in the
-    containment sense, which is stipulated here as an axiom. -/
+    Proof: s ⊴ s' means s' ⊴ u whenever s ⊴ u (by transitivity of ⊴,
+    since s ⊴ s' and s ⊴ u gives s' ⊴ u only if... actually the correct
+    reading is: s ≺ s' means ∀ u, s ⊴ u → s' ⊴ u.  We build this
+    directly from partOf_trans: given s ⊴ s' and s' ⊴ u, we get s ⊴ u
+    by partOf_trans — but we need the *other* direction.
+
+    The correct witness for s ≺ s' from s ⊴ s' is:
+      ∀ u, Situation u → s ⊴ u → s' ⊴ u
+    This does NOT follow from partOf_trans (which gives s ⊴ u → s' ⊴ u
+    only when s' ⊴ s, i.e., the reverse direction).
+
+    What does follow from s ⊴ s' is s' ⊴ u whenever s ⊴ u and s ⊴ s'
+    — no, still wrong direction.
+
+    Correct: to get s ≺ s'' from s ⊴ s' and s' ≺ s'', we need
+    s ≺ s' as an intermediate.  We derive s ≺ s' from s ⊴ s' as:
+      fun u _ hsu => partOf_trans s' s u (partOf_trans ... ) hsu
+    — this is still not available without the full biconditional.
+
+    Resolution: the proof goes directly without building s ≺ s'.
+    Given hpart : s ⊴ s' and hdep : s' ≺ s'', show s ≺ s'':
+      ∀ u, Situation u → s ⊴ u → s'' ⊴ u
+    Take arbitrary u, hu, hsu : s ⊴ u.  We need s'' ⊴ u.
+    hdep gives: ∀ u, Situation u → s' ⊴ u → s'' ⊴ u.
+    So it suffices to show s' ⊴ u.  But s ⊴ s' and s ⊴ u do not
+    give s' ⊴ u without additional information.
+
+    This confirms the proof obligation is genuine: s ⊴ s' → s ≺ s'
+    requires an axiom. See README.md § OP-2b. -/
 axiom parthood_yields_depends :
-  ∀ s s' : World, (s ⊴ s') → (s ≺ s')
+  ∀ (s s' : World), Situation s → Situation s' → (s ⊴ s') → (s ≺ s')
 
+/-- If s is a part of s' and s' depends on s'', then s depends on s''.
+    Closed via parthood_yields_depends (OP-2b). -/
 theorem parthood_implies_depends (s s' s'' : World)
+    (hs    : Situation s)
+    (hs'   : Situation s')
     (hpart : s ⊴ s')
     (hdep  : s' ≺ s'') : s ≺ s'' :=
-  depends_trans s s' s'' (parthood_yields_depends s s' hpart) hdep
-
-
+  depends_trans s s' s'' (parthood_yields_depends s s' hs hs' hpart) hdep
 
 /-- Mutual dependence without identity.
     Two situations can each require the other without being identical.
