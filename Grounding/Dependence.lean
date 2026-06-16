@@ -48,8 +48,8 @@ theorem parthood_implies_depends (s s' s'' : World)
     (hdep  : s' ≺ s'') : s ≺ s'' := by
   apply depends_trans s s' s'' _ hdep
   intro u hu hsu
-  sorry -- OP-2: need s ⊴ s' → s ≺ s' which requires truth_mono_to_part
-
+  exact partOf_trans s s' u hpart hsu
+  
 /-- Mutual dependence without identity.
     Two situations can each require the other without being identical.
     This captures ontological co-dependence, as in the Fine
