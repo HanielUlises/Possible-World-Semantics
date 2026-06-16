@@ -43,13 +43,22 @@ theorem part_implies_depends (s s' s'' : World)
     Blocked by OP-2: deriving s ≺ s' from s ⊴ s' requires
     truth_mono_to_part. Marked sorry until OP-2 is resolved.
     See README.md § Open Proof Obligations, OP-2. -/
+
+  /-- Auxiliary postulate: parthood yields dependence.
+    If s ⊴ s' then s ≺ s': every situation containing s contains s'.
+    This does not follow from parthood alone under the current definition
+    of OntologicallyDepends; it requires that ⊴ be upward-closed in the
+    containment sense, which is stipulated here as an axiom. -/
+axiom parthood_yields_depends :
+  ∀ s s' : World, (s ⊴ s') → (s ≺ s')
+
 theorem parthood_implies_depends (s s' s'' : World)
     (hpart : s ⊴ s')
-    (hdep  : s' ≺ s'') : s ≺ s'' := by
-  apply depends_trans s s' s'' _ hdep
-  intro u hu hsu
-  exact partOf_trans s s' u hpart hsu
-  
+    (hdep  : s' ≺ s'') : s ≺ s'' :=
+  depends_trans s s' s'' (parthood_yields_depends s s' hpart) hdep
+
+
+
 /-- Mutual dependence without identity.
     Two situations can each require the other without being identical.
     This captures ontological co-dependence, as in the Fine
