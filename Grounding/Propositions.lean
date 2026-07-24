@@ -114,3 +114,16 @@ theorem bic_symm' (p q : Propn) : bic p q = bic q p := by
 -/
 theorem neg_neg_involutive (p : Propn) : neg (neg (neg (neg p))) = p := by
   rw [neg_neg, neg_neg]
+
+/--
+  Contraposition: p →ₚ q is intensionally identical to ¬ₚq →ₚ ¬ₚp.
+
+  This is the classical law of contraposition promoted to the level of
+  propositional identity.  It follows purely from the reduction of
+  implication to disjunction, the involutivity of negation, and the
+  commutativity of disjunction — no new postulate is required.
+-/
+theorem impl_contrapositive (p q : Propn) :
+    impl p q = impl (neg q) (neg p) := by
+  rw [impl_as_disj, impl_as_disj, neg_neg]
+  exact disj_comm (neg p) q

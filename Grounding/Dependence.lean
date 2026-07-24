@@ -102,3 +102,64 @@ def Foundational (s : World) : Prop :=
     external to themselves. -/
 def Derivative (s : World) : Prop :=
   ∃ s' : World, (s ≺ s') ∧ ¬ (s ⊴ s')
+
+/-- Strict (proper) dependence: s depends on a distinct s'.
+    This excludes the trivial self-dependence of depends_refl, isolating
+    the cases where one situation genuinely requires another. -/
+def StrictlyDepends (s s' : World) : Prop :=
+  (s ≺ s') ∧ s ≠ s'
+
+/-- Grounding as asymmetric dependence.
+    s' grounds s when s depends on s' but not conversely.  This is the
+    Fine–Correia reading of grounding as a strict, direction-fixed
+    relation: the ground is that on which the grounded asymmetrically
+    depends. -/
+def WeaklyGrounds (s s' : World) : Prop :=
+  (s' ≺ s) ∧ ¬ (s ≺ s')
+
+/-- Grounding is asymmetric by construction.
+    Nothing both grounds and is grounded by the same situation, since
+    the second conjunct of WeaklyGrounds explicitly denies the converse
+    dependence. -/
+theorem weakly_grounds_asymm (s s' : World)
+    (h : WeaklyGrounds s s') : ¬ WeaklyGrounds s' s :=
+  fun h' => h.2 h'.1
+
+/-- Mutual dependence is symmetric.
+    Co-dependence is a symmetric relation: if each of two situations
+    requires the other, the relation is unchanged by swapping them. -/
+theorem mutual_depends_symm (s s' : World)
+    (h : MutuallyDependent s s') : MutuallyDependent s' s :=
+  ⟨h.2, h.1⟩
+
+/-- Mutual parthood induces mutual dependence.
+    If two situations are parts of each other, then each depends on the
+    other, so they are ontologically co-dependent.  (By parthood
+    antisymmetry such situations are in fact identical; the point here
+    is that parthood in both directions already suffices for the
+    dependence structure via parthood_yields_depends.) -/
+theorem mutual_dependence_from_parthood (s s' : World)
+    (hs : Situation s) (hs' : Situation s')
+    (hss' : s ⊴ s') (hs's : s' ⊴ s) : MutuallyDependent s s' :=
+  ⟨parthood_yields_depends s s' hs hs' hss',
+   parthood_yields_depends s' s hs' hs hs's⟩
+
+/-- Foundational and derivative situations exhaust the space.
+    A situation fails to be foundational exactly when it is derivative:
+    the failure of "every dependence is already contained" is the
+    existence of an uncontained dependence.  The two notions are strict
+    negations of each other. -/
+theorem not_foundational_iff_derivative (s : World) :
+    ¬ Foundational s ↔ Derivative s := by
+  constructor
+  · intro h
+    rcases Classical.em (Derivative s) with hd | hnd
+    · exact hd
+    · exfalso
+      apply h
+      intro s' hdep
+      rcases Classical.em (s ⊴ s') with hp | hnp
+      · exact hp
+      · exact absurd ⟨s', hdep, hnp⟩ hnd
+  · rintro ⟨s', hdep, hnpart⟩ hfound
+    exact hnpart (hfound s' hdep)
