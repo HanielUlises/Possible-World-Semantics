@@ -82,6 +82,21 @@ theorem persistent_conj :
   rw [TrueIn_conj] at hpq ⊢
   exact ⟨hp s s' hs hs' hpq.1 hss', hq s s' hs hs' hpq.2 hss'⟩
 
+/-- The disjunction of two persistent propositions is persistent.
+    Whichever disjunct holds at the smaller situation is carried upward
+    by its own persistence, and re-forming the disjunction at the larger
+    situation preserves it. -/
+theorem persistent_disj :
+    ∀ p q : Propn,
+      Persistent p →
+      Persistent q →
+      Persistent (p ∨ₚ q) := by
+  intro p q hp hq s s' hs hs' hpq hss'
+  rw [TrueIn_disj] at hpq ⊢
+  cases hpq with
+  | inl h => exact Or.inl (hp s s' hs hs' h hss')
+  | inr h => exact Or.inr (hq s s' hs hs' h hss')
+
 /-- Consistency is downward closed under parthood. -/
 axiom consistent_downward_closed :
   ∀ (s x : World), Consistent s → (x ⊴ s) → Consistent x

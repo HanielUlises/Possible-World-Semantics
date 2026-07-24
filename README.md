@@ -48,6 +48,8 @@ This cannot be derived from purely intensional primitives and must be stipulated
 | `PossNec` | `Modality/Operators` | ◊□φ → □φ, S5 collapse |
 | `actualWorld` | `Situation/Definitions` | designated constant |
 | `situation_extensionality` | `Situation/Extensionality` | constitutive postulate |
+| `Concrete`, `ordinary_no_encoding`, `Comprehension` | `Grounding/AbstractObjects` | primitive / comprehension postulate |
+| `abstract_extensionality` | `Grounding/AbstractObjects` | constitutive postulate |
 | `situation_extensionality_via_truth` | `Situation/Theorems` | Prover9 Theorem 2 |
 | `actual_implies_possible` | `Situation/Theorems` | modal postulate |
 | `situation_closed_under_parthood` | `Situation/Theorems` | Prover9 Theorem 3 |
@@ -100,6 +102,31 @@ Both were closed by postulating `Nec` and `PossNec` in `Modality/Operators.lean`
 `TrueIn_def` and `Encp_def` both require an `Object x` hypothesis. `Situation` and `Object` are independent predicates with nothing forcing their extensions to overlap. The bridge `Situation(s) → Object(s)` was postulated as `situation_is_object` in `Grounding/Ontology.lean`.
 
 With this in place, `part_truth_mono` closes without `sorry`: the direction `s ⊴ s' → (s ⊨ p → s' ⊨ p)` is fully derived by unfolding `TrueIn_def` and `Encp_def` on both sides and applying encoding-monotonicity of `PartOf` directly.
+
+## Derived Theory
+
+Beyond the core obligations, the development carries several families of
+purely derived results (no new postulates beyond those tabulated above):
+
+- **Modal calculus** (`Modality/Operators`). On top of the S5 core, `□`/`◊`
+  duality (`Box_iff_not_Diamond_not`), the monotonicity of `◊`
+  (`Diamond_monotone`), distribution laws (`Diamond_distrib_disj`,
+  `Box_distrib_conj`), and the contingency vocabulary (`Necessary`,
+  `Impossible`, `Contingent`) with their exclusion theorems. Each is a
+  calculation over the universal accessibility relation `R`.
+
+- **Propositional algebra** (`Grounding/Propositions`). Contraposition
+  (`impl_contrapositive`) alongside the De Morgan and double-negation laws.
+
+- **Abstract-object identity** (`Grounding/AbstractObjects`). Zalta's
+  encoding-identity `=ₐ` (`IdentityA`) as an equivalence relation, its
+  collapse to `=` under `abstract_extensionality`, and the promotion of
+  `Comprehension` to a definite description (`abstract_object_unique`).
+
+- **Grounding structure** (`Grounding/Dependence`). Strict dependence,
+  grounding as asymmetric dependence (`WeaklyGrounds`, `weakly_grounds_asymm`),
+  and the exhaustiveness of the foundational/derivative dichotomy
+  (`not_foundational_iff_derivative`).
 
 ## References
 
