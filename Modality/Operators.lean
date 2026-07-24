@@ -170,3 +170,106 @@ theorem Nec_implies_Pos (p : World → Prop) (w : World)
     (h : ∀ v, p v) : ◊ p w := by
   intro hbox
   exact T (fun v => ¬ p v) w hbox (h w)
+
+/-
+  DUALITY, DISTRIBUTION, AND CONTINGENCY
+
+  This section develops the classical modal calculus on top of the
+  S5 core above.  Every result is a calculation over R (which is the
+  universal relation, from Frames.lean) and adds no new postulate.
+  The theorems make the □/◊ interplay explicit and introduce the
+  standard contingency vocabulary as defined notions.
+-/
+
+/-- What is necessary is possible (the modal square of opposition).
+    In any reflexive frame necessity entails possibility: if p holds at
+    every accessible world it holds at some accessible world, since the
+    evaluation world itself is accessible by R_refl.  This is the T-dual
+    of the T axiom. -/
+theorem Diamond_of_Box (p : World → Prop) (w : World)
+    (h : □ p w) : ◊ p w :=
+  fun hbox => hbox w (R_refl w) (h w (R_refl w))
+
+/-- Necessity is the dual of possibility.
+    □ p is definitionally ¬ ◊ ¬p up to a double negation on the matrix;
+    the equivalence makes the duality between the two operators explicit
+    rather than leaving it implicit in the definition of ◊. -/
+theorem Box_iff_not_Diamond_not (p : World → Prop) (w : World) :
+    □ p w ↔ ¬ ◊ (fun v => ¬ p v) w := by
+  constructor
+  · intro hbox hdia
+    exact hdia (fun v hrwv hnp => hnp (hbox v hrwv))
+  · intro hdia v hrwv
+    rcases Classical.em (p v) with hp | hnp
+    · exact hp
+    · exact absurd (fun hbox => hbox v hrwv hnp) hdia
+
+/-- Possibility is monotone with respect to implication.
+    If p entails q pointwise, then whatever is possibly p is possibly q:
+    a world witnessing the possibility of p also witnesses that of q.
+    This is the ◊-analogue of Box_monotone. -/
+theorem Diamond_monotone (p q : World → Prop) (w : World)
+    (hpq : ∀ v, p v → q v) (hp : ◊ p w) : ◊ q w :=
+  fun hboxnq => hp (fun v hrwv hpv => hboxnq v hrwv (hpq v hpv))
+
+/-- Possibility distributes over disjunction.
+    A disjunction is possible iff one of its disjuncts is possible.
+    The right-to-left direction is monotonicity; the left-to-right
+    direction is the characteristic K-level validity, obtained by
+    contradiction from the necessity of both negated disjuncts. -/
+theorem Diamond_distrib_disj (p q : World → Prop) (w : World) :
+    ◊ (fun v => p v ∨ q v) w ↔ ◊ p w ∨ ◊ q w := by
+  constructor
+  · intro h
+    rcases Classical.em (◊ p w) with hp | hnp
+    · exact Or.inl hp
+    · refine Or.inr ?_
+      intro hboxnq
+      apply h
+      intro v hrwv hpq
+      cases hpq with
+      | inl hpv => exact hnp (fun hbox => hbox v hrwv hpv)
+      | inr hqv => exact hboxnq v hrwv hqv
+  · rintro (hp | hq)
+    · exact Diamond_monotone p _ w (fun _ hpv => Or.inl hpv) hp
+    · exact Diamond_monotone q _ w (fun _ hqv => Or.inr hqv) hq
+
+/-- Necessity distributes over conjunction.
+    A conjunction is necessary iff both conjuncts are necessary.
+    Both directions are immediate from the definition of □ as a
+    universal quantifier over accessible worlds. -/
+theorem Box_distrib_conj (p q : World → Prop) (w : World) :
+    □ (fun v => p v ∧ q v) w ↔ □ p w ∧ □ q w := by
+  constructor
+  · intro h
+    exact ⟨fun v hrwv => (h v hrwv).1, fun v hrwv => (h v hrwv).2⟩
+  · rintro ⟨hp, hq⟩ v hrwv
+    exact ⟨hp v hrwv, hq v hrwv⟩
+
+/-- Necessity of a proposition. -/
+def Necessary (p : World → Prop) (w : World) : Prop :=
+  □ p w
+
+/-- Impossibility of a proposition: its negation is necessary. -/
+def Impossible (p : World → Prop) (w : World) : Prop :=
+  □ (fun v => ¬ p v) w
+
+/-- Contingency of a proposition: it is possibly true and possibly false.
+    Contingent propositions are those the modal structure leaves open in
+    both directions — neither necessary nor impossible. -/
+def Contingent (p : World → Prop) (w : World) : Prop :=
+  ◊ p w ∧ ◊ (fun v => ¬ p v) w
+
+/-- The necessary is not impossible.
+    Since necessity entails possibility (Diamond_of_Box), a necessary
+    proposition is possibly true, hence not necessarily false. -/
+theorem necessary_not_impossible (p : World → Prop) (w : World)
+    (h : Necessary p w) : ¬ Impossible p w :=
+  fun himp => (Box_iff_not_Diamond_not p w).mp h (Diamond_of_Box _ w himp)
+
+/-- The contingent is not necessary.
+    A contingent proposition is possibly false, so its necessity would
+    contradict the possibility of its negation via duality. -/
+theorem contingent_not_necessary (p : World → Prop) (w : World)
+    (h : Contingent p w) : ¬ Necessary p w :=
+  fun hnec => (Box_iff_not_Diamond_not p w).mp hnec h.2
