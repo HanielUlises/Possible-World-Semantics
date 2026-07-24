@@ -114,3 +114,81 @@ theorem abstract_objects_encode :
   intro F
   obtain ⟨x, hA, hspec⟩ := Comprehension (fun G => G = F)
   exact ⟨x, hA, (hspec F).mpr rfl⟩
+
+-- §5  Identity of abstract objects
+/--
+  Encoding-identity of abstract objects (Zalta's identityₐ).
+
+  Two abstract objects are identityₐ-related iff they are both abstract
+  and encode exactly the same properties.  For abstract objects, unlike
+  ordinary ones, identity is fixed by the encoding extension rather than
+  by the exemplification of properties — this is the defining move of
+  abstract object theory.
+-/
+def IdentityA (x y : World) : Prop :=
+  A! x ∧ A! y ∧ ∀ F : Property, Enc x F ↔ Enc y F
+
+notation:50 x " =ₐ " y => IdentityA x y
+
+/--
+  Identityₐ is reflexive on abstract objects.
+-/
+theorem identityA_refl (x : World) (hx : A! x) : x =ₐ x :=
+  ⟨hx, hx, fun _ => Iff.rfl⟩
+
+/--
+  Identityₐ is symmetric.
+-/
+theorem identityA_symm (x y : World) (h : x =ₐ y) : y =ₐ x :=
+  ⟨h.2.1, h.1, fun F => (h.2.2 F).symm⟩
+
+/--
+  Identityₐ is transitive.
+-/
+theorem identityA_trans (x y z : World)
+    (hxy : x =ₐ y) (hyz : y =ₐ z) : x =ₐ z :=
+  ⟨hxy.1, hyz.2.1, fun F => (hxy.2.2 F).trans (hyz.2.2 F)⟩
+
+/--
+  Extensionality for abstract objects.
+
+  Abstract objects that encode exactly the same properties are identical.
+  Like `situation_extensionality`, this cannot be derived from the
+  intensional primitives — Enc is a bare relation with nothing forcing
+  coextensive encoders to coincide — and must be postulated.  It is the
+  encoding-level analogue of the extensionality of situations.
+-/
+axiom abstract_extensionality :
+  ∀ x y : World,
+    A! x → A! y → (∀ F : Property, Enc x F ↔ Enc y F) → x = y
+
+/--
+  Identityₐ collapses to genuine identity.
+
+  Under `abstract_extensionality`, the defined encoding-identity relation
+  is not merely an equivalence but coincides with `=` on abstract objects.
+-/
+theorem identityA_implies_eq (x y : World) (h : x =ₐ y) : x = y :=
+  abstract_extensionality x y h.1 h.2.1 h.2.2
+
+/--
+  Comprehension yields a *unique* abstract object.
+
+  For every condition φ on properties there is exactly one abstract
+  object encoding precisely the properties satisfying φ.  Existence is
+  `Comprehension`; uniqueness is `abstract_extensionality`, which forces
+  any two such objects to have the same encoding extension and hence to
+  be identical.  This upgrades comprehension from a mere existence
+  principle to a genuine definite description of abstract objects.
+-/
+theorem abstract_object_unique :
+    ∀ φ : Property → Prop,
+      ∃ x : World,
+        (A! x ∧ ∀ F : Property, Enc x F ↔ φ F) ∧
+        ∀ y : World, (A! y ∧ ∀ F : Property, Enc y F ↔ φ F) → y = x := by
+  intro φ
+  obtain ⟨x, hAx, hx⟩ := Comprehension φ
+  refine ⟨x, ⟨hAx, hx⟩, ?_⟩
+  rintro y ⟨hAy, hy⟩
+  exact abstract_extensionality y x hAy hAx
+    (fun F => (hy F).trans (hx F).symm)
