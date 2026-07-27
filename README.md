@@ -1,8 +1,48 @@
 # Possible-World-Semantics
 
-[![Documentation](https://img.shields.io/badge/Documentation-Online-blue)](https://hanielulises.github.io/Possible-World-Semantics/)
+> A machine-checked theory of possible worlds, situations, and modal necessity — formalizing *what could have been*, and proving it, in Lean 4.
 
-A Lean 4 formalization of possible-world and situation semantics, following the higher-order modal and situation-theoretic tradition of Zalta, Fine, and Barwise–Perry.
+[![Documentation](https://img.shields.io/badge/Documentation-Online-blue)](https://hanielulises.github.io/Possible-World-Semantics/)
+[![Lean](https://img.shields.io/badge/Lean-4.26.0-4a3f2f)](https://leanprover.github.io/)
+[![Proof obligations](https://img.shields.io/badge/proof_obligations-3_open_·_3_closed-orange)](#open-proof-obligations)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
+A Lean 4 formalization of possible-world and situation semantics, following the higher-order modal and situation-theoretic tradition of Zalta, Fine, and Barwise–Perry. Every theorem below is checked by the Lean kernel; every remaining `sorry` is tabulated as an explicit, open proof obligation.
+
+## Architecture
+
+The development is layered: an ontological **Grounding** core fixes the primitives and their algebra, a **Modality** layer postulates the S5 calculus, and a **Situation** layer builds worlds and their meet-semilattice on top.
+
+```mermaid
+flowchart TD
+    subgraph G["Grounding — ontological core"]
+        Ont["Ontology<br/>Enc · Situation · Object"]
+        Tru["Truth ⊨"]
+        Par["Parthood ⊴"]
+        Dep["Dependence ≺"]
+        Abs["AbstractObjects =ₐ"]
+    end
+    subgraph M["Modality — S5"]
+        Fr["Frames · S5 conditions"]
+        Op["Operators · □ ◊"]
+    end
+    subgraph S["Situation — worlds & lattice"]
+        Def["Definitions · actualWorld"]
+        Ext["Extensionality"]
+        Inf["Infimum · meet ∧"]
+        Wld["Worlds"]
+    end
+    Ont --> Tru --> Par --> Dep
+    Ont --> Abs
+    Par --> Inf
+    Fr -.-> Op
+    Op --> Def --> Ext --> Inf --> Wld
+```
+
+## Getting Started
+
+The toolchain is pinned in `lean-toolchain` (Lean `v4.26.0`), so the build is reproducible — [`elan`](https://github.com/leanprover/elan) selects the right compiler automatically.
+
 
 ## Theoretical Background
 
@@ -28,6 +68,26 @@ Situation(s) ∧ Situation(s') ∧ (∀p, s ⊨ p ↔ s' ⊨ p) → s = s'
 ```
 
 This cannot be derived from purely intensional primitives and must be stipulated, which is the standard move in both situation semantics and abstract object theory.
+
+### The situation lattice
+
+Under parthood `⊴`, situations form a meet-semilattice: `⟨Sit, ⊴, ∧⟩`. Worlds are the maximal elements (maximal consistent content); the meet `s ∧ s'` is the greatest lower bound, whose content is exactly what `s` and `s'` share.
+
+```mermaid
+graph TD
+    W["world — maximal element"]
+    S1["s"]
+    S2["s′"]
+    Meet["s ∧ s′ — meet (greatest lower bound)"]
+    Bot["⊥ — vacuous situation"]
+    W --> S1
+    W --> S2
+    S1 --> Meet
+    S2 --> Meet
+    Meet --> Bot
+```
+
+*A fragment of the meet-semilattice: edges denote parthood, descending from maximal worlds to the vacuous situation. The structure is a meet-semilattice with distinguished maximal elements, not a complete lattice — see [OP-4](#open-proof-obligations).*
 
 ## Axiom Inventory
 
@@ -89,7 +149,7 @@ Every `sorry` in the codebase corresponds to exactly one entry in this table.
 
 was not initially derivable, leaving the biconditional `s ⊴ s' ↔ ∀p, s ⊨ p → s' ⊨ p` half-proved and blocking antisymmetry (Theorem 5) and same-parts identity (Theorem 6) of Zalta (1993).
 
-Closed by `truth_mono_to_part` in `Grounding/Parthood.lean`. The proof goes via `Enc_VAC_complete`, where every property encoded by a situation is of the form `VAC p`, so truth-monotonicity in the `TrueIn` sense transfers back to encoding-monotonicity in the `Enc` sense, yielding `s ⊴ s'` directly. No new axioms were needed beyond `Enc_VAC_complete` and `situation_is_object` (OP-3). With this in place, `parthood_iff_truth_inclusion`, `parthood_antisymm`, `same_parts_identity`, and `all_propositions_persistent` all close without. Metatheoretic justification check Prover9 proof `theorem4.in` at peoppenheimer.org/cm/worlds/, Theorem 4 of Zalta (1993).
+Closed by `truth_mono_to_part` in `Grounding/Parthood.lean`. The proof goes via `Enc_VAC_complete`, where every property encoded by a situation is of the form `VAC p`, so truth-monotonicity in the `TrueIn` sense transfers back to encoding-monotonicity in the `Enc` sense, yielding `s ⊴ s'` directly. No new axioms were needed beyond `Enc_VAC_complete` and `situation_is_object` (OP-3). With this in place, `parthood_iff_truth_inclusion`, `parthood_antisymm`, `same_parts_identity`, and `all_propositions_persistent` all close without `sorry`. Metatheoretic justification: the Prover9 proof `theorem4.in` at peoppenheimer.org/cm/worlds/, Theorem 4 of Zalta (1993).
 
 ### OP-1 — Necessitation and possible-necessity collapse
 
@@ -127,6 +187,24 @@ purely derived results (no new postulates beyond those tabulated above):
   grounding as asymmetric dependence (`WeaklyGrounds`, `weakly_grounds_asymm`),
   and the exhaustiveness of the foundational/derivative dichotomy
   (`not_foundational_iff_derivative`).
+
+## Contributing
+
+Contributions are welcome especially proofs. The three open obligations are self-contained and each comes with a documented strategy, so they make good entry points:
+
+| Obligation | Where | Why it's tractable |
+|---|---|---|
+| [OP-4](#op-4--lattice-structure-of-meet) | `Situation/Infimum.lean` | `truth_mono_to_part` is already available; all three lemmas should close by applying it to `TrueIn_meet`. **Best first proof.** |
+| [OP-5](#op-5--no-strict-subworld) | `Situation/Worlds.lean` | Two `sorry`s, both unblocked by OP-2; closeable with `part_truth_mono` and `truth_mono_to_part`. |
+| [OP-2b](#op-2b--parthood-implies-dependence) | `Grounding/Dependence.lean` | Open-ended: may follow from `s ⊴ s'` alone or need a new postulate — the more research-flavored one. |
+
+**Ground rules.**
+
+- No new axioms without discussion. If a proof genuinely needs a postulate, open an issue first — the whole point of the [Axiom Inventory](#axiom-inventory) is that it stays complete and honest.
+- Every `sorry` must correspond to exactly one row in [Open Proof Obligations](#open-proof-obligations); if you close one, delete its row and (if it unblocks others) update the dependent entries.
+- `lake build` must pass with no errors and no new `sorry`.
+
+To get started: pick an obligation above, open an issue to claim it, then send a PR. Questions and partial attempts are just as welcome as finished proofs.
 
 ## References
 
