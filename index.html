@@ -180,6 +180,41 @@
       gap: 0.4rem;
     }
 
+    /* ── Figures ── */
+    figure { margin: 2rem 0 1.4rem; }
+    figure svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      max-width: 540px;
+      margin: 0 auto;
+      overflow: visible;
+    }
+    figcaption {
+      font-size: 0.85rem;
+      font-style: italic;
+      color: var(--dim);
+      text-align: center;
+      line-height: 1.55;
+      max-width: 90%;
+      margin: 1rem auto 0;
+    }
+    figcaption .fig-num {
+      font-variant: small-caps;
+      font-style: normal;
+      color: var(--accent);
+      letter-spacing: 0.05em;
+      margin-right: 0.15em;
+    }
+    /* SVG figure typography */
+    .dg-sym  { font-family: 'EB Garamond', Georgia, serif; font-style: italic; fill: var(--ink); }
+    .dg-note { font-family: 'EB Garamond', Georgia, serif; font-style: italic; fill: var(--dim); }
+    .dg-edge { stroke: var(--ink); stroke-width: 1.2; fill: none; }
+    .dg-lead { stroke: var(--rule); stroke-width: 1; stroke-dasharray: 2 3; fill: none; }
+    .dg-node { fill: var(--ink); }
+    .dg-halo { fill: var(--paper); }
+    .dg-set  { fill: var(--accent); fill-opacity: 0.05; stroke: var(--accent); stroke-width: 1.4; }
+
     @media (max-width: 520px) {
       h1 { font-size: 1.55rem; }
     }
@@ -510,22 +545,114 @@
 </section>
 
 <section>
-  <h2>Meet Structure</h2>
+  <h2>Lattice Structure</h2>
 
   <p>
-    Binary meets are postulated to exist and are characterized
-    truth-theoretically. The conjunction of two situations makes true precisely
-    those propositions made true by both.
+    The parthood relation organizes the domain of situations into an ordered
+    algebraic structure. Reflexivity is immediate from the definition of ⊴;
+    antisymmetry is the identity-by-common-parts theorem; transitivity descends
+    from the transitivity of implication in the encoding clause. The situations
+    therefore constitute a partial order ⟨<em>Sit</em>, ⊴⟩, whose covering
+    relation is displayed below.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 560 470" role="img" aria-label="Hasse diagram of the situation meet-semilattice">
+      <!-- edges -->
+      <path class="dg-edge" d="M200 60 L110 190"/>
+      <path class="dg-edge" d="M200 60 L290 190"/>
+      <path class="dg-edge" d="M110 190 L200 320"/>
+      <path class="dg-edge" d="M290 190 L200 320"/>
+      <path class="dg-edge" d="M200 320 L200 420"/>
+      <!-- leaders -->
+      <path class="dg-lead" d="M200 60 H346"/>
+      <path class="dg-lead" d="M290 190 H346"/>
+      <path class="dg-lead" d="M200 320 H346"/>
+      <path class="dg-lead" d="M200 420 H346"/>
+      <!-- nodes -->
+      <circle class="dg-halo" cx="200" cy="60"  r="8"/><circle class="dg-node" cx="200" cy="60"  r="5"/>
+      <circle class="dg-halo" cx="110" cy="190" r="8"/><circle class="dg-node" cx="110" cy="190" r="5"/>
+      <circle class="dg-halo" cx="290" cy="190" r="8"/><circle class="dg-node" cx="290" cy="190" r="5"/>
+      <circle class="dg-halo" cx="200" cy="320" r="8"/><circle class="dg-node" cx="200" cy="320" r="5"/>
+      <circle class="dg-halo" cx="200" cy="420" r="8"/><circle class="dg-node" cx="200" cy="420" r="5"/>
+      <!-- node symbols -->
+      <text class="dg-sym" x="200" y="44"  text-anchor="middle" font-size="19">w</text>
+      <text class="dg-sym" x="92"  y="196" text-anchor="end"    font-size="19">s</text>
+      <text class="dg-sym" x="308" y="196" text-anchor="start"  font-size="19">s′</text>
+      <text class="dg-sym" x="218" y="326" text-anchor="start"  font-size="18">s ∧ s′</text>
+      <text class="dg-sym" x="200" y="448" text-anchor="middle" font-size="19">⊥</text>
+      <!-- annotations -->
+      <text class="dg-note" x="354" y="64"  font-size="13">maximal element — a world</text>
+      <text class="dg-note" x="354" y="194" font-size="13">⊴-incomparable situations</text>
+      <text class="dg-note" x="354" y="324" font-size="13">meet — greatest lower bound</text>
+      <text class="dg-note" x="354" y="424" font-size="13">least element — null situation</text>
+    </svg>
+    <figcaption>
+      <span class="fig-num">Figure 1.</span> A fragment of the meet-semilattice
+      ⟨<em>Sit</em>, ⊴⟩ drawn as a Hasse diagram; edges denote covering under
+      parthood, read upward. Two ⊴-incomparable situations <em>s</em>,
+      <em>s</em>′ possess a greatest lower bound <em>s</em> ∧ <em>s</em>′, while
+      the world <em>w</em> sits at the maximal stratum.
+    </figcaption>
+  </figure>
+
+  <p>
+    The equivalence of parthood and truth-inclusion shows this order to be
+    isomorphic to the inclusion order on truth-sets. Writing
+    ⟦<em>s</em>⟧ = { <em>p</em> : <em>s</em> ⊨ <em>p</em> } for the propositional
+    content of a situation, the central theorem reads:
   </p>
 
   <span class="formula">
-    s ∧ s′ ⊨ p ↔ (s ⊨ p ∧ s′ ⊨ p)
+    s ⊴ s′ &nbsp;↔&nbsp; ⟦s⟧ ⊆ ⟦s′⟧
   </span>
 
   <p>
-    Once the equivalence between parthood and truth inclusion is available, the
-    lower-bound and greatest-lower-bound properties of the meet operation follow
-    immediately as theorems.
+    Parthood is therefore not merely analogous to but identical with
+    propositional containment, and the entire order may be recovered from the
+    family of truth-sets. Binary meets are postulated and characterized
+    truth-theoretically — the conjunction of two situations makes true precisely
+    those propositions made true by both:
+  </p>
+
+  <span class="formula">
+    s ∧ s′ ⊨ p &nbsp;↔&nbsp; (s ⊨ p ∧ s′ ⊨ p)
+  </span>
+
+  <p>
+    Under the truth-set isomorphism this condition is exactly set intersection,
+    ⟦<em>s</em> ∧ <em>s</em>′⟧ = ⟦<em>s</em>⟧ ∩ ⟦<em>s</em>′⟧, as the following
+    diagram records.
+  </p>
+
+  <figure>
+    <svg viewBox="0 0 560 250" role="img" aria-label="The meet of two situations as the intersection of their truth-sets">
+      <ellipse class="dg-set" cx="205" cy="125" rx="140" ry="92"/>
+      <ellipse class="dg-set" cx="355" cy="125" rx="140" ry="92"/>
+      <text class="dg-sym"  x="120" y="130" text-anchor="middle" font-size="17">⟦s⟧</text>
+      <text class="dg-sym"  x="440" y="130" text-anchor="middle" font-size="17">⟦s′⟧</text>
+      <text class="dg-sym"  x="280" y="122" text-anchor="middle" font-size="15">⟦s ∧ s′⟧</text>
+      <text class="dg-note" x="280" y="145" text-anchor="middle" font-size="12">= ⟦s⟧ ∩ ⟦s′⟧</text>
+    </svg>
+    <figcaption>
+      <span class="fig-num">Figure 2.</span> The meet realized as intersection
+      of truth-sets. Because the parthood order coincides with inclusion of
+      truth-sets, the greatest lower bound of <em>s</em> and <em>s</em>′ is the
+      set of propositions true in both, and the ⊴-inequalities are read directly
+      off the containment of regions.
+    </figcaption>
+  </figure>
+
+  <p>
+    That <em>s</em> ∧ <em>s</em>′ is a lower bound, and the greatest such,
+    then follows immediately: the two inequalities and the universal property are
+    derived theorems rather than further postulates, and the structure
+    ⟨<em>Sit</em>, ⊴, ∧⟩ is a meet-semilattice. Worlds occupy its maximal
+    stratum — a world decides every proposition and harbours no contradiction,
+    so no proper part of a world is itself a world, and worlds are precisely the
+    ⊴-maximal elements. Arbitrary joins are not assumed: the development commits
+    only to the meet-semilattice together with this distinguished class of
+    maximal elements, and not to a complete lattice.
   </p>
 </section>
 
