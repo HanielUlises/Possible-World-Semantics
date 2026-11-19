@@ -91,29 +91,41 @@ graph TD
 
 ## Axiom Inventory
 
+Every `axiom` declaration in the codebase, grouped by file. Definitions and theorems are not listed. Items marked ⚠ are implicated in a [known issue](#known-issues).
+
 | Axiom | File | Status |
 |---|---|---|
 | `World`, `Property`, `Propn` | `Grounding/Ontology` | primitive type |
 | `Object`, `Situation` | `Grounding/Ontology` | primitive predicate |
 | `Enc`, `Encp`, `VAC` | `Grounding/Ontology` | primitive relation / operator |
-| `situation_is_object` | `Grounding/Ontology` | predicate inclusion postulate |
-| `neg` (¬ₚ) | `Grounding/Propositions` | primitive connective |
+| `Enc_VAC_complete` | `Grounding/Ontology` | situations encode only propositional properties `VAC p` |
+| `situation_is_object` | `Grounding/Ontology` | predicate inclusion postulate (OP-3) |
+| `neg` (¬ₚ), `conj` (∧ₚ), `disj` (∨ₚ), `impl` (→ₚ), `bic` | `Grounding/Propositions` | primitive connectives |
+| `bic_def`, `impl_as_disj` | `Grounding/Propositions` | definitional equations on `Propn` |
+| `neg_neg`, `deMorgan_conj`, `deMorgan_disj` | `Grounding/Propositions` | Boolean identities on `Propn` |
+| `conj_comm`, `disj_comm`, `conj_assoc`, `disj_assoc` | `Grounding/Propositions` | Boolean identities on `Propn` |
 | `TrueIn` (⊨) | `Grounding/Truth` | primitive relation |
-| `Encp_def` | `Grounding/Truth` | Prover9-verified metatheorem |
-| `TrueIn_def` | `Grounding/Truth` | Prover9-verified metatheorem |
-| `R`, `R_refl`, `R_trans`, `R_symm` | `Modality/Frames` | S5 frame conditions |
-| `Box` (□) | `Modality/Operators` | primitive modal operator |
-| `K`, `T`, `Four`, `Five` | `Modality/Operators` | S5 axioms |
-| `Nec` | `Modality/Operators` | necessitation rule |
-| `PossNec` | `Modality/Operators` | ◊□φ → □φ, S5 collapse |
+| `Encp_def`, `TrueIn_def` | `Grounding/Truth` | Prover9-verified metatheorems |
+| `TrueIn_conj` | `Grounding/Truth` | truth clause for ∧ₚ |
+| `TrueIn_disj`, `TrueIn_impl`, `TrueIn_neg` | `Grounding/Truth` | ⚠ classical truth clauses, stated for every `s` |
+| `Concrete` | `Grounding/AbstractObjects` | primitive predicate (E!) |
+| `ordinary_no_encoding` | `Grounding/AbstractObjects` | ⚠ axiom β (ordinary objects encode nothing) |
+| `Comprehension` | `Grounding/AbstractObjects` | comprehension for abstract objects |
+| `abstract_extensionality` | `Grounding/AbstractObjects` | constitutive postulate |
+| `SitJoin`, `SitJoin_situation` | `Grounding/StructuredProps` | join existence |
+| `SitJoin_left`, `SitJoin_right`, `SitJoin_minimal` | `Grounding/StructuredProps` | join is the least upper bound |
 | `actualWorld` | `Situation/Definitions` | designated constant |
 | `situation_extensionality` | `Situation/Extensionality` | constitutive postulate |
-| `Concrete`, `ordinary_no_encoding`, `Comprehension` | `Grounding/AbstractObjects` | primitive / comprehension postulate |
-| `abstract_extensionality` | `Grounding/AbstractObjects` | constitutive postulate |
-| `situation_extensionality_via_truth` | `Situation/Theorems` | Prover9 Theorem 2 |
+| `situation_extensionality_via_truth` | `Situation/Theorems` | Prover9 Theorem 2; redundant, derivable from `parthood_iff_truth_inclusion` and `parthood_antisymm` |
 | `actual_implies_possible` | `Situation/Theorems` | modal postulate |
-| `situation_closed_under_parthood` | `Situation/Theorems` | Prover9 Theorem 3 |
+| `situation_closed_under_parthood` | `Situation/Theorems` | ⚠ Prover9 Theorem 3 |
+| `consistent_downward_closed`, `actual_consistent` | `Situation/Theorems` | consistency postulates |
 | `meet`, `meet_situation`, `TrueIn_meet` | `Situation/Infimum` | meet existence and truth conditions |
+| `world_maximal`, `world_consistent` | `Situation/Worlds` | worlds are maximal and consistent |
+| `actualWorld_is_world` | `Situation/Worlds` | the actual world is a world |
+| `maximal_consistent_possible_is_world` | `Situation/Worlds` | sufficient condition for worldhood |
+
+The modal layer (`Modality/Frames`, `Modality/Operators`) has no axioms: `R`, `Box` and `Diamond` are definitions, and `K`, `T`, `Four`, `Five`, `Nec` and `PossNec` are theorems.
 
 ## Open Proof Obligations
 
