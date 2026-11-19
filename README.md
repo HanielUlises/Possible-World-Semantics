@@ -11,7 +11,7 @@ A Lean 4 formalization of possible-world and situation semantics, following the 
 
 ## Architecture
 
-The development is layered: an ontological **Grounding** core fixes the primitives and their algebra, a **Modality** layer postulates the S5 calculus, and a **Situation** layer builds worlds and their meet-semilattice on top.
+The development is layered: an ontological **Grounding** core fixes the primitives and their algebra, a **Modality** layer defines `□` and `◊` over an accessibility relation and derives S5, and a **Situation** layer builds worlds and their meet-semilattice on top.
 
 ```mermaid
 flowchart TD
@@ -23,7 +23,7 @@ flowchart TD
         Abs["AbstractObjects =ₐ"]
     end
     subgraph M["Modality — S5"]
-        Fr["Frames · S5 conditions"]
+        Fr["Frames · R"]
         Op["Operators · □ ◊"]
     end
     subgraph S["Situation — worlds & lattice"]
@@ -35,7 +35,8 @@ flowchart TD
     Ont --> Tru --> Par --> Dep
     Ont --> Abs
     Par --> Inf
-    Fr -.-> Op
+    Fr --> Op
+    Op --> Abs
     Op --> Def --> Ext --> Inf --> Wld
 ```
 
@@ -50,7 +51,7 @@ The development follows the Zalta–Fine tradition. Worlds and situations are no
 
 The central primitive is encoding (`Enc`). A situation encodes the properties that constitute its informational content. Parthood is defined encoding-first: `s ⊴ s'` holds iff every property encoded by `s` is also encoded by `s'`, matching the mereology of Barwise–Perry and the abstract object theory of Zalta.
 
-Modal operators are axiomatic, and not reduced to Kripke frames. The S5 schemas are postulated directly:
+Modal operators are defined over a Kripke frame rather than postulated. `Modality/Frames.lean` defines the accessibility relation as universal (`R w v := True`), so reflexivity, transitivity and symmetry hold by computation, and `Modality/Operators.lean` defines `□ p w := ∀ v, R w v → p v` with `◊` as its dual. The S5 schemas are then theorems:
 
 ```
 □(φ → ψ) → □φ → □ψ          (K)
@@ -59,7 +60,7 @@ Modal operators are axiomatic, and not reduced to Kripke frames. The S5 schemas 
 ◊φ → □◊φ                    (5)
 ```
 
-`Modality/Frames.lean` provides the frame-level conditions as a potential semantic grounding, but they are not wired to `Box` by default. The modal layer stays neutral with respect to frame semantics.
+Necessitation (`Nec`) and the collapse `◊□φ → □φ` (`PossNec`) are also theorems. Because `R` is universal, `□ p w` amounts to `∀ v, p v`: the modal layer is S5 with a single equivalence class of worlds, and it has no axioms of its own.
 
 Extensionality is a postulate. Situations are individuated by propositional content:
 
@@ -168,7 +169,7 @@ Closed by `truth_mono_to_part` in `Grounding/Parthood.lean`. The proof goes via 
 
 The necessitation rule `(∀w, φw) → ∀w, □φw` and the S5 collapse `◊□φ → □φ` are not derivable from K, T, 4, and 5 alone. Necessitation is admissible in every normal modal logic but is not a substitution instance of any of the schemas. The collapse holds in all S5 frames by euclideanity but requires a frame-level reduction or a direct postulate in a purely axiomatic development.
 
-Both were closed by postulating `Nec` and `PossNec` in `Modality/Operators.lean`. Deriving them from `Modality/Frames.lean` remains possible but is not imposed.
+Both were first closed by postulating `Nec` and `PossNec`. They are now theorems: once `Box` was defined by quantification over the universal relation `R` in `Modality/Frames.lean`, every S5 principle, these two included, became a direct calculation, and the modal axioms were removed.
 
 ### OP-3 — Situations are objects
 
