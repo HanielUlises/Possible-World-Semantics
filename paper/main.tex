@@ -1,41 +1,22 @@
-\documentclass[11pt]{article}
+\documentclass[11pt]{amsart}
 
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{lmodern}
-\usepackage[margin=1.1in]{geometry}
+\usepackage[margin=1.15in]{geometry}
 \usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
 \usepackage{booktabs}
+\usepackage{enumitem}
 \usepackage{microtype}
-\usepackage{xcolor}
-\usepackage{listings}
 \usepackage[hidelinks]{hyperref}
-\usepackage{newunicodechar}
-\newunicodechar{↔}{\ensuremath{\leftrightarrow}}
-\newunicodechar{→}{\ensuremath{\rightarrow}}
-\newunicodechar{∀}{\ensuremath{\forall}}
-\newunicodechar{∃}{\ensuremath{\exists}}
-\newunicodechar{¬}{\ensuremath{\neg}}
-\newunicodechar{∧}{\ensuremath{\wedge}}
-\newunicodechar{∨}{\ensuremath{\vee}}
-\newunicodechar{□}{\ensuremath{\Box}}
-\newunicodechar{◊}{\ensuremath{\Diamond}}
-\newunicodechar{𝒜}{\ensuremath{\mathcal{A}}}
-\newunicodechar{⊨}{\ensuremath{\models}}
-\newunicodechar{⊴}{\ensuremath{\trianglelefteq}}
-\newunicodechar{φ}{\ensuremath{\varphi}}
-\newunicodechar{ψ}{\ensuremath{\psi}}
-\newunicodechar{α}{\ensuremath{\alpha}}
-\newunicodechar{⟨}{\ensuremath{\langle}}
-\newunicodechar{⟩}{\ensuremath{\rangle}}
-\newunicodechar{ₚ}{\ensuremath{_{p}}}
-\newunicodechar{≠}{\ensuremath{\neq}}
-\newunicodechar{₁}{\ensuremath{_{1}}}
 
-\emergencystretch=3em
+\emergencystretch=2em
 
-\newtheorem{theorem}{Theorem}
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
 \newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
 \newtheorem{corollary}[theorem]{Corollary}
 \theoremstyle{definition}
 \newtheorem{definition}[theorem]{Definition}
@@ -43,573 +24,890 @@
 \newtheorem{remark}[theorem]{Remark}
 
 \newcommand{\Act}{\mathcal{A}}
-\newcommand{\RW}{\mathrm{RW}}
-\newcommand{\G}{\mathrm{G}}
-\newcommand{\Obt}{\mathsf{Obtains}}
-\newcommand{\aw}{@}
-\newcommand{\lean}[1]{\texttt{#1}}
-
-\definecolor{leankw}{RGB}{0,0,160}
-\definecolor{leancomment}{RGB}{100,100,100}
-\lstdefinelanguage{lean}{
-  morekeywords={theorem,def,noncomputable,inductive,structure,where,fun,
-    namespace,end,open,abbrev,axiom,by,with,match,example,variable,import},
-  sensitive=true,
-  morecomment=[l]{--},
-  morecomment=[s]{/-}{-/},
-}
-\lstset{
-  language=lean,
-  basicstyle=\ttfamily\small,
-  keywordstyle=\color{leankw}\bfseries,
-  commentstyle=\color{leancomment}\itshape,
-  columns=fullflexible,
-  keepspaces=true,
-  frame=single,
-  framerule=0.3pt,
-  rulecolor=\color{black!30},
-  xleftmargin=0.5em,
-  xrightmargin=0.5em,
-  aboveskip=0.8em,
-  belowskip=0.8em,
-  extendedchars=true,
-  literate=
-    {↔}{{$\leftrightarrow$}}1
-    {→}{{$\rightarrow$}}1
-    {∀}{{$\forall$}}1
-    {∃}{{$\exists$}}1
-    {¬}{{$\neg$}}1
-    {∧}{{$\wedge$}}1
-    {∨}{{$\vee$}}1
-    {□}{{$\Box$}}1
-    {◊}{{$\Diamond$}}1
-    {𝒜}{{$\mathcal{A}$}}1
-    {⊨}{{$\models$}}1
-    {⊴}{{$\trianglelefteq$}}1
-    {φ}{{$\varphi$}}1
-    {ψ}{{$\psi$}}1
-    {α}{{$\alpha$}}1
-    {⟨}{{$\langle$}}1
-    {⟩}{{$\rangle$}}1
-    {ₚ}{{$_{p}$}}1
-    {≠}{{$\neq$}}1
-    {₁}{{$_{1}$}}1
-}
-
-\title{Contingent Logical Truths, Mechanized:\\
-Actuality and Real-World Validity in a Lean~4 Situation Theory}
-\author{Haniel Ulises}
-\date{November 2026}
+\newcommand{\Lang}{\mathcal{L}_{\Box\Act}}
+\newcommand{\Mod}{\mathfrak{M}}
+\newcommand{\Kl}{\mathsf{K}}
+\newcommand{\at}{@}
+\newcommand{\RWv}[1]{\models^{#1}_{\mathrm{rw}}}
+\newcommand{\Gv}[1]{\models^{#1}_{\mathrm{g}}}
+\newcommand{\nRWv}[1]{\not\models^{#1}_{\mathrm{rw}}}
+\newcommand{\nGv}[1]{\not\models^{#1}_{\mathrm{g}}}
+\newcommand{\Two}{\Mod_2}
+\newcommand{\Sit}{\mathrm{Sit}}
+\newcommand{\Obj}{\mathrm{Obj}}
+\newcommand{\Enc}{\mathrm{Enc}}
+\newcommand{\Encp}{\mathrm{Enc}_{\mathrm{p}}}
+\newcommand{\Obt}{\mathrm{Ob}}
+\newcommand{\Conc}{\mathrm{E}}
+\newcommand{\VAC}{\mathrm{vac}}
+\newcommand{\World}{\mathrm{World}}
+\newcommand{\Actual}{\mathrm{Actual}}
+\newcommand{\Poss}{\mathrm{Possible}}
+\newcommand{\Max}{\mathrm{Max}}
+\newcommand{\Cons}{\mathrm{Cons}}
+\newcommand{\Ord}{\mathrm{O!}}
+\newcommand{\Abs}{\mathrm{A!}}
+\newcommand{\partof}{\trianglelefteq}
+\newcommand{\meet}{\sqcap}
+\newcommand{\join}{\sqcup}
+\newcommand{\Prop}{\mathbb{P}}
+\newcommand{\Pty}{\mathbb{F}}
+\newcommand{\Dom}{D}
+\newcommand{\T}{\mathsf{T}}
+\newcommand{\N}{\mathcal{N}}
+\newcommand{\tr}[1]{[\![#1]\!]}
+\newcommand{\pneg}{\mathord{\sim}}
+\newcommand{\pand}{\mathbin{\&}}
+\newcommand{\por}{\mathbin{\vee_{\mathrm{p}}}}
+\newcommand{\pimp}{\mathbin{\to_{\mathrm{p}}}}
+\newcommand{\piff}{\mathbin{\leftrightarrow_{\mathrm{p}}}}
 
 \begin{document}
-\maketitle
+
+\title[Contingent logical truths and real-world validity]{Contingent
+logical truths and real-world validity,\\ with an application to
+situation theory}
+
+\author{Haniel Ulises}
+
+\date{}
+
+\subjclass[2020]{Primary 03B45; Secondary 03A05, 03B35}
+
+\keywords{actuality operator, real-world validity, general validity,
+contingent logical truth, necessitation, situation theory, abstract
+objects}
 
 \begin{abstract}
-Zalta argued that a modal language with an actuality operator contains
-logical truths that are not necessary, such as
-$\varphi \leftrightarrow \Act\varphi$. The argument identifies logical
-truth with \emph{real-world validity}, truth at the actual world of
-every model, rather than with \emph{general validity}, truth at every
-world of every model. We give a mechanization of this argument in
-Lean~4 at three levels. First, in a deep embedding of propositional
-modal logic with actuality, we prove for an arbitrary class of models
-that general validity is closed under necessitation while real-world
-validity is not, that $\varphi \leftrightarrow \Act\varphi$ is
-real-world valid for every $\varphi$ but neither it nor its
-necessitation is valid in the stronger sense in any class containing a
-two-world model, and that $\Box(\varphi \leftrightarrow \Act\varphi)$
-holds at a world exactly when $\varphi$ takes its actual value
-throughout that world's accessible worlds. Second, we add an actuality
-operator, as a definition that introduces no axioms, to a Lean
-development of situation and world theory in the style of Zalta, and
-prove that the deep and shallow semantics of $\Act$ agree. Third, we
-give a concrete model of all 48 axioms of that theory, checked against
-them mechanically, in which the actuality truth for a contingent
-proposition holds at the actual world while its necessitation fails.
-We also report how earlier versions of the theory's axioms collapsed,
-and how separating situated truth from obtaining repairs them.
+In modal languages with an actuality operator $\Act$, the sentence
+$\varphi \leftrightarrow \Act\varphi$ is true at the actual world of
+every model but is not, in general, necessary. Whether this exhibits a
+logical truth that is not necessary depends on whether logical truth is
+identified with real-world validity or with general validity. We give a
+uniform treatment of the two notions relative to an arbitrary class of
+Kripke models with a designated world. General validity is closed under
+necessitation and real-world validity is not; the two notions separate
+on every class containing a two-world model; and
+$\Box(\varphi \leftrightarrow \Act\varphi)$ holds at a world exactly
+when $\varphi$ is constant on the worlds accessible from it. We then
+apply these results to an axiomatic theory of situations and worlds in
+the tradition of Zalta, in which the actuality operator is definable
+and the worlds are exactly the maximal possible situations. The theory,
+read as a model of the logic of actuality, validates every real-world
+valid formula at its actual world, and it has a non-degenerate model in
+which the actuality biconditional for a contingent proposition is true
+but not necessary. We also show that the theory must distinguish truth
+in a situation from truth at an index: if the two are identified, there
+is at most one situation. All results have been verified in an
+interactive proof assistant.
 \end{abstract}
 
+\maketitle
+
 \section{Introduction}
+\label{sec:intro}
 
-Is every logical truth necessary? The traditional answer is yes, and
-modal logics reflect it in the rule of necessitation: from
-$\vdash\varphi$ infer $\vdash\Box\varphi$. Zalta~\cite{zalta1988}
-argued that the answer is no once the language contains a device for
-referring to the actual world. Let $\Act$ be an actuality operator, so
-that $\Act\varphi$ is true at any world just in case $\varphi$ is true
-at the actual world. Then $\varphi \leftrightarrow \Act\varphi$ is true
-at the actual world of every interpretation, and so, on the natural
-model-theoretic account of logical truth, it is a logical truth. Yet
-it is not necessary: if $\varphi$ is actually true but could have been
-false, then at a world where $\varphi$ fails, $\Act\varphi$ still
-holds, so the biconditional fails there.
+The rule of necessitation, from $\varphi$ infer $\Box\varphi$, is
+admissible in every normal modal logic, and it reflects the traditional
+view that whatever is logically true is necessarily true. Zalta
+\cite{zalta1988} argued that this view fails for modal languages
+containing a device that refers rigidly to the actual world. If $\Act$
+is an actuality operator, so that $\Act\varphi$ is true at any world
+just in case $\varphi$ is true at the actual world, then
+$\varphi \leftrightarrow \Act\varphi$ is true at the actual world of
+every interpretation. Yet if $\varphi$ is true but could have been
+false, the biconditional fails at any world where $\varphi$ is false,
+since $\Act\varphi$ remains true there.
 
-The formal ingredients go back to Crossley and
-Humberstone~\cite{crossley1977}, and the two notions of validity
-involved were named by Davies and Humberstone~\cite{davies1980}:
-\emph{real-world validity} (truth at the designated actual world of
-every model) and \emph{general validity} (truth at every world of
-every model). Zalta's claim is that real-world validity, not general
-validity, is the correct explication of logical truth. Hanson~\cite{hanson2006}
-defended the traditional link between logical truth and necessity, and
-Nelson and Zalta~\cite{nelson2012} replied.
+The semantics of the actuality operator is due to Crossley and
+Humberstone \cite{crossley1977}. Davies and Humberstone
+\cite{davies1980} distinguished two notions of validity for it:
+\emph{real-world validity}, truth at the designated world of every
+model, and \emph{general validity}, truth at every world of every
+model. Zalta's thesis is that real-world validity is the correct
+explication of logical truth, and hence that some logical truths are
+not necessary. Hanson \cite{hanson2006} defended the traditional
+connection between logical truth and necessity, and Nelson and Zalta
+\cite{nelson2012} replied.
 
-The philosophical dispute is about which notion of validity explicates
-logical truth. The formal facts on which both sides rely should not be
-in dispute, but they are subtle enough that it is worth having them
-checked by machine. This paper does so in Lean~4~\cite{demoura2021}.
-Our contributions are:
+The facts about the two notions of validity on which this debate turns
+are elementary and largely known. Our first aim is to state them
+uniformly for an arbitrary class of models, and to sharpen them in two
+respects. First, the failure of necessitation for the actuality
+biconditional admits an exact characterization:
+$\Box(\varphi \leftrightarrow \Act\varphi)$ holds at a world precisely
+when $\varphi$ is constant on the worlds accessible from it
+(Theorem~\ref{thm:characterization}). Second, prefixing $\Act$ converts
+real-world validity into general validity, so that the necessary truth
+in the vicinity is $\Act(\varphi \leftrightarrow \Act\varphi)$ rather
+than $\varphi \leftrightarrow \Act\varphi$
+(Corollary~\ref{cor:actually-necessary}).
 
-\begin{enumerate}
-\item A deep embedding of propositional modal logic with $\Box$ and
-  $\Act$, with real-world and general validity defined relative to an
-  arbitrary class of models, and machine-checked proofs of the closure
-  properties, non-closure under necessitation, strictness, and a
-  characterization of when $\Box(\varphi \leftrightarrow \Act\varphi)$
-  holds (Section~\ref{sec:deep}).
-\item An actuality operator in an existing Lean development of
-  situation and world theory, defined rather than postulated, with a
-  proof that the development is a model of the deep embedding and that
-  the two treatments of $\Act$ agree (Section~\ref{sec:theory}).
-\item A concrete, non-degenerate model of all 48 axioms of the
-  situation theory, in which the actuality truth for a contingent
-  proposition holds but is not necessary, together with a check that
-  ties the model's statements to the axioms (Section~\ref{sec:model}).
-\item A report on how earlier versions of the theory's axioms
-  collapsed, and on the repair that makes room for the results above
-  (Section~\ref{sec:repair}).
+Our second aim is to show that the phenomenon arises within a
+substantive metaphysical theory, and not merely in arbitrary Kripke
+models. We consider an axiomatic theory of situations and worlds in the
+tradition of Zalta's theory of abstract objects
+\cite{zalta1983,zalta1993}. In this theory the actuality operator is
+definable without further axioms (Section~\ref{sec:theory}). Read as a
+model of the logic of actuality, the theory validates every real-world
+valid formula at its actual world (Theorem~\ref{thm:agreement}), and it
+has a non-degenerate model in which the actuality biconditional for a
+contingent proposition is true but not necessary
+(Section~\ref{sec:model}). The theory distinguishes truth in a
+situation, which is partial, from truth at an index, which is
+classical. This distinction cannot be dropped: if truth in a situation
+is required to be classical, the theory admits at most one situation
+(Proposition~\ref{prop:collapse}).
+
+Section~\ref{sec:logic} introduces the logic of actuality and the two
+notions of validity, and Section~\ref{sec:results} establishes the
+results on validity and necessitation. Section~\ref{sec:theory}
+presents the theory of situations and worlds and the actuality operator
+within it, and Section~\ref{sec:model} constructs a model of the
+theory. Section~\ref{sec:related} discusses related work.
+Appendix~\ref{app:mech} describes the mechanical verification of the
+results.
+
+\section{The logic of actuality}
+\label{sec:logic}
+
+\begin{definition}
+Let $\Phi$ be a set of propositional atoms. The language $\Lang(\Phi)$
+is given by the grammar
+\[
+  \varphi \Coloneqq a \mid \bot \mid \neg\varphi \mid
+  \varphi \wedge \varphi \mid \varphi \to \varphi \mid
+  \Box\varphi \mid \Act\varphi
+  \qquad (a \in \Phi).
+\]
+We write $\varphi \leftrightarrow \psi$ for
+$(\varphi \to \psi) \wedge (\psi \to \varphi)$ and $\Diamond\varphi$
+for $\neg\Box\neg\varphi$.
+\end{definition}
+
+\begin{definition}
+A \emph{model} is a tuple $\Mod = \langle W, R, \at, V\rangle$, where
+$W$ is a nonempty set of worlds, $R \subseteq W \times W$ is an
+accessibility relation, $\at \in W$ is the \emph{actual world}, and
+$V\colon \Phi \to \mathcal{P}(W)$ is a valuation. Truth at a world is
+defined by
+\begin{align*}
+  \Mod, w &\models a &&\text{iff}\quad w \in V(a),\\
+  \Mod, w &\not\models \bot,\\
+  \Mod, w &\models \neg\varphi &&\text{iff}\quad \Mod, w \not\models \varphi,\\
+  \Mod, w &\models \varphi \wedge \psi &&\text{iff}\quad
+     \Mod, w \models \varphi \text{ and } \Mod, w \models \psi,\\
+  \Mod, w &\models \varphi \to \psi &&\text{iff}\quad
+     \Mod, w \not\models \varphi \text{ or } \Mod, w \models \psi,\\
+  \Mod, w &\models \Box\varphi &&\text{iff}\quad
+     \Mod, v \models \varphi \text{ for all } v \text{ with } wRv,\\
+  \Mod, w &\models \Act\varphi &&\text{iff}\quad \Mod, \at \models \varphi.
+\end{align*}
+\end{definition}
+
+The truth condition of $\Act\varphi$ does not depend on the world of
+evaluation.
+
+\begin{lemma}[rigidity]
+\label{lem:rigid}
+For every model $\Mod$, formula $\varphi$ and worlds $w, w'$ of $\Mod$,
+\[
+  \Mod, w \models \Act\varphi
+  \iff \Mod, w' \models \Act\varphi
+  \iff \Mod, \at \models \varphi .
+\]
+\end{lemma}
+
+\begin{proof}
+Immediate from the truth clause for $\Act$.
+\end{proof}
+
+\begin{definition}
+A \emph{class of models} is any collection $\Kl$ of models. We write
+$\Kl_{\mathrm{all}}$ for the class of all models, $\Kl_{\mathrm{S5}}$
+for the class of models in which $R$ is an equivalence relation, and
+$\Kl_{\mathrm{u}}$ for the class of models in which $R = W \times W$.
+A formula $\varphi$ is
+\begin{enumerate}[label=(\roman*)]
+\item \emph{real-world valid} in $\Kl$, written $\RWv{\Kl} \varphi$,
+  if $\Mod, \at \models \varphi$ for every $\Mod \in \Kl$;
+\item \emph{generally valid} in $\Kl$, written $\Gv{\Kl} \varphi$, if
+  $\Mod, w \models \varphi$ for every $\Mod \in \Kl$ and every world
+  $w$ of $\Mod$.
 \end{enumerate}
+\end{definition}
 
-All results are proved without \lean{sorry}. The development is
-available at
-\url{https://github.com/HanielUlises/Possible-World-Semantics}.
+\begin{definition}
+Let $\Two = \langle \{0,1\}, \{0,1\}^2, 1, V_2\rangle$, where
+$V_2(a) = \{1\}$ for every $a \in \Phi$. Thus $\Two$ has two mutually
+accessible worlds, the actual world $1$ and the world $0$, and every
+atom is true at the actual world only. Clearly
+$\Two \in \Kl_{\mathrm{u}} \subseteq \Kl_{\mathrm{S5}} \subseteq
+\Kl_{\mathrm{all}}$.
+\end{definition}
 
-\section{Background}
-\label{sec:background}
+\section{Validity, necessitation and the actuality biconditional}
+\label{sec:results}
 
-\paragraph{The logic of actuality.}
-A model for propositional modal logic with actuality is a Kripke model
-$M = \langle W, R, \aw, V\rangle$ with a designated actual world
-$\aw \in W$. Truth at a world is defined as usual, with
-\[
-  M, w \models \Act\varphi \quad\text{iff}\quad M, \aw \models \varphi .
-\]
-A formula is \emph{real-world valid} in a class $\mathcal{C}$ of models
-if it is true at $\aw$ in every $M \in \mathcal{C}$, and \emph{generally
-valid} in $\mathcal{C}$ if it is true at every world of every
-$M \in \mathcal{C}$. General validity implies real-world validity. The
-converse fails, and so does closure of real-world validity under
-necessitation. Both facts are witnessed by
-$\varphi \leftrightarrow \Act\varphi$.
+Throughout this section, $\Kl$ is an arbitrary class of models.
 
-\paragraph{Situation and world theory.}
-Zalta's theory of abstract objects~\cite{zalta1983,zalta1988book}
-distinguishes \emph{exemplifying} a property from \emph{encoding} it.
-Situations are abstract objects that encode only propositional
-properties, and a proposition is true in a situation when the
-situation encodes the corresponding property. Worlds are situations
-that could make true exactly the propositions that are true. On this
-basis Zalta proved twenty-five basic theorems of situation and world
-theory~\cite{zalta1993}, and Fitelson and Zalta verified a number of
-them with the automated reasoner Prover9~\cite{fitelson2007}.
-
-\paragraph{The Lean development.}
-The development extended here formalizes a version of this theory in
-Lean~4 as a shallow embedding. A single type \lean{World} serves as
-the domain of objects, situations and indices. Encoding (\lean{Enc}),
-situated truth ($s \models p$) and situationhood are primitives
-constrained by axioms; parthood $s \trianglelefteq s'$ is inclusion of
-encoded properties; and $\Box$ and $\Diamond$ are \emph{defined} by
-quantification over a universal accessibility relation, so that the S5
-principles are theorems. Every axiom is listed in an inventory, and the
-development has no axioms beyond the 48 listed there.
-
-\section{The logic of actuality, deeply embedded}
-\label{sec:deep}
-
-We define formulas over an arbitrary type of atoms and models with a
-designated actual world.
-
-\begin{lstlisting}
-inductive Formula (α : Type) where
-  | atom : α → Formula α
-  | bot  : Formula α
-  | neg  : Formula α → Formula α
-  | conj : Formula α → Formula α → Formula α
-  | impl : Formula α → Formula α → Formula α
-  | box  : Formula α → Formula α
-  | act  : Formula α → Formula α
-
-structure Model (α : Type) where
-  W      : Type
-  R      : W → W → Prop
-  actual : W
-  val    : α → W → Prop
-\end{lstlisting}
-
-Truth at a world, \lean{sat M φ w}, is defined by structural recursion
-on the formula; the clause for $\Act$ ignores the world of evaluation:
-
-\begin{lstlisting}
-  | box φ, w => ∀ v, M.R w v → sat M φ v
-  | act φ, _ => sat M φ M.actual
-\end{lstlisting}
-
-A class of models is a predicate on models. The classes we use are all
-models, models whose accessibility relation is an equivalence (S5), and
-models whose accessibility relation is universal. The two notions of
-validity are:
-
-\begin{lstlisting}
-def RWValid (C : ModelClass α) (φ : Formula α) : Prop :=
-  ∀ M, C M → sat M φ M.actual
-
-def GValid (C : ModelClass α) (φ : Formula α) : Prop :=
-  ∀ M, C M → ∀ w, sat M φ w
-\end{lstlisting}
-
-\begin{proposition}[closure]
-For every class $\mathcal{C}$: general validity implies real-world
-validity (\lean{GValid.rwValid}); both are closed under modus ponens
-(\lean{RWValid.mp}, \lean{GValid.mp}); and general validity is closed
-under necessitation (\lean{GValid.nec}).
+\begin{proposition}
+\label{prop:closure}
+\leavevmode
+\begin{enumerate}[label=(\roman*)]
+\item If $\Gv{\Kl} \varphi$, then $\RWv{\Kl} \varphi$.
+\item If $\RWv{\Kl} \varphi \to \psi$ and $\RWv{\Kl} \varphi$, then
+  $\RWv{\Kl} \psi$. The same holds for general validity.
+\item If $\Gv{\Kl} \varphi$, then $\Gv{\Kl} \Box\varphi$.
+\end{enumerate}
 \end{proposition}
 
-\begin{proposition}[the actuality truth]
-For every class $\mathcal{C}$ and every formula $\varphi$,
-$\varphi \leftrightarrow \Act\varphi$ is real-world valid in
-$\mathcal{C}$ (\lean{actuality\_rwValid}).
-\end{proposition}
+\begin{proof}
+(i) The actual world of a model is one of its worlds. (ii) Modus ponens
+preserves truth at each world, in particular at the actual world.
+(iii) If $\varphi$ is true at every world of every model in $\Kl$, then
+for each such model and each world $w$, $\varphi$ is true at every $v$
+with $wRv$.
+\end{proof}
 
-The countermodel has two mutually accessible worlds, \lean{true}
-(actual) and \lean{false}, and makes every atom true at \lean{true}
-only. It belongs to the S5 and universal classes
-(\lean{twoWorlds\_S5}, \lean{twoWorlds\_universal}). At the world
-\lean{false}, an atom $a$ is false but $\Act a$ is true.
-
-\begin{theorem}[non-closure under necessitation]
-\label{thm:nonclosure}
-Let $\mathcal{C}$ contain the two-world model and let $a$ be an atom.
-Then $a \leftrightarrow \Act a$ is not generally valid in $\mathcal{C}$
-(\lean{actuality\_not\_gValid}), and
-$\Box(a \leftrightarrow \Act a)$ is not even real-world valid in
-$\mathcal{C}$ (\lean{box\_actuality\_not\_rwValid}). Hence real-world
-validity is strictly weaker than general validity
-(\lean{rwValid\_strictly\_weaker}) and is not closed under necessitation
-(\lean{rwValid\_not\_closed\_under\_nec}).
+\begin{theorem}
+\label{thm:rw}
+For every formula $\varphi$,
+$\RWv{\Kl} \varphi \leftrightarrow \Act\varphi$.
 \end{theorem}
 
-In Lean, the S5 instance of the second statement reads:
+\begin{proof}
+Let $\Mod \in \Kl$. By Lemma~\ref{lem:rigid},
+$\Mod, \at \models \Act\varphi$ if and only if
+$\Mod, \at \models \varphi$, so the biconditional is true at $\at$.
+\end{proof}
 
-\begin{lstlisting}
-theorem contingent_logical_truth_S5 (a : α) :
-    ∃ φ : Formula α, RWValid S5Models φ ∧ ¬ RWValid S5Models (box φ)
-\end{lstlisting}
+The necessitation of the actuality biconditional is governed by the
+following characterization.
 
-The failure of necessitation is not a feature of the particular atom.
-It is exactly as wide as contingency.
-
-\begin{theorem}[when the necessitation holds]
+\begin{theorem}
 \label{thm:characterization}
-For every model $M$, formula $\varphi$ and world $w$,
+For every model $\Mod$, formula $\varphi$ and world $w$ of $\Mod$,
 \[
-  M, w \models \Box(\varphi \leftrightarrow \Act\varphi)
-  \quad\text{iff}\quad
-  \text{for all } v \text{ with } wRv,\;
-  M, v \models \varphi \iff M, \aw \models \varphi
+  \Mod, w \models \Box(\varphi \leftrightarrow \Act\varphi)
+  \iff
+  \text{for every } v \text{ with } wRv,\quad
+  \Mod, v \models \varphi \iff \Mod, \at \models \varphi .
 \]
-(\lean{sat\_box\_actuality}). If $R$ is universal, the right-hand side
-says that $\varphi$ is true everywhere or false everywhere
-(\lean{sat\_box\_actuality\_universal}).
 \end{theorem}
 
-Finally, actuality is inert for real-world validity but not for general
-validity.
+\begin{proof}
+By the truth clauses for $\Box$ and $\leftrightarrow$, the left-hand
+side holds if and only if, for every $v$ with $wRv$,
+$\Mod, v \models \varphi$ iff $\Mod, v \models \Act\varphi$. By
+Lemma~\ref{lem:rigid}, the latter is equivalent to
+$\Mod, \at \models \varphi$.
+\end{proof}
 
-\begin{proposition}[inertness]
-For every class $\mathcal{C}$: $\Act\varphi$ is real-world valid iff
-$\varphi$ is (\lean{rwValid\_act\_iff}); $\Act\varphi$ is generally
-valid iff $\varphi$ is \emph{real-world} valid (\lean{gValid\_act\_iff});
-and $\Act\varphi \to \Box\Act\varphi$ is generally valid in all models
-(\lean{act\_imp\_box\_act\_gValid}).
+\begin{corollary}
+\label{cor:universal}
+Let $\Mod \in \Kl_{\mathrm{u}}$. For every world $w$ of $\Mod$,
+$\Mod, w \models \Box(\varphi \leftrightarrow \Act\varphi)$ if and only
+if $\varphi$ is true at every world of $\Mod$ or false at every world
+of $\Mod$.
+\end{corollary}
+
+\begin{proof}
+Suppose $\Mod, w \models \Box(\varphi \leftrightarrow \Act\varphi)$.
+Since $R$ is universal, Theorem~\ref{thm:characterization} gives that
+the truth value of $\varphi$ at every world equals its truth value at
+$\at$. Conversely, if $\varphi$ has the same truth value at every
+world, then in particular its value at each $v$ agrees with its value
+at $\at$.
+\end{proof}
+
+In universal models, therefore, the necessitation of the actuality
+biconditional fails exactly when $\varphi$ is contingent. A single
+contingent atom suffices to separate the two notions of validity.
+
+\begin{theorem}
+\label{thm:separation}
+Suppose that $\Two \in \Kl$, and let $a \in \Phi$. Then:
+\begin{enumerate}[label=(\roman*)]
+\item $\nGv{\Kl} a \leftrightarrow \Act a$;
+\item $\nRWv{\Kl} \Box(a \leftrightarrow \Act a)$;
+\item real-world validity in $\Kl$ is not closed under necessitation;
+\item real-world validity in $\Kl$ properly extends general validity
+  in $\Kl$.
+\end{enumerate}
+In particular, \textup{(i)--(iv)} hold for $\Kl_{\mathrm{all}}$,
+$\Kl_{\mathrm{S5}}$ and $\Kl_{\mathrm{u}}$.
+\end{theorem}
+
+\begin{proof}
+In $\Two$ we have $\Two, 0 \not\models a$, while
+$\Two, 0 \models \Act a$ by Lemma~\ref{lem:rigid}, since
+$\Two, 1 \models a$. Hence $a \leftrightarrow \Act a$ fails at $0$,
+which gives (i). Since $1 R 0$, the formula
+$\Box(a \leftrightarrow \Act a)$ fails at the actual world $1$, which
+gives (ii). By Theorem~\ref{thm:rw}, $a \leftrightarrow \Act a$ is
+real-world valid in $\Kl$; hence (ii) yields (iii), and (i) together
+with Proposition~\ref{prop:closure}(i) yields (iv).
+\end{proof}
+
+By Proposition~\ref{prop:closure}(iii), the failure of necessitation is
+specific to real-world validity. If logical truth is identified with
+real-world validity, then $a \leftrightarrow \Act a$ is a logical truth
+that is not necessary. If it is identified with general validity, then
+$a \leftrightarrow \Act a$ is not a logical truth.
+
+The actuality operator interacts differently with the two notions.
+
+\begin{proposition}
+\label{prop:inert}
+For every formula $\varphi$:
+\begin{enumerate}[label=(\roman*)]
+\item $\RWv{\Kl} \Act\varphi$ if and only if $\RWv{\Kl} \varphi$;
+\item $\Gv{\Kl} \Act\varphi$ if and only if $\RWv{\Kl} \varphi$;
+\item $\Gv{\Kl_{\mathrm{all}}} \Act\varphi \to \Box\Act\varphi$.
+\end{enumerate}
 \end{proposition}
 
-The second clause is a compact statement of the whole phenomenon.
-Prefixing $\Act$ converts real-world validity into general validity,
-so $\Act(\varphi \leftrightarrow \Act\varphi)$ is generally valid and
-hence necessary, while $\varphi \leftrightarrow \Act\varphi$ itself is
-not. What is necessary is that the biconditional \emph{actually}
-holds, not that it holds.
+\begin{proof}
+By Lemma~\ref{lem:rigid}, the truth value of $\Act\varphi$ at any world
+of $\Mod$ is the truth value of $\varphi$ at $\at$; this gives (i) and
+(ii). For (iii), if $\Act\varphi$ is true at $w$, then $\varphi$ is
+true at $\at$, so $\Act\varphi$ is true at every world, and in
+particular at every $v$ with $wRv$.
+\end{proof}
 
-All proofs in this section use only Lean's logic. For the S5 result
-above, \lean{\#print axioms} lists only Lean's standard axioms
-\lean{propext}, \lean{Classical.choice} and \lean{Quot.sound}.
+\begin{corollary}
+\label{cor:actually-necessary}
+For every formula $\varphi$,
+$\Gv{\Kl} \Act(\varphi \leftrightarrow \Act\varphi)$ and
+$\Gv{\Kl} \Box\Act(\varphi \leftrightarrow \Act\varphi)$.
+\end{corollary}
 
-\section{Actuality in situation theory}
+\begin{proof}
+The first claim follows from Theorem~\ref{thm:rw} and
+Proposition~\ref{prop:inert}(ii), and the second from the first by
+Proposition~\ref{prop:closure}(iii).
+\end{proof}
+
+Corollary~\ref{cor:actually-necessary} identifies the necessary truth
+associated with the actuality biconditional. It is not necessary that
+$\varphi$ holds if and only if $\varphi$ actually holds; it is
+necessary, and generally valid, that this biconditional actually holds.
+
+\section{Actuality in a theory of situations and worlds}
 \label{sec:theory}
 
-\subsection{Situated truth and obtaining}
+We now consider a theory $\T$ of situations and worlds in the tradition
+of Zalta's theory of abstract objects \cite{zalta1983,zalta1988book}
+and his development of situation and world theory \cite{zalta1993}. The
+theory is formulated in the metalanguage of higher-order logic.
 
-The situation theory distinguishes two truth relations. Situated truth
-$s \models p$ is partial: a situation may make neither $p$ nor $\neg p$
-true. The relation $\Obt\ v\ p$, read ``$p$ is the case at index
-$v$'', is classical; it alone is governed by the clauses
-\[
-  \Obt\ v\ (\neg p) \leftrightarrow \neg\,\Obt\ v\ p,
-  \qquad
-  \Obt\ v\ (p \wedge q) \leftrightarrow \Obt\ v\ p \wedge \Obt\ v\ q,
-\]
-and similarly for disjunction and implication. Following Zalta, a world
-is a situation that could make true exactly what is the case, and a
-situation is actual when everything true in it is actually the case:
+\subsection{Signature}
+
+The theory has three sorts: a domain $\Dom$ of \emph{objects}, which
+also serve as indices of modal evaluation; a sort $\Prop$ of
+\emph{propositions}; and a sort $\Pty$ of \emph{properties}. Its
+primitive vocabulary consists of:
+\begin{enumerate}[label=(\alph*)]
+\item operations $\pneg\colon \Prop \to \Prop$ and
+  $\pand, \por, \pimp, \piff\colon \Prop \times \Prop \to \Prop$;
+\item a map $\VAC\colon \Prop \to \Pty$, sending $p$ to the property
+  of being such that $p$;
+\item predicates $\Obj, \Sit \subseteq \Dom$ (being an object, being a
+  situation) and a relation $\Conc \subseteq \Dom \times \Dom$, where
+  $\Conc(w,x)$ expresses that $x$ is concrete at the index $w$;
+\item encoding relations $\Enc \subseteq \Dom \times \Pty$ and
+  $\Encp \subseteq \Dom \times \Prop$;
+\item \emph{truth in a situation}, $\models\ \subseteq \Dom \times
+  \Prop$, written $s \models p$;
+\item \emph{obtaining at an index}, $\Obt \subseteq \Dom \times
+  \Prop$, where $\Obt(v,p)$ expresses that $p$ is the case at $v$;
+\item a constant $\at \in \Dom$, the actual world;
+\item operations $\meet, \join\colon \Dom \times \Dom \to \Dom$.
+\end{enumerate}
+
+The modal operators act on conditions on indices. Accessibility is
+universal: for $P \subseteq \Dom$, $(\Box P)(w)$ holds if and only if
+$P(v)$ for every $v \in \Dom$, and $\Diamond P = \neg\Box\neg P$. The
+operators $\Box$ and $\Diamond$ thus satisfy S5 without further axioms.
+We use the following abbreviations:
 \begin{align*}
-  \mathsf{World}(s) &:= \mathsf{Situation}(s) \wedge
-    \Diamond\lambda v.\,\forall p\,(s \models p \leftrightarrow \Obt\ v\ p),\\
-  \mathsf{Actual}(s) &:= \forall p\,(s \models p \to \Obt\ \aw\ p).
+  s \partof s' &\;:\Longleftrightarrow\; \forall F\,
+    (\Enc(s,F) \to \Enc(s',F)) &&\text{(parthood)}\\
+  \Ord(x) &\;:\Longleftrightarrow\;
+    \Diamond(\lambda w.\,\Conc(w,x))(x) &&\text{(ordinary object)}\\
+  \Abs(x) &\;:\Longleftrightarrow\; \neg\Ord(x)
+    &&\text{(abstract object)}\\
+  \Max(s) &\;:\Longleftrightarrow\; \forall p\,
+    (s \models p \;\vee\; s \models \pneg p) &&\text{(maximality)}\\
+  \Cons(s) &\;:\Longleftrightarrow\; \neg\exists p\,
+    (s \models p \;\wedge\; s \models \pneg p) &&\text{(consistency)}
 \end{align*}
-With these definitions the classical behaviour of truth at worlds, and
-the maximality and consistency of worlds, are theorems; worlds are
-characterized as exactly the maximal possible situations. The designated
-constant \lean{actualWorld} is used both as a situation and as the
-index of evaluation, and a single axiom, \lean{actualWorld\_faithful},
-states that its truths are exactly what obtains at it.
+
+\subsection{Axioms}
+
+The axioms of $\T$ fall into seven groups. Free variables are
+universally quantified.
+
+\begin{enumerate}[label=(T\arabic*), leftmargin=3.2em]
+\item \label{ax:boolean} \emph{Propositional identities.} The
+  operations on $\Prop$ satisfy double negation, the De Morgan laws,
+  commutativity and associativity of $\pand$ and $\por$, and the
+  identities $p \pimp q = \pneg p \por q$ and
+  $p \piff q = (p \pimp q) \pand (q \pimp p)$.
+\item \label{ax:encoding} \emph{Encoding and truth.} If $\Obj(x)$, then
+  $\Encp(x,p) \leftrightarrow \Enc(x, \VAC(p))$ and
+  $x \models p \leftrightarrow \Encp(x,p)$. Every situation is an
+  object, and every property encoded by a situation is of the form
+  $\VAC(p)$.
+\item \label{ax:obtains} \emph{Obtaining.} For every index $v$,
+  \begin{align*}
+    \Obt(v, \pneg p) &\leftrightarrow \neg\Obt(v,p), &
+    \Obt(v, p \pand q) &\leftrightarrow \Obt(v,p) \wedge \Obt(v,q),\\
+    \Obt(v, p \por q) &\leftrightarrow \Obt(v,p) \vee \Obt(v,q), &
+    \Obt(v, p \pimp q) &\leftrightarrow (\Obt(v,p) \to \Obt(v,q)).
+  \end{align*}
+\item \label{ax:abstract} \emph{Abstract objects.} Ordinary objects
+  necessarily encode no property:
+  $\Ord(x) \to \Box(\lambda w.\,\neg\exists F\,\Enc(x,F))(x)$. For
+  every condition $\varphi$ on properties there is an abstract object
+  encoding exactly the properties that satisfy it:
+  $\exists x\,(\Abs(x) \wedge \forall F\,(\Enc(x,F) \leftrightarrow
+  \varphi(F)))$. Abstract objects that encode the same properties are
+  identical.
+\item \label{ax:ext} \emph{Situations.} Situations that make the same
+  propositions true are identical. If $\Sit(s)$, $\Abs(x)$ and
+  $x \partof s$, then $\Sit(x)$.
+\item \label{ax:lattice} \emph{Meet and join.} If $\Sit(s)$ and
+  $\Sit(s')$, then $\Sit(s \meet s')$ and $\Sit(s \join s')$. For all
+  $s, s', u$: $(s \meet s') \models p \leftrightarrow (s \models p
+  \wedge s' \models p)$; $s \partof s \join s'$ and $s' \partof s \join s'$;
+  and if $s \partof u$ and $s' \partof u$, then $s \join s' \partof u$.
+\item \label{ax:actual} \emph{The actual world.} $\Sit(\at)$, and
+  $\at \models p \leftrightarrow \Obt(\at, p)$ for every $p$.
+\end{enumerate}
+
+Axiom group~\ref{ax:obtains} imposes the classical truth conditions on
+obtaining and not on truth in a situation, so that the latter may be
+partial; Proposition~\ref{prop:collapse} shows that this is
+unavoidable. Axiom group~\ref{ax:actual} relates the two roles of
+$\at$, as a situation and as the index of evaluation.
+
+\subsection{Worlds}
+
+Following Zalta, a world is a situation that could make true exactly
+what is the case, and a situation is actual if everything true in it is
+the case. Since the propositions of $\T$ do not themselves carry truth
+values, ``$p$ is the case'' is expressed by obtaining at the index of
+evaluation:
+\begin{align*}
+  \World(s) &\;:\Longleftrightarrow\; \Sit(s) \wedge
+    \Diamond\bigl(\lambda v.\,\forall p\,
+      (s \models p \leftrightarrow \Obt(v,p))\bigr)(\at),\\
+  \Actual(s) &\;:\Longleftrightarrow\; \forall p\,
+    (s \models p \to \Obt(\at, p)),\\
+  \Poss(s) &\;:\Longleftrightarrow\;
+    \Diamond\bigl(\lambda v.\,\forall p\,
+      (s \models p \to \Obt(v,p))\bigr)(\at).
+\end{align*}
+
+\begin{theorem}
+\label{thm:worlds}
+The following are theorems of $\T$.
+\begin{enumerate}[label=(\roman*)]
+\item If $\World(w)$, there is an index $v$ such that
+  $w \models p \leftrightarrow \Obt(v,p)$ for every $p$.
+\item If $\World(w)$, then $w \models \pneg p \leftrightarrow
+  \neg(w \models p)$, and truth at $w$ satisfies the classical clauses
+  for $\pand$, $\por$ and $\pimp$.
+\item If $\World(w)$, then $\Max(w)$, $\Cons(w)$ and $\Poss(w)$.
+\item If $\Poss(s)$, then $\Cons(s)$.
+\item $\World(s) \leftrightarrow \Sit(s) \wedge \Max(s) \wedge \Poss(s)$.
+\item $\World(\at)$ and $\Actual(\at)$. If $\Actual(s)$, then
+  $\Poss(s)$ and $\Cons(s)$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) Since accessibility is universal, $(\Diamond P)(\at)$ is equivalent
+to $\exists v\, P(v)$.
+(ii) Let $v$ be as in (i); the clauses transfer from~\ref{ax:obtains}.
+(iii) Maximality and consistency follow from the clause for $\pneg$ in
+(ii), and the index $v$ of (i) witnesses $\Poss(w)$.
+(iv) Let $v$ witness $\Poss(s)$. If $s \models p$ and
+$s \models \pneg p$, then $\Obt(v,p)$ and $\Obt(v,\pneg p)$, contrary
+to~\ref{ax:obtains}.
+(v) The forward direction is (iii). Conversely, let $v$ witness
+$\Poss(s)$; it suffices to show that $\Obt(v,p)$ implies
+$s \models p$. By maximality, $s \models p$ or $s \models \pneg p$, and
+the second alternative yields $\Obt(v,\pneg p)$, which is incompatible
+with $\Obt(v,p)$.
+(vi) By~\ref{ax:actual}, the index $\at$ witnesses $\World(\at)$, and
+$\Actual(\at)$ is one direction of~\ref{ax:actual}. If $\Actual(s)$,
+then $\at$ witnesses $\Poss(s)$, and $\Cons(s)$ follows by (iv).
+\end{proof}
+
+By part~(v), the worlds are exactly the maximal possible situations.
+Consistency need not be required, since by part~(iv) it follows from
+possibility.
+
+\subsection{Truth in a situation and truth at an index}
+
+The distinction between truth in a situation and obtaining at an index
+is essential to $\T$. If truth in a situation is required to satisfy
+the classical clause for negation, the theory collapses.
+
+\begin{proposition}
+\label{prop:collapse}
+Let $\T^-$ be the extension of $\T$ by the schema
+\[
+  s \models \pneg p \;\leftrightarrow\; \neg(s \models p)
+  \qquad (s \in \Dom,\ p \in \Prop).
+\]
+In $\T^-$, any two objects make the same propositions true, and there
+is at most one situation.
+\end{proposition}
+
+\begin{proof}
+Let $s, s' \in \Dom$ and $p \in \Prop$. By the schema and the meet
+axiom in~\ref{ax:lattice}, the truth of $\pneg p$ in $s \meet s'$ can
+be computed in two ways:
+\[
+  \neg\bigl(s \models p \wedge s' \models p\bigr)
+  \;\leftrightarrow\; (s \meet s') \models \pneg p
+  \;\leftrightarrow\; \neg(s \models p) \wedge \neg(s' \models p).
+\]
+If exactly one of $s \models p$ and $s' \models p$ holds, the left-hand
+side is true and the right-hand side is false. Hence
+$s \models p \leftrightarrow s' \models p$. By the extensionality
+axiom in~\ref{ax:ext}, any two situations are identical.
+\end{proof}
+
+The schema of Proposition~\ref{prop:collapse} also forces every
+situation to be maximal, so that no situation could be partial. A
+related difficulty arises if ``$p$ is the case'' in the definition of
+worldhood is replaced by a tautology.
+
+\begin{proposition}
+\label{prop:empty}
+Let $\World^\top(s)$ abbreviate $\Sit(s) \wedge
+\Diamond(\lambda v.\,\forall p\,(s \models p \leftrightarrow
+\top))(\at)$. If $\World^\top(\at)$ and
+$\at \models \pneg p \leftrightarrow \neg(\at \models p)$ for every
+$p$, then $\Prop$ is empty.
+\end{proposition}
+
+\begin{proof}
+The assumption $\World^\top(\at)$ gives $\at \models p$ for every $p$,
+and in particular $\at \models p$ and $\at \models \pneg p$, which
+together with the clause for negation is a contradiction for any
+$p \in \Prop$.
+\end{proof}
 
 \subsection{The actuality operator}
 
-Because $\Box$, $\Diamond$ and \lean{actualWorld} are already available,
-$\Act$ can be defined rather than postulated:
+In $\T$ the actuality operator is definable. For a condition
+$P \subseteq \Dom$ on indices, let
+\[
+  (\Act P)(w) \;:\Longleftrightarrow\; P(\at).
+\]
+The operator $\Act$ is rigid and idempotent, and
+$\Box\Act P \leftrightarrow \Act P \leftrightarrow \Diamond\Act P$
+holds at every index. The actuality of a situation is the
+actualization of its possibility condition: for every index $w$,
+$\Actual(s)$ holds if and only if
+$\Act\bigl(\lambda v.\,\forall p\,(s \models p \to \Obt(v,p))\bigr)(w)$.
 
-\begin{lstlisting}
-def Actually (p : World → Prop) : World → Prop :=
-  fun _ => p actualWorld
-
-notation "𝒜" => Actually
-\end{lstlisting}
-
-The actuality truth then holds at the actual world by definition, for
-every condition $p$ on indices (\lean{actuality\_truth}). Its
-necessitation is governed by the same characterization as in the deep
-embedding.
+A condition $P$ is \emph{necessary} at $w$ if $(\Box P)(w)$,
+\emph{impossible} at $w$ if $(\Box\neg P)(w)$, and \emph{contingent} at
+$w$ if $(\Diamond P)(w)$ and $(\Diamond\neg P)(w)$.
 
 \begin{theorem}
-\label{thm:theory}
-For every $p$ and $w$, $\Box(p \leftrightarrow \Act p)$ holds at $w$
-iff $p$ is necessary or impossible at $w$
-(\lean{box\_actuality\_truth\_iff}). Consequently, if $p$ is contingent
-at $w$ (possibly true and possibly false), then
-$\Box(p \leftrightarrow \Act p)$ fails at $w$:
+\label{thm:theory-actuality}
+In $\T$, for every condition $P$ and index $w$:
+\begin{enumerate}[label=(\roman*)]
+\item $P(\at) \leftrightarrow (\Act P)(\at)$;
+\item $\Box(\lambda v.\, P(v) \leftrightarrow (\Act P)(v))(w)$ holds if
+  and only if $P$ is necessary or impossible at $w$;
+\item if $P$ is contingent at $w$, then
+  $\Box(\lambda v.\, P(v) \leftrightarrow (\Act P)(v))(w)$ fails.
+\end{enumerate}
+In particular, for every proposition $q$ whose obtaining is contingent
+at $\at$, the condition $\Obt(\at,q) \leftrightarrow
+\Act(\lambda v.\,\Obt(v,q))(\at)$ holds but is not necessary.
 \end{theorem}
 
-\begin{lstlisting}
-theorem contingent_actuality_truth_not_necessary
-    (p : World → Prop) (w : World) (hc : Contingent p w) :
-    ¬ □ (fun v => p v ↔ 𝒜 p v) w
-\end{lstlisting}
+\begin{proof}
+Part (i) is the definition of $\Act$. For (ii), the left-hand side
+states that $P(v) \leftrightarrow P(\at)$ for every $v$. If $P(\at)$,
+then $P$ is necessary at $w$; otherwise $P$ is impossible at $w$.
+Conversely, a necessary or impossible condition is constant on $\Dom$
+and therefore agrees everywhere with its value at $\at$. Part (iii)
+follows from (ii), since a contingent condition is neither necessary
+nor impossible.
+\end{proof}
 
-Further theorems record that $\Act$ is rigid, idempotent, and necessary
-when true ($\Box\Act p \leftrightarrow \Act p$ and
-$\Diamond\Act p \leftrightarrow \Act p$), and that the actuality of a
-situation is the actualization of its possibility condition:
-$\mathsf{Actual}(s)$ holds iff
-$\Act(\lambda v.\,\forall p\,(s \models p \to \Obt\ v\ p))$ holds at any
-index (\lean{actual\_iff\_actually}).
+\subsection{The theory as a model of the logic of actuality}
 
-\subsection{The development as a model of the logic}
+The theory determines a model of the logic of
+Section~\ref{sec:logic}, with the propositions of $\T$ as atoms.
 
-The development can be read as a model of the deep embedding: its
-worlds are the indices, accessibility is the development's relation
-$R$, the actual world is \lean{actualWorld}, and an atom is a
-proposition, true at an index where it obtains. A translation
-\lean{interp} sends each formula to a condition on worlds, interpreting
-$\Box$ as the development's \lean{Box} and $\Act$ as \lean{Actually}.
+\begin{definition}
+Let $\Mod_\T = \langle \Dom, \Dom \times \Dom, \at, V_\T\rangle$, with
+set of atoms $\Prop$ and $V_\T(q) = \{v \in \Dom : \Obt(v,q)\}$. The
+translation $\tr{\cdot}$ from $\Lang(\Prop)$ to conditions on $\Dom$ is
+defined by $\tr{q} = \lambda v.\,\Obt(v,q)$, by commutation with the
+Boolean connectives, and by $\tr{\Box\varphi} = \Box\tr{\varphi}$ and
+$\tr{\Act\varphi} = \Act\tr{\varphi}$.
+\end{definition}
 
-\begin{theorem}[agreement]
-For every formula $\varphi$ and world $v$,
-$\lean{sat theoryModel}\ \varphi\ v \leftrightarrow \lean{interp}\ \varphi\ v$
-(\lean{sat\_theoryModel}). Since \lean{theoryModel} is universal, every
-formula that is real-world valid over universal models holds at the
-actual world of the development (\lean{rwValid\_holds\_actually}).
+\begin{theorem}
+\label{thm:agreement}
+For every $\varphi \in \Lang(\Prop)$ and $v \in \Dom$,
+$\Mod_\T, v \models \varphi$ if and only if $\tr{\varphi}(v)$.
+Consequently, if $\RWv{\Kl_{\mathrm{u}}} \varphi$, then
+$\tr{\varphi}(\at)$ is a theorem of $\T$.
 \end{theorem}
 
-The theorem is proved by induction on formulas; the $\Act$ case is
-exactly the definition of \lean{Actually}. It shows that the shallow
-operator is not an ad hoc device but the operator of the
-Crossley--Humberstone semantics.
+\begin{proof}
+By induction on $\varphi$. The atomic case is the definition of
+$V_\T$, and the Boolean cases are immediate. In the case of
+$\Box\varphi$, both sides quantify over all of $\Dom$, and in the case
+of $\Act\varphi$, both sides reduce to the induction hypothesis at
+$\at$. For the second claim, $\Mod_\T \in \Kl_{\mathrm{u}}$, so
+$\Mod_\T, \at \models \varphi$.
+\end{proof}
 
-\section{A model of the whole theory}
+Theorem~\ref{thm:agreement} shows that the operator defined in $\T$ is
+the actuality operator of Crossley and Humberstone, and that every
+formula real-world valid over universal models holds at the actual
+world of $\T$. The theory does not determine whether any proposition is
+contingent; this is settled in the model constructed in the next
+section.
+
+\section{A model of the theory}
 \label{sec:model}
 
-The theory itself does not settle whether any proposition is
-contingent: nothing in the axioms forces there to be more than one
-index. To show that the necessitation of the actuality truth can fail
-in the presence of all the axioms of situation theory, and not merely in
-a bare Kripke model, we give a model of the whole theory.
+We construct a model $\N$ of $\T$. Let $\mathbb{B} = \{0,1\}$ be a set
+of two valuations, with $1$ the actual valuation, and for
+$b \in \mathbb{B}$ let $S_b = \{p \subseteq \mathbb{B} : b \in p\}$.
+\begin{itemize}
+\item $\Prop = \Pty = \mathcal{P}(\mathbb{B})$, the propositional
+  operations are the Boolean operations, and $\VAC$ is the identity.
+\item $\Dom = \{\iota_b : b \in \mathbb{B}\} \sqcup
+  \{\alpha_S : S \subseteq \Pty\}$. The elements $\iota_b$ are the
+  \emph{indices} and the elements $\alpha_S$ are the \emph{abstract
+  objects}.
+\item $\Conc(w,x)$ holds if and only if $x$ is an index.
+  $\Enc(\iota_b, F)$ never holds, $\Enc(\alpha_S, F)$ holds if and only
+  if $F \in S$, and $\Encp(x,p)$ holds if and only if $\Enc(x,p)$.
+\item $\Obj = \Dom$, and $\Sit(x)$ holds if and only if $x$ is an
+  abstract object.
+\item $x \models p$ if and only if $\Encp(x,p)$; thus
+  $\alpha_S \models p$ if and only if $p \in S$.
+\item $\Obt(\iota_b, p)$ if and only if $b \in p$, and
+  $\Obt(\alpha_S, p)$ if and only if $1 \in p$.
+\item $\at = \alpha_{S_1}$.
+\item $x \meet y = \alpha_{\{F : \Enc(x,F) \wedge \Enc(y,F)\}}$ and
+  $x \join y = \alpha_{\{F : \Enc(x,F) \vee \Enc(y,F)\}}$.
+\end{itemize}
 
-\paragraph{The structure.}
-There are two valuations, \lean{true} (actual) and \lean{false}. A
-proposition is a set of valuations, so the connectives are Boolean
-operations and the propositional identities among the axioms hold.
-Properties are propositions. Objects are either indices, one per
-valuation, which are concrete and encode nothing (the ordinary
-objects), or abstract objects, one per set of properties (the
-situations). A situation makes $p$ true iff it encodes $p$, and
-$\Obt\ v\ p$ evaluates $p$ at the valuation of $v$. The actual world is
-the abstract object encoding exactly the propositions true at
-\lean{true}.
+\begin{theorem}
+\label{thm:model}
+$\N$ satisfies every axiom of $\T$. Consequently, $\T$ is consistent
+relative to higher-order logic.
+\end{theorem}
 
-\paragraph{Faithfulness.}
-The model file imports nothing from the development. Each primitive is
-given a concrete definition under its original name, each definition
-that an axiom mentions is copied verbatim, and each of the 48 axioms is
-restated verbatim as a theorem and proved. A script compares the
-statements, the copied definitions and the notations with those of the
-development, up to whitespace, and fails if any differ; we checked
-that it detects a changed statement and a changed notation precedence.
-Since every axiom is true in the model, no contradiction is derivable
-from the axioms.
+\begin{proof}
+We verify the axiom groups in turn.
+\ref{ax:boolean} holds because $\mathcal{P}(\mathbb{B})$ is a Boolean
+algebra.
+\ref{ax:encoding} holds by definition, since every property is of the
+form $\VAC(p)$.
+\ref{ax:obtains} holds because, for fixed $v$, $\Obt(v,\cdot)$ is
+membership of a fixed valuation.
+For~\ref{ax:abstract}: every index is concrete at every index, hence
+ordinary, and encodes no property; no $\alpha_S$ is concrete at any
+index, so every $\alpha_S$ is abstract. Comprehension for a condition
+$\varphi$ is witnessed by $\alpha_{\{F : \varphi(F)\}}$, and abstract
+objects encoding the same properties have the same index set $S$ and
+are therefore identical.
+For~\ref{ax:ext}: the situations are the $\alpha_S$, and $\alpha_S$
+makes true exactly the members of $S$, which gives extensionality; an
+abstract part of a situation is some $\alpha_T$, hence a situation.
+\ref{ax:lattice} holds because meet and join are intersection and union
+of encoded properties; in particular the properties encoded by
+$x \join y$ form the least set containing those encoded by $x$ and by
+$y$.
+\ref{ax:actual} holds since $\at \models p$ if and only if $1 \in p$, if
+and only if $\Obt(\at, p)$.
+\end{proof}
 
-\paragraph{Non-degeneracy.}
-The model has two distinct worlds, a proposition that is possibly the
-case and possibly not, a partial situation strictly below a world that
-is possible but not itself a world, an impossible situation, and
-ordinary objects alongside abstract ones (\lean{Model.nondegenerate}).
-In it, the actuality truth for the contingent proposition holds at the
-actual world while its necessitation fails:
+\begin{theorem}
+\label{thm:nondegenerate}
+In $\N$:
+\begin{enumerate}[label=(\roman*)]
+\item $\alpha_{S_1}$ and $\alpha_{S_0}$ are distinct worlds;
+\item the proposition $c = \{1\}$ is contingent: it obtains at
+  $\iota_1$ and does not obtain at $\iota_0$;
+\item the situation $\alpha_\varnothing$ is partial and possible but is
+  not a world, and $\alpha_\varnothing \partof \at$ with
+  $\alpha_\varnothing \neq \at$;
+\item the situation $\alpha_{\Pty}$ is not possible;
+\item there are both ordinary and abstract objects.
+\end{enumerate}
+\end{theorem}
 
-\begin{lstlisting}
-theorem contingent_logical_truth :
-    (fun w => Obtains w contingentProp ↔
-      𝒜 (fun v => Obtains v contingentProp) w) actualWorld ∧
-    ¬ □ (fun w => Obtains w contingentProp ↔
-      𝒜 (fun v => Obtains v contingentProp) w) actualWorld
-\end{lstlisting}
+\begin{proof}
+(i) The index $\iota_b$ witnesses $\World(\alpha_{S_b})$, and
+$c \in S_1 \setminus S_0$. (ii) is immediate.
+(iii) $\alpha_\varnothing$ makes neither $c$ nor $\pneg c$ true; it is
+possible because it makes nothing true; it is not a world by
+Theorem~\ref{thm:worlds}(iii), since it is not maximal; and it encodes
+no property, so it is a part of every object.
+(iv) $\alpha_{\Pty}$ makes both $c$ and $\pneg c$ true, so it is not
+consistent, and hence not possible by Theorem~\ref{thm:worlds}(iv).
+(v) The indices are ordinary and the $\alpha_S$ are abstract.
+\end{proof}
 
-The witness for the failure is the index for the valuation
-\lean{false}, where the proposition does not obtain although it
-actually does.
+\begin{corollary}
+\label{cor:contingent-truth}
+In $\N$, the condition
+$\Obt(\at,c) \leftrightarrow \Act(\lambda v.\,\Obt(v,c))(\at)$ holds,
+but its necessitation fails: the proposition $c$ does not obtain at the
+index $\iota_0$, although it actually obtains.
+\end{corollary}
 
-\section{How the theory collapsed, and the repair}
-\label{sec:repair}
+\begin{proof}
+By Theorem~\ref{thm:theory-actuality} and
+Theorem~\ref{thm:nondegenerate}(ii).
+\end{proof}
 
-The results above depend on a version of the situation theory that
-differs from earlier ones in the repository. Those earlier versions were
-not rejected by the type checker, but they were degenerate. We found
-the degeneracy by auditing the axioms and deriving its consequences in
-Lean, and the model of Section~\ref{sec:model} now rules it out. We record the failures because they illustrate pitfalls
-of shallow embeddings of metaphysical theories that are easy to miss.
-
-\paragraph{Classical clauses for partial truth.}
-The clauses $s \models \neg p \leftrightarrow \neg(s \models p)$, and
-those for the other connectives, were stated for every situation $s$.
-This forces every situation to decide every proposition, so no
-situation is partial. Worse, together with the axiom giving the truth
-conditions of the meet $s \wedge s'$ of two situations, it forces any
-two indices to agree on every proposition: computing the truth of
-$\neg p$ at $s \wedge s'$ in the two available ways gives two answers
-that coincide only if $s$ and $s'$ agree on $p$. With extensionality,
-there was at most one situation.
-
-\paragraph{Truth simpliciter replaced by \texttt{True}.}
-Zalta's definition of worldhood,
-$\Diamond\forall p\,(s \models p \leftrightarrow p)$, uses $p$ on the
-right as a sentence whose truth varies across worlds. In the shallow
-embedding, propositions are elements of an opaque type and have no
-truth value of their own, and the earlier translation put
-\lean{True} in place of $p$. A world then made every proposition true,
-$\neg p$ included, and the axiom that the actual world is a world
-entailed that there are no propositions at all.
-
-\paragraph{Variable capture in a modal operator.}
-The axiom that ordinary objects necessarily encode no properties was
-written as $\Box(\lambda w.\,\neg\exists F\,\mathsf{Enc}\,w\,F)\,x$,
-binding the encoding subject to the index of evaluation rather than to
-the object $x$. With a universal accessibility relation this says that
-nothing encodes anything, which contradicts the comprehension principle
-for abstract objects as soon as there is one ordinary object and one
-property.
-
-\paragraph{The repair.}
-The first two failures share a cause: one relation was asked to do the
-work of two. Separating situated truth from obtaining, and placing the
-classical clauses on obtaining, removes both. The four clauses are not
-new content. They are the old clauses for situated truth, relocated,
-and the classical behaviour of situated truth at worlds becomes a
-theorem. Together with the corrected scope of the third axiom, and a
-restriction of the closure of situations under parthood to abstract
-parts, the repair reduced the number of axioms from 54 to 48, eight
-former axioms becoming theorems. It also made room for the actuality
-operator. In the earlier versions $\Obt$ did not exist, and an operator
-defined from truth at \lean{actualWorld} would have been trivial,
-since every index agreed with the actual world on every proposition.
-
-\paragraph{The lesson.}
-A shallow embedding inherits the meta-theory's logic, and a translation
-error can make a theory degenerate while every proof still checks.
-A model of the axioms, kept in step with them mechanically, is a cheap
-and effective guard. Any one of the three failures would have blocked
-the construction of a non-degenerate model, and keeping the model in
-step means that the next such failure will be caught when it is
-introduced.
+Corollary~\ref{cor:contingent-truth} exhibits the phenomenon of
+Section~\ref{sec:results} in a model of the full theory, in which
+situations may be partial, there is more than one world, and ordinary
+and abstract objects coexist. By Proposition~\ref{prop:collapse}, no
+model of $\T^-$ has two distinct worlds.
 
 \section{Related work}
 \label{sec:related}
 
-The logic of actuality and the two notions of validity are due to
-Crossley and Humberstone~\cite{crossley1977} and Davies and
-Humberstone~\cite{davies1980}. Kaplan's logic of
-demonstratives~\cite{kaplan1989} exhibits related phenomena, such as
-sentences true in every context that express contingent propositions.
-Zalta's argument~\cite{zalta1988} and the ensuing
-debate~\cite{hanson2006,nelson2012} concern which notion of validity
-explicates logical truth; our formalization takes no side in that
-debate but makes precise what each side is committed to.
+The actuality operator and its semantics are due to Crossley and
+Humberstone \cite{crossley1977}. The distinction between real-world and
+general validity, and the failure of necessitation for the former, are
+due to Davies and Humberstone \cite{davies1980}, who also introduced the
+operator ``fixedly''. Kaplan's logic of demonstratives
+\cite{kaplan1989} exhibits a closely related phenomenon: sentences true
+in every context of utterance that nonetheless express contingent
+propositions. Zalta \cite{zalta1988} argued that real-world validity
+explicates logical truth, so that some logical truths are not
+necessary; Hanson \cite{hanson2006} defended general validity, and
+Nelson and Zalta \cite{nelson2012} replied. The results of
+Section~\ref{sec:results} are neutral between these positions. They
+make precise what each position is committed to, and they identify the
+necessary truth associated with the actuality biconditional
+(Corollary~\ref{cor:actually-necessary}).
 
-Computational metaphysics in Zalta's tradition began with the use of
-Prover9 to verify theorems of situation and world
-theory~\cite{fitelson2007}. Kirchner, Benzm\"uller and Zalta embedded
-the second-order fragment of Zalta's \emph{Principia
-Logico-Metaphysica}, which includes an actuality operator, in
-Isabelle/HOL using the method of shallow semantical
-embeddings~\cite{benzmuller2013,kirchner2019,kirchner2020}. That
-embedding distinguishes modally strict theorems, to which necessitation
-applies, from theorems whose proofs depend on actuality axioms, and its
-construction led to the discovery and repair of a paradox in the
-theory. Our work is complementary. It is carried out in Lean~4 rather
-than Isabelle/HOL. It states the real-world/general distinction as a
-metatheorem about arbitrary classes of models, rather than building it
-into a proof system. And it connects that metatheorem to a situation
-theory for which a non-degenerate model is given and kept in step with
-the axioms. To our knowledge, this is the first Lean formalization of
-the real-world/general validity distinction and of contingent logical
-truths.
+The theory of Section~\ref{sec:theory} follows Zalta's theory of
+abstract objects \cite{zalta1983,zalta1988book} and his treatment of
+situations and worlds \cite{zalta1993}. Fitelson and Zalta
+\cite{fitelson2007} verified a number of theorems of situation and world
+theory with an automated reasoning system. Kirchner, Benzm\"uller and
+Zalta \cite{kirchner2019,kirchner2020} embedded the higher-order
+fragment of Zalta's \emph{Principia Logico-Metaphysica}, which includes
+an actuality operator, in Isabelle/HOL by the method of shallow
+semantical embeddings \cite{benzmuller2013}. Their embedding
+distinguishes modally strict theorems, to which necessitation applies,
+from theorems that depend on the axioms of actuality, and its
+construction led to the discovery and resolution of a paradox in the
+theory. The present work differs in treating real-world and general
+validity as properties of formulas relative to arbitrary classes of
+models, in characterizing exactly when the actuality biconditional is
+necessary, and in exhibiting the phenomenon in a model of a theory of
+situations that separates truth in a situation from truth at an index.
 
 \section{Conclusion}
 \label{sec:conclusion}
 
-We have machine-checked the formal core of Zalta's claim that some
-logical truths are not necessary. For every class of models, general
-validity is closed under necessitation and real-world validity is not.
-The actuality truth $\varphi \leftrightarrow \Act\varphi$ is
-real-world valid, and its necessitation fails exactly where $\varphi$
-is contingent. The same holds for an actuality operator defined inside
-a situation theory, which is a model of the logic and has itself a
-non-degenerate model.
+For every class of models, general validity is closed under
+necessitation and real-world validity is not, and the two notions
+separate on every class containing a two-world model. The actuality
+biconditional is real-world valid, its necessitation holds exactly
+where its argument is constant, and its actualization is generally
+valid. The same holds for the definable actuality operator of a theory
+of situations and worlds. That theory is a model of the logic of
+actuality, and it has a non-degenerate model in which the biconditional
+for a contingent proposition is true but not necessary. The theory
+requires truth in a situation to be distinguished from truth at an
+index.
 
-Several directions remain. The propositional identities among the
-axioms make propositions coarse-grained, which is at odds with the
-hyperintensional propositions of Zalta's theory; removing them, and
-giving a model with distinct but equivalent propositions, would bring
-the development closer to its source. The link between the model and
-the axioms is currently checked by a script comparing statements;
-bundling the axioms into a Lean structure would let the kernel check it
-directly. Defining situations as Zalta does, as abstract objects
-encoding only propositional properties, would allow the actual world to
-be obtained by comprehension and remove the remaining axiom about it.
-Finally, the remaining basic theorems of situation and world
-theory~\cite{zalta1993} are natural targets.
+Three questions remain open. The identities~\ref{ax:boolean} make
+propositions coarse-grained, whereas the propositions of Zalta's theory
+are hyperintensional; a model of a variant of $\T$ with distinct but
+necessarily equivalent propositions would bring the theory closer to
+its source. If situations are defined, as in Zalta's theory, as
+abstract objects encoding only propositional properties, the actual
+world should be obtainable by comprehension and axiom
+group~\ref{ax:actual} derivable. Finally, the extension of the results
+of Section~\ref{sec:results} to quantified modal logic, where the
+actuality operator interacts with variable domains, is of independent
+interest.
 
-\bibliographystyle{plain}
+\appendix
+
+\section{Mechanical verification}
+\label{app:mech}
+
+All definitions and results of
+Sections~\ref{sec:logic}--\ref{sec:model} have been formalized and
+verified in the Lean~4 proof assistant \cite{demoura2021}. The
+formalization is available at
+\url{https://github.com/HanielUlises/Possible-World-Semantics}.
+
+The logic of Section~\ref{sec:logic} is formalized as a deep embedding,
+and the results of Section~\ref{sec:results} are proved for an
+arbitrary class of models using only the logic of the proof assistant.
+The theory $\T$ is formalized as a shallow embedding in which the sorts,
+the primitive vocabulary and the axioms~\ref{ax:boolean}--\ref{ax:actual}
+are postulated; there are 48 postulates in all. Propositions
+\ref{prop:collapse} and~\ref{prop:empty} are proved with the additional
+assumptions of the variant theories as explicit hypotheses. The model
+$\N$ is formalized independently of the postulates of $\T$: each axiom
+is restated in the model with the same statement and proved there, and
+a separate check confirms that the restated statements coincide with the
+postulates. Table~\ref{tab:mech} lists the formal counterparts of the
+main results.
+
+\begin{table}[ht]
+\centering
+\small
+\begin{tabular}{@{}ll@{}}
+\toprule
+Result & Formal counterpart \\
+\midrule
+Proposition~\ref{prop:closure} & \texttt{GValid.rwValid}, \texttt{RWValid.mp}, \texttt{GValid.mp}, \texttt{GValid.nec} \\
+Theorem~\ref{thm:rw} & \texttt{actuality\_rwValid} \\
+Theorem~\ref{thm:characterization} & \texttt{sat\_box\_actuality} \\
+Corollary~\ref{cor:universal} & \texttt{sat\_box\_actuality\_universal} \\
+Theorem~\ref{thm:separation} & \texttt{actuality\_not\_gValid}, \texttt{box\_actuality\_not\_rwValid}, \\
+ & \texttt{rwValid\_not\_closed\_under\_nec}, \texttt{rwValid\_strictly\_weaker} \\
+Proposition~\ref{prop:inert} & \texttt{rwValid\_act\_iff}, \texttt{gValid\_act\_iff}, \texttt{act\_imp\_box\_act\_gValid} \\
+Theorem~\ref{thm:worlds} & \texttt{world\_index}, \texttt{world\_TrueIn\_neg}, \texttt{world\_maximal}, \\
+ & \texttt{possible\_consistent}, \texttt{worldhood\_iff}, \texttt{actualWorld\_is\_world} \\
+Proposition~\ref{prop:collapse} & \texttt{classical\_truth\_collapse}, \texttt{classical\_truth\_one\_situation} \\
+Proposition~\ref{prop:empty} & \texttt{tautological\_worldhood\_empty} \\
+Theorem~\ref{thm:theory-actuality} & \texttt{actuality\_truth}, \texttt{box\_actuality\_truth\_iff}, \\
+ & \texttt{contingent\_actuality\_truth\_not\_necessary} \\
+Theorem~\ref{thm:agreement} & \texttt{sat\_theoryModel}, \texttt{rwValid\_holds\_actually} \\
+Theorems~\ref{thm:model} and~\ref{thm:nondegenerate} & \texttt{Model/Satisfiable.lean}, \texttt{Model.nondegenerate} \\
+Corollary~\ref{cor:contingent-truth} & \texttt{Model.contingent\_logical\_truth} \\
+\bottomrule
+\end{tabular}
+\caption{Formal counterparts of the main results.}
+\label{tab:mech}
+\end{table}
+
+\bibliographystyle{amsplain}
 \bibliography{references}
 
 \end{document}

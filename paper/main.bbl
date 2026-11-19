@@ -1,0 +1,71 @@
+\providecommand{\bysame}{\leavevmode\hbox to3em{\hrulefill}\thinspace}
+\providecommand{\MR}{\relax\ifhmode\unskip\space\fi MR }
+% \MRhref is called by the amsart/book/proc definition of \MR.
+\providecommand{\MRhref}[2]{%
+  \href{http://www.ams.org/mathscinet-getitem?mr=#1}{#2}
+}
+\providecommand{\href}[2]{#2}
+\begin{thebibliography}{10}
+
+\bibitem{benzmuller2013}
+Christoph Benzm{\"u}ller and Lawrence~C. Paulson, \emph{Quantified multimodal
+  logics in simple type theory}, Logica Universalis \textbf{7} (2013), no.~1,
+  7--20.
+
+\bibitem{crossley1977}
+John~N. Crossley and I.~Lloyd Humberstone, \emph{The logic of ``actually''},
+  Reports on Mathematical Logic \textbf{8} (1977), 11--29.
+
+\bibitem{davies1980}
+Martin Davies and Lloyd Humberstone, \emph{Two notions of necessity},
+  Philosophical Studies \textbf{38} (1980), no.~1, 1--30.
+
+\bibitem{demoura2021}
+Leonardo de~Moura and Sebastian Ullrich, \emph{The {Lean 4} theorem prover and
+  programming language}, Automated Deduction -- CADE 28, Lecture Notes in
+  Computer Science, vol. 12699, Springer, 2021, pp.~625--635.
+
+\bibitem{fitelson2007}
+Branden Fitelson and Edward~N. Zalta, \emph{Steps toward a computational
+  metaphysics}, Journal of Philosophical Logic \textbf{36} (2007), no.~2,
+  227--247.
+
+\bibitem{hanson2006}
+William~H. Hanson, \emph{Actuality, necessity, and logical truth},
+  Philosophical Studies \textbf{130} (2006).
+
+\bibitem{kaplan1989}
+David Kaplan, \emph{Demonstratives}, Themes from Kaplan (Joseph Almog, John
+  Perry, and Howard Wettstein, eds.), Oxford University Press, 1989,
+  pp.~481--563.
+
+\bibitem{kirchner2019}
+Daniel Kirchner, Christoph Benzm{\"u}ller, and Edward~N. Zalta, \emph{Computer
+  science and metaphysics: A cross-fertilization}, Open Philosophy \textbf{2}
+  (2019), no.~1.
+
+\bibitem{kirchner2020}
+\bysame, \emph{Mechanizing {Principia Logico-Metaphysica} in functional
+  type-theory}, The Review of Symbolic Logic \textbf{13} (2020), no.~1.
+
+\bibitem{nelson2012}
+Michael Nelson and Edward~N. Zalta, \emph{A defense of contingent logical
+  truths}, Philosophical Studies \textbf{157} (2012).
+
+\bibitem{zalta1983}
+Edward~N. Zalta, \emph{Abstract objects: An introduction to axiomatic
+  metaphysics}, D. Reidel, Dordrecht, 1983.
+
+\bibitem{zalta1988book}
+\bysame, \emph{Intensional logic and the metaphysics of intentionality}, MIT
+  Press, Cambridge, MA, 1988.
+
+\bibitem{zalta1988}
+\bysame, \emph{Logical and analytic truths that are not necessary}, The Journal
+  of Philosophy \textbf{85} (1988), no.~2, 57--74.
+
+\bibitem{zalta1993}
+\bysame, \emph{Twenty-five basic theorems in situation and world theory},
+  Journal of Philosophical Logic \textbf{22} (1993), no.~4, 385--428.
+
+\end{thebibliography}
