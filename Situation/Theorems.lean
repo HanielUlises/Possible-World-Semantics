@@ -3,6 +3,7 @@ import Grounding.Propositions
 import Grounding.Truth
 import Grounding.Parthood
 import Situation.Definitions
+import Grounding.AbstractObjects
 
 /-
   THEOREMS OF SITUATION SEMANTICS
@@ -44,9 +45,13 @@ theorem maximal₂_not_partial₂ :
   rcases hpart with ⟨p, hp⟩
   exact hp (hmax p)
 
-/-- Every part of a situation is itself a situation. -/
+/-- Every abstract part of a situation is itself a situation
+    (Zalta 1993, Theorem 3, which ranges over abstract objects).
+    Without the A! hypothesis every ordinary object, which encodes
+    nothing and is therefore a part of everything, would count as a
+    situation. -/
 axiom situation_closed_under_parthood :
-  ∀ s x : World, Situation s → (x ⊴ s) → Situation x
+  ∀ s x : World, Situation s → A! x → (x ⊴ s) → Situation x
 
 /-- Parthood is monotone with respect to truth.
     If x is a part of y and p is persistent, truth of p
