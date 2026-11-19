@@ -5,4 +5,3 @@ import Grounding.AbstractObjects
 import Grounding.Truth
 import Grounding.Parthood
 import Grounding.StructuredProps
-import Grounding.Truth
