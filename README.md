@@ -4,10 +4,11 @@
 
 [![Documentation](https://img.shields.io/badge/Documentation-Online-blue)](https://hanielulises.github.io/Possible-World-Semantics/)
 [![Lean](https://img.shields.io/badge/Lean-4.26.0-4a3f2f)](https://leanprover.github.io/)
-[![Proof obligations](https://img.shields.io/badge/proof_obligations-3_open_·_3_closed-orange)](#open-proof-obligations)
+[![Proof obligations](https://img.shields.io/badge/proof_obligations-1_open_·_5_closed-orange)](#open-proof-obligations)
+[![Known issues](https://img.shields.io/badge/known_issues-4-red)](#known-issues)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-A Lean 4 formalization of possible-world and situation semantics, following the higher-order modal and situation-theoretic tradition of Zalta, Fine, and Barwise–Perry. Every theorem below is checked by the Lean kernel; every remaining `sorry` is tabulated as an explicit, open proof obligation.
+A Lean 4 formalization of possible-world and situation semantics, following the higher-order modal and situation-theoretic tradition of Zalta, Fine, and Barwise–Perry. Every theorem that builds is checked by the Lean kernel, and every remaining gap is tabulated as an open proof obligation or a [known issue](#known-issues). The current axioms have a known collapse: see [KI-1](#ki-1--truth-clauses-collapse-the-situation-lattice) before relying on any result about partial situations.
 
 ## Architecture
 
@@ -88,7 +89,7 @@ graph TD
     Meet --> Bot
 ```
 
-*A fragment of the meet-semilattice: edges denote parthood, descending from maximal worlds to the vacuous situation. The structure is a meet-semilattice with distinguished maximal elements, not a complete lattice — see [OP-4](#open-proof-obligations).*
+*A fragment of the meet-semilattice: edges denote parthood, descending from maximal worlds to the vacuous situation. The structure is a meet-semilattice with distinguished maximal elements, not a complete lattice — see [OP-4](#op-4--lattice-structure-of-meet). Under the current truth clauses this picture collapses to a single point; see [KI-1](#ki-1--truth-clauses-collapse-the-situation-lattice).*
 
 ## Axiom Inventory
 
@@ -128,24 +129,50 @@ Every `axiom` declaration in the codebase, grouped by file. Definitions and theo
 
 The modal layer (`Modality/Frames`, `Modality/Operators`) has no axioms: `R`, `Box` and `Diamond` are definitions, and `K`, `T`, `Four`, `Five`, `Nec` and `PossNec` are theorems.
 
-## Open Proof Obligations
+## Known Issues
 
-Every `sorry` in the codebase corresponds to exactly one entry in this table.
+These are problems in the axioms or the build, not missing proofs. Each one was confirmed by a Lean derivation or by building the file.
+
+### KI-1 — Truth clauses collapse the situation lattice
+
+`TrueIn_neg` states `s ⊨ ¬ₚp ↔ ¬(s ⊨ p)` for every `s`, so every situation decides every proposition and none can be partial. Combined with `TrueIn_meet`, any two worlds agree on every proposition: the truth of `¬ₚp` at `meet s s'` can be computed both ways, and the two answers only match when `s` and `s'` agree on `p`. With `situation_extensionality_via_truth`, there is then at most one situation:
+
+```lean
+theorem all_agree (s s' : World) (p : Propn) : (s ⊨ p) ↔ (s' ⊨ p)
+theorem all_situations_equal (s s' : World) : Situation s → Situation s' → s = s'
+```
+
+This makes OP-4, OP-5 and the OP-2b repair trivially true rather than informative. In the Oppenheimer–Zalta theory the classical clauses hold only at worlds; restricting `TrueIn_neg`, `TrueIn_disj` and `TrueIn_impl` to `Worldhood s` is the likely fix.
+
+### KI-2 — `ordinary_no_encoding` is mis-scoped
+
+The axiom reads `O! x → □ (fun w => ¬ ∃ F, Enc w F) x`. The bound variable is the world `w`, not the object `x`, and since `R` is universal this says that nothing encodes any property anywhere. `Comprehension` applied to `fun _ => True` produces an object that encodes every property, so one ordinary object and one property are enough to derive `False`. The intended statement is `□ (fun _ => ¬ ∃ F, Enc x F) x`.
+
+### KI-3 — `situation_closed_under_parthood` lacks a hypothesis
+
+The axiom makes every `x` with `x ⊴ s` a situation. Parthood is defined on all of `World`, and an object that encodes nothing is a part of everything, so every such object becomes a situation. Zalta's Theorem 3 ranges over abstract objects only. Nothing currently uses this axiom.
+
+### KI-4 — Build coverage
+
+- `@[default_target]` in `lakefile.lean` applies only to `Grounding`, so `lake build` never compiles `Situation/Infimum.lean`, `Situation/Worlds.lean` or the `Situation` and `Modality` root modules. Use `lake build Grounding Modality Situation` to build everything.
+- `Situation/Worlds.lean` does not compile (see [OP-5](#op-5--no-strict-subworld)).
+- The `Test` library declared in `lakefile.lean` doesn't match the `Tests/` directory, so the tests never run, and `Tests/Smoke.lean` uses `world_maximal` and `actualWorld_is_world` without importing `Situation.Worlds`.
+
+## Open Proof Obligations
 
 | ID | Obligation | Blocks | File |
 |---|---|---|---|
-| OP-4 | `meet_le_left`, `meet_le_right`, `meet_greatest` | full lattice structure of meet | `Situation/Infimum.lean` |
-| OP-5 | `no_strict_subworld` | strict subworld exclusion | `Situation/Worlds.lean` |
-
-### OP-4 — Lattice structure of meet
-
-`meet_le_left`, `meet_le_right`, and `meet_greatest` all need to connect `TrueIn_meet` (which governs truth at the meet) to `PartOf` (which is defined over `Enc`). `truth_mono_to_part` is now available (OP-2 resolved), so all three should be closeable by applying it to the truth conditions given by `TrueIn_meet`. No new axioms are expected to be needed.
+| OP-5 | `no_strict_subworld`, `worlds_distinguished_by_truth`, `distinct_worlds_incomparable` | world-theoretic consequences of maximality | `Situation/Worlds.lean` |
 
 ### OP-5 — No strict subworld
 
-`no_strict_subworld` states that no proper part of a world is itself a world. The two `sorry` markers correspond to steps that propagate truth across the parthood relation. Both are now unblocked by the resolution of OP-2 and should be closeable using `part_truth_mono` and `truth_mono_to_part`.
+`no_strict_subworld` states that no proper part of a world is itself a world. The file has no `sorry` but does not compile, which went unnoticed because `lake build` skips it (KI-4). The proofs use `by_contra` and `push_neg`, which come from Mathlib (not a dependency); use bare terms such as `· (hwx).1` where `exact` is needed; and call `situation_extensionality_via_truth` without importing `Situation.Theorems`. The proof strategy, propagating truth across `⊴` with `part_truth_mono`, `world_maximal` and `TrueIn_neg`, is sound, so repairing the syntax and imports should close it.
 
 ## Resolved Proof Obligations
+
+### OP-4 — Lattice structure of meet
+
+`meet_le_left`, `meet_le_right` and `meet_greatest` connect `TrueIn_meet`, which governs truth at the meet, to `PartOf`, which is defined over `Enc`. All three close by applying `truth_mono_to_part` to the truth conditions given by `TrueIn_meet`, with no new axioms. `meet_self` and `meet_comm` follow.
 
 ### OP-2b — Dependence is inherited from parts
 
@@ -204,18 +231,19 @@ purely derived results (no new postulates beyond those tabulated above):
 
 ## Contributing
 
-Contributions are welcome especially proofs. The three open obligations are self-contained and each comes with a documented strategy, so they make good entry points:
+Contributions are welcome, especially proofs and axiom repairs. Good entry points:
 
-| Obligation | Where | Why it's tractable |
+| Item | Where | What it needs |
 |---|---|---|
-| [OP-4](#op-4--lattice-structure-of-meet) | `Situation/Infimum.lean` | `truth_mono_to_part` is already available; all three lemmas should close by applying it to `TrueIn_meet`. **Best first proof.** |
-| [OP-5](#op-5--no-strict-subworld) | `Situation/Worlds.lean` | Two `sorry`s, both unblocked by OP-2; closeable with `part_truth_mono` and `truth_mono_to_part`. |
+| [OP-5](#op-5--no-strict-subworld) | `Situation/Worlds.lean` | Syntax and import repairs; the proof strategy is already in place. **Best first proof.** |
+| [KI-2](#ki-2--ordinary_no_encoding-is-mis-scoped) | `Grounding/AbstractObjects.lean` | Rebind the encoding subject from `w` to `x`. |
+| [KI-1](#ki-1--truth-clauses-collapse-the-situation-lattice) | `Grounding/Truth.lean` | Restrict the classical truth clauses to worlds, then repair whatever depends on them. The most substantial item. |
 
 **Ground rules.**
 
 - No new axioms without discussion. If a proof genuinely needs a postulate, open an issue first — the whole point of the [Axiom Inventory](#axiom-inventory) is that it stays complete and honest.
 - Every `sorry` must correspond to exactly one row in [Open Proof Obligations](#open-proof-obligations); if you close one, delete its row and (if it unblocks others) update the dependent entries.
-- `lake build` must pass with no errors and no new `sorry`.
+- `lake build Grounding Modality Situation` must pass with no errors and no new `sorry`.
 
 To get started: pick an obligation above, open an issue to claim it, then send a PR. Questions and partial attempts are just as welcome as finished proofs.
 
