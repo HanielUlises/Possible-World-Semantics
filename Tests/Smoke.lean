@@ -6,6 +6,7 @@ import Grounding.AbstractObjects
 import Modality.Operators
 import Situation.Definitions
 import Situation.Theorems
+import Situation.Worlds
 
 /-
   Smoke tests: verify that the axiom inventory is not
