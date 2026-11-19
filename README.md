@@ -4,7 +4,7 @@
 
 [![Documentation](https://img.shields.io/badge/Documentation-Online-blue)](https://hanielulises.github.io/Possible-World-Semantics/)
 [![Lean](https://img.shields.io/badge/Lean-4.26.0-4a3f2f)](https://leanprover.github.io/)
-[![Proof obligations](https://img.shields.io/badge/proof_obligations-1_open_·_5_closed-orange)](#open-proof-obligations)
+[![Proof obligations](https://img.shields.io/badge/proof_obligations-0_open_·_6_closed-brightgreen)](#open-proof-obligations)
 [![Known issues](https://img.shields.io/badge/known_issues-4-red)](#known-issues)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
@@ -48,10 +48,10 @@ The toolchain is pinned in `lean-toolchain` (Lean `v4.26.0`), so the build is re
 ```bash
 git clone https://github.com/HanielUlises/Possible-World-Semantics.git
 cd Possible-World-Semantics
-lake build Grounding Modality Situation
+lake build
 ```
 
-A plain `lake build` compiles only the `Grounding` library and the modules it imports (see [KI-4](#ki-4--build-coverage)). `scripts/check.sh` runs a clean build of that default target.
+`lake build` compiles all three libraries and the tests in `Tests/`. `scripts/check.sh` does the same from a clean state.
 
 To see which axioms a theorem rests on, open a file and use `#print axioms`:
 
@@ -138,14 +138,14 @@ Every `axiom` declaration in the codebase, grouped by file. Definitions and theo
 | `consistent_downward_closed`, `actual_consistent` | `Situation/Theorems` | consistency postulates |
 | `meet`, `meet_situation`, `TrueIn_meet` | `Situation/Infimum` | meet existence and truth conditions |
 | `world_maximal`, `world_consistent` | `Situation/Worlds` | worlds are maximal and consistent |
-| `actualWorld_is_world` | `Situation/Worlds` | the actual world is a world |
+| `actualWorld_is_world` | `Situation/Worlds` | ⚠ the actual world is a world |
 | `maximal_consistent_possible_is_world` | `Situation/Worlds` | sufficient condition for worldhood |
 
 The modal layer (`Modality/Frames`, `Modality/Operators`) has no axioms: `R`, `Box` and `Diamond` are definitions, and `K`, `T`, `Four`, `Five`, `Nec` and `PossNec` are theorems.
 
 ## Known Issues
 
-These are problems in the axioms or the build, not missing proofs. Each one was confirmed by a Lean derivation or by building the file.
+These are problems in the axioms, not missing proofs. Each one was confirmed by a Lean derivation or by building the file.
 
 ### KI-1 — Truth clauses collapse the situation lattice
 
@@ -156,7 +156,7 @@ theorem all_agree (s s' : World) (p : Propn) : (s ⊨ p) ↔ (s' ⊨ p)
 theorem all_situations_equal (s s' : World) : Situation s → Situation s' → s = s'
 ```
 
-This makes OP-4, OP-5 and the OP-2b repair trivially true rather than informative. In the Oppenheimer–Zalta theory the classical clauses hold only at worlds; restricting `TrueIn_neg`, `TrueIn_disj` and `TrueIn_impl` to `Worldhood s` is the likely fix.
+This makes OP-4, OP-5 and the OP-2b repair trivially true rather than informative; [KI-5](#ki-5--worldhood-leaves-no-propositions) is worse still. In the Oppenheimer–Zalta theory the classical clauses hold only at worlds; restricting `TrueIn_neg`, `TrueIn_disj` and `TrueIn_impl` to `Worldhood s` is the likely fix, once `Worldhood` itself is repaired (KI-5).
 
 ### KI-2 — `ordinary_no_encoding` is mis-scoped
 
@@ -166,23 +166,25 @@ The axiom reads `O! x → □ (fun w => ¬ ∃ F, Enc w F) x`. The bound variabl
 
 The axiom makes every `x` with `x ⊴ s` a situation. Parthood is defined on all of `World`, and an object that encodes nothing is a part of everything, so every such object becomes a situation. Zalta's Theorem 3 ranges over abstract objects only. Nothing currently uses this axiom.
 
-### KI-4 — Build coverage
+### KI-5 — Worldhood leaves no propositions
 
-- `@[default_target]` in `lakefile.lean` applies only to `Grounding`, so `lake build` never compiles `Situation/Infimum.lean`, `Situation/Worlds.lean` or the `Situation` and `Modality` root modules. Use `lake build Grounding Modality Situation` to build everything.
-- `Situation/Worlds.lean` does not compile (see [OP-5](#op-5--no-strict-subworld)).
-- The `Test` library declared in `lakefile.lean` doesn't match the `Tests/` directory, so the tests never run, and `Tests/Smoke.lean` uses `world_maximal` and `actualWorld_is_world` without importing `Situation.Worlds`.
+`Worldhood s` is defined as `Situation s ∧ ◊ (fun _ => ∀ p, (s ⊨ p) ↔ True) actualWorld`, so a world makes every proposition true, `¬ₚp` included. `TrueIn_neg` forbids that for any `p`, and `actualWorld_is_world` asserts that the actual world is a world. Together they prove that `Propn` is empty:
+
+```lean
+theorem worldhood_empties_propn (h : Worldhood actualWorld) (p : Propn) : False
+```
+
+Every result quantifying over propositions is therefore vacuous, and adding a single proposition constant would make the theory inconsistent. In Zalta's definition the right-hand side is `p` itself (a world makes `p` true exactly when `p` is the case), which needs a notion of a proposition obtaining; the Lean translation replaced it with `True`.
 
 ## Open Proof Obligations
 
-| ID | Obligation | Blocks | File |
-|---|---|---|---|
-| OP-5 | `no_strict_subworld`, `worlds_distinguished_by_truth`, `distinct_worlds_incomparable` | world-theoretic consequences of maximality | `Situation/Worlds.lean` |
+None. Every `sorry` must correspond to exactly one row here; the codebase currently has none.
+
+## Resolved Proof Obligations
 
 ### OP-5 — No strict subworld
 
-`no_strict_subworld` states that no proper part of a world is itself a world. The file has no `sorry` but does not compile, which went unnoticed because `lake build` skips it (KI-4). The proofs use `by_contra` and `push_neg`, which come from Mathlib (not a dependency); use bare terms such as `· (hwx).1` where `exact` is needed; and call `situation_extensionality_via_truth` without importing `Situation.Theorems`. The proof strategy, propagating truth across `⊴` with `part_truth_mono`, `world_maximal` and `TrueIn_neg`, is sound, so repairing the syntax and imports should close it.
-
-## Resolved Proof Obligations
+`no_strict_subworld` states that no proper part of a world is itself a world. The file had no `sorry` but did not compile, which went unnoticed because `lake build` only built the `Grounding` library. It relied on the Mathlib-only tactics `by_contra` and `push_neg`, used bare terms where `exact` was needed, and called `situation_extensionality_via_truth` without importing `Situation.Theorems`. With those repaired, `no_strict_subworld`, `worlds_distinguished_by_truth` and `distinct_worlds_incomparable` close by propagating truth across `⊴` with `part_truth_mono`, `world_maximal`, `world_consistent` and `TrueIn_neg`. Every library and test is now a default build target.
 
 ### OP-4 — Lattice structure of meet
 
@@ -245,19 +247,19 @@ purely derived results (no new postulates beyond those tabulated above):
 
 ## Contributing
 
-Contributions are welcome, especially proofs and axiom repairs. Good entry points:
+Contributions are welcome, especially axiom repairs and new proofs. Good entry points:
 
 | Item | Where | What it needs |
 |---|---|---|
-| [OP-5](#op-5--no-strict-subworld) | `Situation/Worlds.lean` | Syntax and import repairs; the proof strategy is already in place. **Best first proof.** |
-| [KI-2](#ki-2--ordinary_no_encoding-is-mis-scoped) | `Grounding/AbstractObjects.lean` | Rebind the encoding subject from `w` to `x`. |
+| [KI-2](#ki-2--ordinary_no_encoding-is-mis-scoped) | `Grounding/AbstractObjects.lean` | Rebind the encoding subject from `w` to `x`. **Best first fix.** |
 | [KI-1](#ki-1--truth-clauses-collapse-the-situation-lattice) | `Grounding/Truth.lean` | Restrict the classical truth clauses to worlds, then repair whatever depends on them. The most substantial item. |
+| [KI-5](#ki-5--worldhood-leaves-no-propositions) | `Situation/Definitions.lean` | Give `Worldhood` Zalta's right-hand side, which needs a notion of a proposition obtaining. |
 
 **Ground rules.**
 
 - No new axioms without discussion. If a proof genuinely needs a postulate, open an issue first — the whole point of the [Axiom Inventory](#axiom-inventory) is that it stays complete and honest.
 - Every `sorry` must correspond to exactly one row in [Open Proof Obligations](#open-proof-obligations); if you close one, delete its row and (if it unblocks others) update the dependent entries.
-- `lake build Grounding Modality Situation` must pass with no errors and no new `sorry`.
+- `lake build` must pass with no errors, no warnings and no new `sorry`.
 
 To get started: pick an obligation above, open an issue to claim it, then send a PR. Questions and partial attempts are just as welcome as finished proofs.
 
