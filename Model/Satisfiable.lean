@@ -155,6 +155,11 @@ def Partial₁ (s : World) : Prop :=
 def Consistent (s : World) : Prop :=
   ¬ ∃ p : Propn, (s ⊨ p) ∧ (s ⊨ ¬ₚ p)
 
+def Actually (p : World → Prop) : World → Prop :=
+  fun _ => p actualWorld
+
+notation "𝒜" => Actually
+
 /-! ## Helper lemmas -/
 
 theorem diamond_intro {p : World → Prop} {w : World} (v : World)
@@ -401,6 +406,18 @@ theorem trivialSituation_impossible : ¬ Possible trivialSituation := by
 theorem ordinary_and_abstract_exist :
     O! (idx true) ∧ A! actualWorld :=
   ⟨idx_ordinary true, abs_abstract _⟩
+
+/-- A contingent logical truth in a model of the whole theory: the
+    actuality truth for `contingentProp` holds at the actual world, as
+    it does for every proposition, but its necessitation fails, since
+    at the non-actual index the proposition does not obtain while it
+    actually does. -/
+theorem contingent_logical_truth :
+    (fun w => Obtains w contingentProp ↔
+      𝒜 (fun v => Obtains v contingentProp) w) actualWorld ∧
+    ¬ □ (fun w => Obtains w contingentProp ↔
+      𝒜 (fun v => Obtains v contingentProp) w) actualWorld :=
+  ⟨Iff.rfl, fun h => Bool.noConfusion ((h (idx false) trivial).mpr rfl)⟩
 
 /-- The model is non-degenerate. -/
 theorem nondegenerate :

@@ -25,14 +25,14 @@ MODEL = ROOT / "Model" / "Satisfiable.lean"
 COPIED_DEFS = [
     "R", "Box", "Diamond", "OrdinaryObject", "AbstractObject", "PartOf",
     "Agree", "ExtEq", "Actual", "Possible", "Worldhood", "Maximal₁",
-    "Partial₁", "Consistent",
+    "Partial₁", "Consistent", "Actually",
 ]
 
 # Notations that occur in axiom statements.
 NOTATION_RE = re.compile(r"^(notation|infixl|infixr)\b.*=>\s*(\w+)\b.*$")
 NOTATION_TARGETS = {
     "TrueIn", "neg", "conj", "disj", "impl", "Box", "Diamond",
-    "OrdinaryObject", "AbstractObject", "PartOf",
+    "OrdinaryObject", "AbstractObject", "PartOf", "Actually",
 }
 
 
