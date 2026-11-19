@@ -8,7 +8,7 @@
 [![Model](https://img.shields.io/badge/model-consistent_·_non--degenerate-brightgreen)](#consistency-and-a-model)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-A Lean 4 formalization of possible-world and situation semantics, following the higher-order modal and situation-theoretic tradition of Zalta, Fine, and Barwise–Perry. Every theorem is checked by the Lean kernel, every axiom is tabulated in the [inventory](#axiom-inventory), and a [concrete model](#consistency-and-a-model) proves the axioms consistent and non-degenerate: there are distinct worlds, contingent propositions, and partial situations strictly below worlds.
+A Lean 4 formalization of possible-world and situation semantics, following the higher-order modal and situation-theoretic tradition of Zalta, Fine, and Barwise–Perry. Every theorem is checked by the Lean kernel, every axiom is tabulated in the [inventory](#axiom-inventory), and a [concrete model](#consistency-and-a-model) proves the axioms consistent and non-degenerate: there are distinct worlds, contingent propositions, and partial situations strictly below worlds. With an actuality operator, the development also machine-checks [contingent logical truths](#actuality-and-contingent-logical-truths): `p ↔ 𝒜p` is true at the actual world in every model, but its necessitation is not.
 
 ## Architecture
 
@@ -26,12 +26,14 @@ flowchart TD
     subgraph M["Modality — S5"]
         Fr["Frames · R"]
         Op["Operators · □ ◊"]
+        AL["ActualityLogic · real-world vs general validity"]
     end
     subgraph S["Situation — worlds & lattice"]
         Def["Definitions · actualWorld"]
         Ext["Extensionality"]
         Inf["Infimum · meet ∧"]
         Wld["Worlds"]
+        Act["Actuality · 𝒜"]
     end
     Ont --> Tru --> Par --> Dep
     Ont --> Abs
@@ -39,6 +41,8 @@ flowchart TD
     Fr --> Op
     Op --> Abs
     Op --> Def --> Ext --> Inf --> Wld
+    Def --> Act
+    AL --> Act
     subgraph X["Model — consistency"]
         Sat["Satisfiable · every axiom proved"]
     end
@@ -120,6 +124,28 @@ graph TD
 ```
 
 *A fragment of the meet-semilattice: edges denote parthood, descending from maximal worlds to the vacuous situation. The structure is a meet-semilattice with distinguished maximal elements, not a complete lattice — see [OP-4](#op-4--lattice-structure-of-meet).*
+
+## Actuality and Contingent Logical Truths
+
+Zalta (1988) argued that a modal language with an actuality operator has logical truths that are not necessary, for example `p ↔ 𝒜p`. The claim turns on the distinction between *real-world validity* (truth at the actual world of every model) and *general validity* (truth at every world of every model), due to Crossley and Humberstone (1977) and Davies and Humberstone (1980). The development machine-checks it at three levels, without adding any axiom.
+
+**The metatheory** (`Modality/ActualityLogic.lean`). A deep embedding of propositional modal logic with `□` and `𝒜`, interpreted in Kripke models with a designated actual world. For an arbitrary class of models:
+
+| Result | Theorem |
+|---|---|
+| General validity implies real-world validity; both are closed under modus ponens | `GValid.rwValid`, `RWValid.mp`, `GValid.mp` |
+| General validity is closed under necessitation | `GValid.nec` |
+| `φ ↔ 𝒜φ` is real-world valid for every `φ` | `actuality_rwValid` |
+| Neither it nor `□(φ ↔ 𝒜φ)` is valid in the stronger sense, in any class containing a two-world model (S5, universal) | `actuality_not_gValid`, `box_actuality_not_rwValid` |
+| Real-world validity is strictly weaker, and not closed under necessitation | `rwValid_strictly_weaker`, `rwValid_not_closed_under_nec`, `contingent_logical_truth_S5` |
+| `□(φ ↔ 𝒜φ)` holds exactly when `φ` is non-contingent | `sat_box_actuality`, `sat_box_actuality_universal` |
+| `𝒜` is inert for real-world validity; `𝒜φ` is generally valid iff `φ` is real-world valid | `rwValid_act_iff`, `gValid_act_iff` |
+
+**The theory** (`Situation/Actuality.lean`). `𝒜 p` is *defined* as `p` evaluated at `actualWorld`. Then `actuality_truth` (`p ↔ 𝒜p` at the actual world) holds by definition, `box_actuality_truth_iff` shows that its necessitation holds exactly when `p` is necessary or impossible, and `contingent_actuality_truth_not_necessary` concludes that for contingent `p` it is not necessary. `sat_theoryModel` proves that reading the development as a model of the deep embedding gives the same truth conditions, so every real-world valid formula holds actually (`rwValid_holds_actually`).
+
+**The model** (`Model/Satisfiable.lean`). The theory does not decide whether anything is contingent. `Model.contingent_logical_truth` shows that in a model of *all* the axioms, the actuality truth for a contingent proposition holds at the actual world while its necessitation fails.
+
+A paper describing these results is in [`paper/`](paper/).
 
 ## Axiom Inventory
 
@@ -261,6 +287,12 @@ purely derived results (no new postulates beyond those tabulated above):
   possible situations are consistent (`possible_consistent`); and worlds
   are exactly the maximal possible situations (`worldhood_iff`).
 
+- **Actuality** (`Situation/Actuality`). `𝒜` is rigid
+  (`actually_rigid`), idempotent (`actually_actually`) and necessary
+  when true (`box_actually`, `diamond_actually`); actuality of a
+  situation is the actualisation of its possibility condition
+  (`actual_iff_actually`).
+
 - **Grounding structure** (`Grounding/Dependence`). Strict dependence,
   grounding as asymmetric dependence (`WeaklyGrounds`, `weakly_grounds_asymm`),
   and the exhaustiveness of the foundational/derivative dichotomy
@@ -288,6 +320,12 @@ To get started: pick an item above, open an issue to claim it, then send a PR. Q
 ## References
 
 Zalta, E. *Intensional Logic and the Metaphysics of Intentionality*. MIT Press, 1988.
+
+Zalta, E. "Logical and Analytic Truths That Are Not Necessary." *Journal of Philosophy* 85(2), 1988.
+
+Crossley, J. N. and Humberstone, I. L. "The Logic of 'Actually'." *Reports on Mathematical Logic* 8, 1977.
+
+Davies, M. and Humberstone, L. "Two Notions of Necessity." *Philosophical Studies* 38, 1980.
 
 Fine, K. "Ontological Dependence." *Proceedings of the Aristotelian Society*, 1995.
 
