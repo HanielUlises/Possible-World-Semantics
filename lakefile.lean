@@ -15,3 +15,7 @@ lean_lib Situation
 @[default_target]
 lean_lib Tests where
   globs := #[.submodules `Tests]
+
+@[default_target]
+lean_lib Model where
+  globs := #[.submodules `Model]
