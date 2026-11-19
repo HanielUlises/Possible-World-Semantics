@@ -121,13 +121,8 @@ Every `sorry` in the codebase corresponds to exactly one entry in this table.
 
 | ID | Obligation | Blocks | File |
 |---|---|---|---|
-| OP-2b | `parthood_implies_depends` | derivation that `s ⊴ s' → s ≺ s'` | `Grounding/Dependence.lean` |
 | OP-4 | `meet_le_left`, `meet_le_right`, `meet_greatest` | full lattice structure of meet | `Situation/Infimum.lean` |
 | OP-5 | `no_strict_subworld` | strict subworld exclusion | `Situation/Worlds.lean` |
-
-### OP-2b — Parthood implies dependence
-
-`parthood_implies_depends` states that if `s ⊴ s'` and `s'` depends on `s''`, then `s` depends on `s''`. The proof requires converting `s ⊴ s'` into `s ≺ s'` (ontological dependence). `truth_mono_to_part` (resolved as OP-2) is now available, but the conversion is not immediate: `OntologicallyDepends s s'` is `∀ u, Situation u → s ⊴ u → s' ⊴ u`, which is a claim about all containing situations, not just a truth-transfer statement. Whether this follows from `s ⊴ s'` alone or requires an additional postulate remains to be determined.
 
 ### OP-4 — Lattice structure of meet
 
@@ -138,6 +133,12 @@ Every `sorry` in the codebase corresponds to exactly one entry in this table.
 `no_strict_subworld` states that no proper part of a world is itself a world. The two `sorry` markers correspond to steps that propagate truth across the parthood relation. Both are now unblocked by the resolution of OP-2 and should be closeable using `part_truth_mono` and `truth_mono_to_part`.
 
 ## Resolved Proof Obligations
+
+### OP-2b — Dependence is inherited from parts
+
+`parthood_implies_depends` originally stated that if `s ⊴ s'` and `s' ≺ s''`, then `s ≺ s''`. That requires `s ⊴ s' → s ≺ s'`, which is not derivable: `OntologicallyDepends s s'` is `∀ u, Situation u → s ⊴ u → s' ⊴ u`, so dependence runs from a situation to its parts, not to its wholes. Postulating it is not harmless. Instantiating `u := s` turns `s ⊴ s'` into `s' ⊴ s`, and `parthood_antisymm` then makes parthood coincide with identity on situations; with `SitJoin`, any two situations become equal.
+
+Closed by reorienting the statement along the derivable direction. `whole_depends_on_part` proves `s' ⊴ s → s ≺ s'` from `partOf_trans`, and `parthood_implies_depends` now reads: if `s' ⊴ s` and `s' ≺ s''`, then `s ≺ s''` — a whole requires whatever its parts require. No axioms beyond the primitives are used.
 
 ### OP-2 — Parthood via truth-monotonicity
 
@@ -196,7 +197,6 @@ Contributions are welcome especially proofs. The three open obligations are self
 |---|---|---|
 | [OP-4](#op-4--lattice-structure-of-meet) | `Situation/Infimum.lean` | `truth_mono_to_part` is already available; all three lemmas should close by applying it to `TrueIn_meet`. **Best first proof.** |
 | [OP-5](#op-5--no-strict-subworld) | `Situation/Worlds.lean` | Two `sorry`s, both unblocked by OP-2; closeable with `part_truth_mono` and `truth_mono_to_part`. |
-| [OP-2b](#op-2b--parthood-implies-dependence) | `Grounding/Dependence.lean` | Open-ended: may follow from `s ⊴ s'` alone or need a new postulate — the more research-flavored one. |
 
 **Ground rules.**
 
