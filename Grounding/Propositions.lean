@@ -98,15 +98,9 @@ axiom disj_assoc :
   ∀ p q r : Propn, disj (disj p q) r = disj p (disj q r)
 
 /--
-  Biconditional is symmetric: bic p q implies bic q p.
+  Biconditional is symmetric: bic p q and bic q p are the same proposition.
 -/
-theorem bic_symm (p q : Propn) (h : bic p q = bic p q) : bic q p = bic q p := by
-  rfl
-
-/--
-  Biconditional is symmetric in the propositional sense.
--/
-theorem bic_symm' (p q : Propn) : bic p q = bic q p := by
+theorem bic_symm (p q : Propn) : bic p q = bic q p := by
   rw [bic_def, bic_def, conj_comm]
 
 /--
