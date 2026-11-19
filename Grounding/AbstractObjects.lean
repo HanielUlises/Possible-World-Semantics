@@ -58,9 +58,14 @@ notation "A!" => AbstractObject
   If x is ordinary then necessarily x encodes no property.
   This is the fundamental separation between the two modes of
   predication: only abstract objects have an encoding extension.
+
+  The encoding subject is x itself.  An earlier version bound the
+  evaluation index instead (`Enc w F`), which, with a universal
+  accessibility relation, said that nothing encodes anything and so
+  contradicted Comprehension as soon as an ordinary object existed.
 -/
 axiom ordinary_no_encoding :
-  ∀ x : World, O! x → □ (fun w => ¬ ∃ F : Property, Enc w F) x
+  ∀ x : World, O! x → □ (fun _ => ¬ ∃ F : Property, Enc x F) x
 
 /--
   Comprehension principle for abstract objects.
