@@ -12,14 +12,16 @@ import Situation.Definitions
   Theorem 2 (extensionality of situations via truth).
 
   Two situations are identical iff they make exactly the
-  same propositions true.
+  same propositions true.  This is situation_extensionality
+  with its ExtEq hypothesis unfolded.
 -/
-axiom situation_extensionality_via_truth :
-  ∀ s₁ s₂ : World,
-    Situation s₁ →
-    Situation s₂ →
-    (∀ p : Propn, (s₁ ⊨ p) ↔ (s₂ ⊨ p)) →
-    s₁ = s₂
+theorem situation_extensionality_via_truth :
+    ∀ s₁ s₂ : World,
+      Situation s₁ →
+      Situation s₂ →
+      (∀ p : Propn, (s₁ ⊨ p) ↔ (s₂ ⊨ p)) →
+      s₁ = s₂ :=
+  fun s₁ s₂ h₁ h₂ h => situation_extensionality s₁ s₂ ⟨h₁, h₂, h⟩
 
 /-- Maximality₁ excludes partiality₁. -/
 theorem maximal₁_not_partial₁ :
@@ -30,9 +32,10 @@ theorem maximal₁_not_partial₁ :
   | inl hp' => exact hp hp'
   | inr hnp' => exact hnp hnp'
 
-/-- Actual situations are possible. -/
-axiom actual_implies_possible :
-  ∀ s : World, Actual s → Possible s
+/-- Actual situations are possible: the actual index witnesses it. -/
+theorem actual_implies_possible :
+    ∀ s : World, Actual s → Possible s :=
+  fun _ h => (Diamond_iff_exists _ _).mpr ⟨actualWorld, R_refl actualWorld, h⟩
 
 /-- Maximality₂ implies non-partiality₂. -/
 theorem maximal₂_not_partial₂ :
@@ -92,13 +95,21 @@ theorem persistent_disj :
   intro p q _ _ s s' hs hs' hpq hss'
   exact part_truth_mono s s' hs hs' hss' (p ∨ₚ q) hpq
 
-/-- Consistency is downward closed under parthood. -/
-axiom consistent_downward_closed :
-  ∀ (s x : World), Consistent s → (x ⊴ s) → Consistent x
+/-- Consistency is downward closed under parthood among situations:
+    whatever a part makes true, the whole makes true. -/
+theorem consistent_downward_closed :
+    ∀ (s x : World), Situation s → Situation x →
+      Consistent s → (x ⊴ s) → Consistent x :=
+  fun s x hs hx hcon hxs ⟨p, hp, hnp⟩ =>
+    hcon ⟨p, part_truth_mono x s hx hs hxs p hp,
+             part_truth_mono x s hx hs hxs (¬ₚ p) hnp⟩
 
-/-- Actual situations are consistent. -/
-axiom actual_consistent :
-  ∀ s : World, Actual s → Consistent s
+/-- Actual situations are consistent: a proposition and its negation
+    cannot both obtain at the actual index. -/
+theorem actual_consistent :
+    ∀ s : World, Actual s → Consistent s :=
+  fun _ h ⟨p, hp, hnp⟩ =>
+    (Obtains_neg actualWorld p).mp (h (¬ₚ p) hnp) (h p hp)
 
 /-- Partial₂ and Maximal₁ are jointly satisfiable. -/
 theorem partial₂_compatible_with_maximal₁ :
