@@ -22,8 +22,8 @@ notation s " ≺ " s' => OntologicallyDepends s s'
 
 /-- A situation is trivially self-dependent.
     Everything requires itself in order to obtain. -/
-theorem depends_refl (s : World) (hs : Situation s) : s ≺ s :=
-  fun u _ hsu => hsu
+theorem depends_refl (s : World) : s ≺ s :=
+  fun _ _ hsu => hsu
 
 /-- Dependence is transitive.
     If s requires s' and s' requires s'', then s requires s''. -/

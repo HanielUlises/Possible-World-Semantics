@@ -135,9 +135,9 @@ theorem Nec : ∀ (p : World → Prop), (∀ w, p w) → ∀ w, □ p w :=
 theorem PossNec :
     ∀ (p : World → Prop) (w : World),
       ◊ (fun w' => □ p w') w → □ p w :=
-  fun p w h v _ =>
+  fun _ _ h v _ =>
     Classical.byContradiction (fun hnpv =>
-      h (fun u _ hBoxpu =>
+      h (fun _ _ hBoxpu =>
         hnpv (hBoxpu v (R_refl v))))
 
 /-- Necessity is monotone with respect to implication.
