@@ -5,6 +5,13 @@ package possibleWorldsSemantics
 
 @[default_target]
 lean_lib Grounding
+
+@[default_target]
 lean_lib Modality
+
+@[default_target]
 lean_lib Situation
-lean_lib Test
+
+@[default_target]
+lean_lib Tests where
+  globs := #[.submodules `Tests]
