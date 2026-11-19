@@ -156,6 +156,8 @@ The modal layer (`Modality/Frames`, `Modality/Operators`) has no axioms: `R`, `B
 
 Formerly postulated, now derived: `world_maximal`, `world_consistent`, `maximal_consistent_possible_is_world`, `actualWorld_is_world` (`Situation/Worlds`); `situation_extensionality_via_truth`, `actual_implies_possible`, `actual_consistent`, `consistent_downward_closed` (`Situation/Theorems`).
 
+`Obtains`, its four classical clauses and `actualWorld_faithful` were introduced on 2026-11-18 to repair [KI-1 and KI-5](#repaired-axioms), and were reviewed and accepted under the no-new-axioms rule. The four clauses relocate the former `TrueIn_neg`, `TrueIn_conj`, `TrueIn_disj` and `TrueIn_impl` from situated truth to obtaining, and `actualWorld_faithful` replaces `actualWorld_is_world`. It could be removed by defining `Situation` as Zalta does and deriving the actual world from `Comprehension`.
+
 ## Consistency and a Model
 
 `Model/Satisfiable.lean` builds a concrete structure in which every axiom holds. It imports nothing from the development. Each primitive gets a concrete definition under its original name, each definition that an axiom mentions is copied verbatim, and each axiom is restated verbatim as a theorem and proved using only Lean's own logic. `scripts/check_model.py` confirms that the statements, definitions and notations match the development exactly, so the model cannot silently drift from the axioms. Since every axiom is true in the model, no contradiction is derivable from them.
