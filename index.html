@@ -229,6 +229,7 @@
     <div class="meta">
       <span>Haniel Ulises</span>
       <a href="https://github.com/HanielUlises/Possible-World-Semantics" target="_blank">Repository</a>
+      <a href="https://github.com/HanielUlises/Possible-World-Semantics/blob/main/paper/main.pdf" target="_blank">Paper (PDF)</a>
       <span>Lean 4 · v4.26.0</span>
     </div>
   </header>
@@ -259,7 +260,20 @@
       propositional truth, and the mereology of situations are all constructed.
       The resulting theory proves Theorems 4–6 of Zalta (1993) — the equivalence
       of parthood and truth-inclusion, antisymmetry of parthood, and same-parts
-      identity — as mechanically verified results.
+      identity — as mechanically verified results. Truth in a situation, which
+      may be partial, is distinguished from obtaining at an index, which is
+      classical; worlds are defined as in Zalta, as situations that could make
+      true exactly what is the case, and are proved to be precisely the maximal
+      possible situations.
+    </p>
+    <p>
+      The theory admits a definable actuality operator 𝒜. For an arbitrary class
+      of Kripke models with a designated world, real-world validity is shown not
+      to be closed under necessitation: <em>φ</em> ↔ 𝒜<em>φ</em> is real-world
+      valid, whereas □(<em>φ</em> ↔ 𝒜<em>φ</em>) holds exactly where <em>φ</em>
+      is constant. A non-degenerate model of all the axioms, in which this
+      biconditional is true but not necessary for a contingent proposition,
+      establishes the consistency of the theory.
     </p>
   </section>
 
@@ -273,7 +287,7 @@
       a domain of <em>properties</em>, and a domain of <em>propositions</em>.
       The primitive predicate <em>Situation</em> carves out the sub-domain of
       situations within the world domain; <em>Worldhood</em> further identifies
-      those situations that are maximal and consistent.
+      those situations that could make true exactly what is the case.
     </p>
 
     <p>
@@ -300,6 +314,26 @@
     <span class="formula">
       <em>s</em> ⊴ <em>s</em>′ &nbsp;↔&nbsp; ∀<em>p</em>. (<em>s</em> ⊨ <em>p</em> → <em>s</em>′ ⊨ <em>p</em>)
     </span>
+
+    <p>
+      Truth-in is partial: a situation may make neither <em>p</em> nor its
+      negation true. The classical truth conditions are borne instead by a
+      second primitive, <em>obtaining</em>, written Ob(<em>v</em>, <em>p</em>)
+      and read “<em>p</em> is the case at the index <em>v</em>”, where the
+      indices are the points over which the modal operators quantify:
+    </p>
+
+    <span class="formula">
+      Ob(<em>v</em>, ¬<em>p</em>) &nbsp;↔&nbsp; ¬Ob(<em>v</em>, <em>p</em>)
+      &emsp; Ob(<em>v</em>, <em>p</em> ∧ <em>q</em>) &nbsp;↔&nbsp; Ob(<em>v</em>, <em>p</em>) ∧ Ob(<em>v</em>, <em>q</em>)
+    </span>
+
+    <p>
+      The separation is not optional. Were truth-in itself required to satisfy
+      the classical clause for negation, the truth conditions of the meet would
+      force any two situations to agree on every proposition, and extensionality
+      would leave at most one situation.
+    </p>
 
     <p>
       Modal operators are grounded in a Kripke frame whose accessibility relation
@@ -361,8 +395,10 @@
 
   <p>
     The primitive non-logical vocabulary consists of the predicates
-    <em>Obj</em> and <em>Sit</em>, the relations <em>enc</em> and
-    <em>⊨</em>, and the operation <em>VAC</em>. Formally:
+    <em>Obj</em> and <em>Sit</em>, the relations <em>enc</em>, <em>⊨</em>,
+    <em>Ob</em> and <em>E</em> (concreteness at an index), the operation
+    <em>VAC</em>, the actual world <em>@</em>, and the meet and join
+    operations. Formally:
   </p>
 
   <span class="formula">
@@ -378,12 +414,25 @@
   </span>
 
   <span class="formula">
+    Ob : W × Π → Prop
+  </span>
+
+  <span class="formula">
+    E : W × W → Prop
+  </span>
+
+  <span class="formula">
     VAC : Π → P
   </span>
 
+  <span class="formula">
+    @ : W &emsp; ⊓, ⊔ : W × W → W
+  </span>
+
   <p>
-    No further primitive constants are assumed. Every subsequent notion is
-    either postulated explicitly or introduced by definition.
+    Together with the propositional operations on <em>Π</em>, these exhaust
+    the primitive vocabulary. Every subsequent notion is either postulated
+    explicitly or introduced by definition.
   </p>
 </section>
 
@@ -391,8 +440,8 @@
   <h2>Constitutive Principles</h2>
 
   <p>
-    The development rests upon three constitutive principles governing the
-    interaction between situations, properties, and propositions.
+    The development rests upon four constitutive principles governing the
+    interaction between situations, properties, propositions, and indices.
   </p>
 
   <p>
@@ -420,8 +469,16 @@
   </span>
 
   <p>
-    These principles constitute the entire bridge between the propositional and
-    ontological layers of the theory. All subsequent interaction between truth,
+    Fourth, obtaining at an index is classical:
+  </p>
+
+  <span class="formula">
+    Ob(v,¬p) ↔ ¬Ob(v,p) &emsp; Ob(v,p ∧ q) ↔ Ob(v,p) ∧ Ob(v,q)
+  </span>
+
+  <p>
+    These principles constitute the entire bridge between the propositional,
+    ontological and modal layers of the theory. All subsequent interaction between truth,
     encoding, and mereology is mediated through them.
   </p>
 </section>
@@ -465,6 +522,32 @@
   <span class="formula">
     s ≺ s′ :⟺
     ∀u(Sit(u) → s ⊴ u → s′ ⊴ u)
+  </span>
+
+  <p>
+    Worldhood, actuality and possibility follow Zalta, with obtaining at the
+    index of evaluation in place of truth simpliciter:
+  </p>
+
+  <span class="formula">
+    World(s) :⟺ Sit(s) ∧ ◊(λv. ∀p(s ⊨ p ↔ Ob(v,p)))(@)
+  </span>
+
+  <span class="formula">
+    Actual(s) :⟺ ∀p(s ⊨ p → Ob(@,p))
+  </span>
+
+  <span class="formula">
+    Possible(s) :⟺ ◊(λv. ∀p(s ⊨ p → Ob(v,p)))(@)
+  </span>
+
+  <p>
+    The actuality operator evaluates a condition at the actual world, whatever
+    the index:
+  </p>
+
+  <span class="formula">
+    𝒜φ(w) :⟺ φ(@)
   </span>
 </section>
 
@@ -523,11 +606,13 @@
 </section>
 
 <section>
-  <h2>World-Theoretic Assumptions</h2>
+  <h2>World-Theoretic Consequences</h2>
 
   <p>
-    Worldhood is characterized by maximality and consistency. A world decides
-    every proposition and contains no contradiction.
+    Maximality and consistency of worlds are not assumed but derived. A world
+    matches some index on every proposition, and so inherits the classical
+    truth conditions of obtaining; in particular it decides every proposition
+    and contains no contradiction.
   </p>
 
   <span class="formula">
@@ -539,9 +624,28 @@
   </span>
 
   <p>
-    These assumptions suffice to establish that no proper part of a world can
-    itself be a world.
+    Consistency follows already from possibility, and the worlds are exactly
+    the maximal possible situations:
   </p>
+
+  <span class="formula">
+    Possible(s) → ¬∃p(s ⊨ p ∧ s ⊨ ¬p)
+  </span>
+
+  <span class="formula">
+    World(s) ↔ Sit(s) ∧ ∀p(s ⊨ p ∨ s ⊨ ¬p) ∧ Possible(s)
+  </span>
+
+  <p>
+    The sole world-theoretic postulate concerns the designated actual world,
+    whose truths are exactly what obtains at it; from it follow that the actual
+    world is a world and is actual. No proper part of a world is itself a
+    world.
+  </p>
+
+  <span class="formula">
+    Sit(@) ∧ ∀p(@ ⊨ p ↔ Ob(@,p))
+  </span>
 </section>
 
 <section>
@@ -657,6 +761,103 @@
 </section>
 
 
+<section>
+  <h2>Actuality and Contingent Logical Truth</h2>
+
+  <p>
+    Let a model of propositional modal logic with actuality be a Kripke model
+    with a designated actual world <em>@</em>, in which 𝒜<em>φ</em> is true at
+    any world just in case <em>φ</em> is true at <em>@</em>. A formula is
+    <em>real-world valid</em> in a class of models if it is true at the actual
+    world of each, and <em>generally valid</em> if it is true at every world of
+    each (Crossley and Humberstone; Davies and Humberstone). For an arbitrary
+    class of models, general validity implies real-world validity and is closed
+    under necessitation, while the actuality biconditional is real-world valid
+    for every formula:
+  </p>
+
+  <span class="formula">
+    ⊨<sub>g</sub> φ ⟹ ⊨<sub>g</sub> □φ &emsp;&emsp; ⊨<sub>rw</sub> φ ↔ 𝒜φ
+  </span>
+
+  <p>
+    Its necessitation holds at a world exactly when <em>φ</em> takes its actual
+    value at every accessible world, and so fails wherever <em>φ</em> is
+    contingent. On every class containing a two-world model, including the S5
+    models, real-world validity is therefore not closed under necessitation and
+    properly extends general validity.
+  </p>
+
+  <span class="formula">
+    𝔐, w ⊨ □(φ ↔ 𝒜φ) &nbsp;↔&nbsp; ∀v(wRv → (𝔐, v ⊨ φ ↔ 𝔐, @ ⊨ φ))
+  </span>
+
+  <figure>
+    <svg viewBox="0 0 560 190" role="img" aria-label="Two-world countermodel for the necessitation of the actuality biconditional">
+      <path class="dg-edge" d="M150 95 L410 95"/>
+      <circle class="dg-halo" cx="150" cy="95" r="8"/><circle class="dg-node" cx="150" cy="95" r="5"/>
+      <circle class="dg-halo" cx="410" cy="95" r="8"/><circle class="dg-node" cx="410" cy="95" r="5"/>
+      <text class="dg-sym"  x="150" y="70"  text-anchor="middle" font-size="19">@</text>
+      <text class="dg-sym"  x="410" y="70"  text-anchor="middle" font-size="19">w</text>
+      <text class="dg-note" x="150" y="130" text-anchor="middle" font-size="14">φ, 𝒜φ</text>
+      <text class="dg-note" x="410" y="130" text-anchor="middle" font-size="14">¬φ, 𝒜φ</text>
+      <text class="dg-note" x="150" y="152" text-anchor="middle" font-size="13">φ ↔ 𝒜φ holds</text>
+      <text class="dg-note" x="410" y="152" text-anchor="middle" font-size="13">φ ↔ 𝒜φ fails</text>
+      <text class="dg-note" x="280" y="85"  text-anchor="middle" font-size="12">mutually accessible</text>
+    </svg>
+    <figcaption>
+      <span class="fig-num">Figure 3.</span> The two-world countermodel. Since
+      𝒜<em>φ</em> is evaluated at <em>@</em> from every world, the actuality
+      biconditional holds at the actual world but fails at <em>w</em>, and its
+      necessitation fails at <em>@</em>.
+    </figcaption>
+  </figure>
+
+  <p>
+    Prefixing 𝒜 converts real-world validity into general validity, so that
+    𝒜(<em>φ</em> ↔ 𝒜<em>φ</em>) is generally valid and hence necessary: what is
+    necessary is not the biconditional but that it actually holds. In the
+    situation theory the actuality operator is definable, its necessitation
+    holds exactly for necessary or impossible conditions, and the theory, read
+    as a model of the logic, validates every real-world valid formula at its
+    actual world. If logical truth is real-world validity, the theory thus
+    contains logical truths that are not necessary, as Zalta (1988) argued.
+  </p>
+</section>
+
+<section>
+  <h2>Consistency</h2>
+
+  <p>
+    The theory has a model. Take two valuations, of which one is actual; let
+    propositions and properties be sets of valuations; let the objects be one
+    index for each valuation, which is concrete and encodes nothing, together
+    with one abstract object for each set of properties. Truth in a situation is
+    encoding, and obtaining at an index is membership of its valuation. Every
+    axiom of the theory holds in this structure, and the model is
+    non-degenerate:
+  </p>
+
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Property</th><th>Witness</th></tr></thead>
+      <tbody>
+        <tr><td>Two distinct worlds</td><td>the situations true at either valuation</td></tr>
+        <tr><td>A contingent proposition</td><td>the set containing only the actual valuation</td></tr>
+        <tr><td>A partial, possible situation below a world</td><td>the situation encoding nothing</td></tr>
+        <tr><td>An impossible situation</td><td>the situation encoding everything</td></tr>
+        <tr><td>Ordinary and abstract objects</td><td>the indices and the encoding objects</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p>
+    In this model the actuality biconditional for the contingent proposition is
+    true at the actual world but not necessary. The correspondence between the
+    model and the axioms is verified mechanically.
+  </p>
+</section>
+
   <!-- Resolved obligations -->
   <section>
     <h2>Resolved Proof Obligations</h2>
@@ -684,6 +885,17 @@
         encoded by <em>s</em> is of the form VAC(<em>p</em>), and truth-inclusion
         then transfers encoding directly. This yields the full biconditional of
         Theorem 4 and unlocks Theorems 5, 6, and 8.
+      </p>
+    </div>
+
+    <div class="ob">
+      <p class="ob-head"><span class="ob-id">OP-2b</span> Dependence and parthood</p>
+      <p>
+        Dependence runs from a situation to its parts: <em>s</em>′ ⊴ <em>s</em>
+        implies <em>s</em> ≺ <em>s</em>′ by transitivity of parthood, so a whole
+        inherits the dependencies of its parts. The converse, that a part depends
+        on its wholes, is not derivable, and postulating it would identify every
+        situation with each of its parts.
       </p>
     </div>
 
@@ -731,7 +943,11 @@
     <h2>References</h2>
     <ol class="refs">
       <li>Zalta, E. N. <em>Intensional Logic and the Metaphysics of Intentionality.</em> MIT Press, 1988.</li>
+      <li>Zalta, E. N. "Logical and Analytic Truths That Are Not Necessary." <em>The Journal of Philosophy</em> 85 (1988), 57–74.</li>
       <li>Zalta, E. N. "Twenty-Five Basic Theorems in Situation and World Theory." <em>Journal of Philosophical Logic</em> 22 (1993), 385–428.</li>
+      <li>Crossley, J. N. and Humberstone, I. L. "The Logic of ‘Actually’." <em>Reports on Mathematical Logic</em> 8 (1977), 11–29.</li>
+      <li>Davies, M. and Humberstone, L. "Two Notions of Necessity." <em>Philosophical Studies</em> 38 (1980), 1–30.</li>
+      <li>Nelson, M. and Zalta, E. N. "A Defense of Contingent Logical Truths." <em>Philosophical Studies</em> 157 (2012).</li>
       <li>Fine, K. "Ontological Dependence." <em>Proceedings of the Aristotelian Society</em> 95 (1995), 269–290.</li>
       <li>Barwise, J. and Perry, J. <em>Situations and Attitudes.</em> MIT Press, 1983.</li>
       <li>Chellas, B. F. <em>Modal Logic: An Introduction.</em> Cambridge University Press, 1980.</li>
