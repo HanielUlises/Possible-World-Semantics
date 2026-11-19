@@ -48,32 +48,35 @@ def Persistent (p : Propn) : Prop :=
   to truth tout court.
 -/
 def Actual (s : World) : Prop :=
-  ∀ p : Propn, (s ⊨ p) → (actualWorld ⊨ p)
+  ∀ p : Propn, (s ⊨ p) → Obtains actualWorld p
 
 
 /--
   Possibility of a situation.
 
-  A situation is possible iff it could be actual.
+  A situation is possible iff it could be actual: at some
+  index, everything true in it obtains.
 
   This is the minimal modal notion needed to connect
   situations with possible worlds.
 -/
 def Possible (s : World) : Prop :=
-  ◊ (fun _ => Actual s) actualWorld
+  ◊ (fun v => ∀ p : Propn, (s ⊨ p) → Obtains v p) actualWorld
 
 /--
   Worldhood.
 
   A world is a situation that could make exactly the
-  true propositions true.
+  true propositions true (Zalta: ◊∀p(s ⊨ p ↔ p)).
+  "p is true" is relative to the index of evaluation, so
+  it is rendered as `Obtains v p`.
 
-  This characterizes worlds as maximal, fully
-  truth-determining situations.
+  Maximality and consistency of worlds are derived from
+  this definition (Situation/Worlds.lean).
 -/
 def Worldhood (s : World) : Prop :=
   Situation s ∧
-  ◊ (fun _ => ∀ p : Propn, (s ⊨ p) ↔ True) actualWorld
+  ◊ (fun v => ∀ p : Propn, (s ⊨ p) ↔ Obtains v p) actualWorld
 
 /--
   Maximality (first sense).

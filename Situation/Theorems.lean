@@ -78,24 +78,19 @@ theorem persistent_conj :
       Persistent p →
       Persistent q →
       Persistent (p ∧ₚ q) := by
-  intro p q hp hq s s' hs hs' hpq hss'
-  rw [TrueIn_conj] at hpq ⊢
-  exact ⟨hp s s' hs hs' hpq.1 hss', hq s s' hs hs' hpq.2 hss'⟩
+  intro p q _ _ s s' hs hs' hpq hss'
+  exact part_truth_mono s s' hs hs' hss' (p ∧ₚ q) hpq
 
 /-- The disjunction of two persistent propositions is persistent.
-    Whichever disjunct holds at the smaller situation is carried upward
-    by its own persistence, and re-forming the disjunction at the larger
-    situation preserves it. -/
+    Like every proposition, it is carried upward along parthood by
+    part_truth_mono. -/
 theorem persistent_disj :
     ∀ p q : Propn,
       Persistent p →
       Persistent q →
       Persistent (p ∨ₚ q) := by
-  intro p q hp hq s s' hs hs' hpq hss'
-  rw [TrueIn_disj] at hpq ⊢
-  cases hpq with
-  | inl h => exact Or.inl (hp s s' hs hs' h hss')
-  | inr h => exact Or.inr (hq s s' hs hs' h hss')
+  intro p q _ _ s s' hs hs' hpq hss'
+  exact part_truth_mono s s' hs hs' hss' (p ∨ₚ q) hpq
 
 /-- Consistency is downward closed under parthood. -/
 axiom consistent_downward_closed :

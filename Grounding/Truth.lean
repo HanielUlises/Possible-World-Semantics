@@ -36,33 +36,42 @@ axiom TrueIn_def :
     Object x →
       ((x ⊨ p) ↔ Encp x p)
 
-/--
-  Truth of a conjunction: s ⊨ p ∧ₚ q ↔ s ⊨ p ∧ s ⊨ q.
--/
-axiom TrueIn_conj :
-  ∀ (s : World) (p q : Propn),
-    (s ⊨ p ∧ₚ q) ↔ (s ⊨ p) ∧ (s ⊨ q)
+/-
+  OBTAINING AT AN INDEX
 
-/--
-  Truth of a disjunction: s ⊨ p ∨ₚ q ↔ s ⊨ p ∨ s ⊨ q.
--/
-axiom TrueIn_disj :
-  ∀ (s : World) (p q : Propn),
-    (s ⊨ p ∨ₚ q) ↔ (s ⊨ p) ∨ (s ⊨ q)
+  Situated truth `s ⊨ p` is partial: a situation may leave a
+  proposition undecided.  The classical truth clauses therefore do
+  not belong to `⊨`.  They govern a separate relation, `Obtains v p`,
+  read "p is the case at index v", where indices are the points over
+  which □ and ◊ quantify.  Worlds are then characterised as the
+  situations whose truths could coincide with what obtains
+  (`Worldhood`), and the classical behaviour of `⊨` at worlds is
+  derived rather than postulated (Situation/Worlds.lean).
 
-/--
-  Truth of implication: s ⊨ p →ₚ q ↔ (s ⊨ p → s ⊨ q).
-
-  NB: this makes material implication match situational
-  implication, which is a deliberate strong choice.
+  Stating the classical clauses for `⊨` at every situation forces
+  every situation to decide every proposition, and together with the
+  meet axioms collapses all situations into one.
 -/
-axiom TrueIn_impl :
-  ∀ (s : World) (p q : Propn),
-    (s ⊨ p →ₚ q) ↔ ((s ⊨ p) → (s ⊨ q))
 
-/--
-  Truth of negation: s ⊨ ¬ₚp ↔ ¬(s ⊨ p).
--/
-axiom TrueIn_neg :
-  ∀ (s : World) (p : Propn),
-    (s ⊨ ¬ₚ p) ↔ ¬(s ⊨ p)
+/-- p is the case at index v (truth simpliciter, relative to v). -/
+axiom Obtains : World → Propn → Prop
+
+/-- Negation is classical at an index. -/
+axiom Obtains_neg :
+  ∀ (v : World) (p : Propn),
+    Obtains v (¬ₚ p) ↔ ¬ Obtains v p
+
+/-- Conjunction is classical at an index. -/
+axiom Obtains_conj :
+  ∀ (v : World) (p q : Propn),
+    Obtains v (p ∧ₚ q) ↔ Obtains v p ∧ Obtains v q
+
+/-- Disjunction is classical at an index. -/
+axiom Obtains_disj :
+  ∀ (v : World) (p q : Propn),
+    Obtains v (p ∨ₚ q) ↔ Obtains v p ∨ Obtains v q
+
+/-- Implication is material at an index. -/
+axiom Obtains_impl :
+  ∀ (v : World) (p q : Propn),
+    Obtains v (p →ₚ q) ↔ (Obtains v p → Obtains v q)
