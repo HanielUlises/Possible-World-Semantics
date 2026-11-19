@@ -204,6 +204,20 @@ theorem Box_iff_not_Diamond_not (p : World → Prop) (w : World) :
     · exact hp
     · exact absurd (fun hbox => hbox v hrwv hnp) hdia
 
+/-- Possibility is witnessed.
+    ◊ p holds at w exactly when some R-accessible world satisfies p.
+    The right-to-left direction is constructive; the left-to-right
+    direction extracts the witness classically from the double
+    negation in the definition of ◊. -/
+theorem Diamond_iff_exists (p : World → Prop) (w : World) :
+    ◊ p w ↔ ∃ v, R w v ∧ p v := by
+  constructor
+  · intro h
+    exact Classical.byContradiction fun hne =>
+      h (fun v hrwv hpv => hne ⟨v, hrwv, hpv⟩)
+  · rintro ⟨v, hrwv, hpv⟩ hbox
+    exact hbox v hrwv hpv
+
 /-- Possibility is monotone with respect to implication.
     If p entails q pointwise, then whatever is possibly p is possibly q:
     a world witnessing the possibility of p also witnesses that of q.
