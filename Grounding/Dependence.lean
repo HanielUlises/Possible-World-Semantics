@@ -39,6 +39,15 @@ theorem part_implies_depends (s s' s'' : World)
     (hdep     : s' ≺ s'') : s ≺ s'' :=
   depends_trans s s' s'' hdep_ss' hdep
 
+/-- A whole depends on each of its parts.
+    If s' is a part of s, then every situation that includes s also
+    includes s', by transitivity of parthood.  This is the derivable
+    direction linking ⊴ and ≺; the converse (a part depends on its
+    wholes) is not derivable, and postulating it collapses parthood
+    to identity on situations (see README.md § OP-2b). -/
+theorem whole_depends_on_part (s s' : World) (hpart : s' ⊴ s) : s ≺ s' :=
+  fun u _ hsu => partOf_trans s' s u hpart hsu
+
 /-- If s is a part of s' and s' depends on s'', then s depends on s''.
 
     Proof: s ⊴ s' means s' ⊴ u whenever s ⊴ u (by transitivity of ⊴,
@@ -137,12 +146,11 @@ theorem mutual_depends_symm (s s' : World)
     other, so they are ontologically co-dependent.  (By parthood
     antisymmetry such situations are in fact identical; the point here
     is that parthood in both directions already suffices for the
-    dependence structure via parthood_yields_depends.) -/
+    dependence structure via whole_depends_on_part.) -/
 theorem mutual_dependence_from_parthood (s s' : World)
-    (hs : Situation s) (hs' : Situation s')
     (hss' : s ⊴ s') (hs's : s' ⊴ s) : MutuallyDependent s s' :=
-  ⟨parthood_yields_depends s s' hs hs' hss',
-   parthood_yields_depends s' s hs' hs hs's⟩
+  ⟨whole_depends_on_part s s' hs's,
+   whole_depends_on_part s' s hss'⟩
 
 /-- Foundational and derivative situations exhaust the space.
     A situation fails to be foundational exactly when it is derivative:
