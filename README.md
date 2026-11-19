@@ -43,8 +43,22 @@ flowchart TD
 
 ## Getting Started
 
-The toolchain is pinned in `lean-toolchain` (Lean `v4.26.0`), so the build is reproducible — [`elan`](https://github.com/leanprover/elan) selects the right compiler automatically.
+The toolchain is pinned in `lean-toolchain` (Lean `v4.26.0`), so the build is reproducible — [`elan`](https://github.com/leanprover/elan) selects the right compiler automatically. There are no external dependencies; the development uses only Lean core.
 
+```bash
+git clone https://github.com/HanielUlises/Possible-World-Semantics.git
+cd Possible-World-Semantics
+lake build Grounding Modality Situation
+```
+
+A plain `lake build` compiles only the `Grounding` library and the modules it imports (see [KI-4](#ki-4--build-coverage)). `scripts/check.sh` runs a clean build of that default target.
+
+To see which axioms a theorem rests on, open a file and use `#print axioms`:
+
+```lean
+import Grounding.Dependence
+#print axioms parthood_implies_depends
+```
 
 ## Theoretical Background
 
