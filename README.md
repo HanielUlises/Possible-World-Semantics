@@ -28,6 +28,7 @@ flowchart TD
         Fr["Frames · R"]
         Op["Operators · □ ◊"]
         AL["ActualityLogic · real-world vs general validity"]
+        QA["QuantifiedActuality · variable domains"]
     end
     subgraph S["Situation — worlds & lattice"]
         Def["Definitions · actualIndex · actualWorld"]
@@ -151,6 +152,16 @@ Zalta (1988) argued that a modal language with an actuality operator has logical
 | `𝒜` is inert for real-world validity; `𝒜φ` is generally valid iff `φ` is real-world valid | `rwValid_act_iff`, `gValid_act_iff` |
 
 **The theory** (`Situation/Actuality.lean`). `𝒜 p` is *defined* as `p` evaluated at the actual index `actualIndex`. Then `actuality_truth` (`p ↔ 𝒜p` at the actual index) holds by definition, `box_actuality_truth_iff` shows that its necessitation holds exactly when `p` is necessary or impossible, and `contingent_actuality_truth_not_necessary` concludes that for contingent `p` it is not necessary. `sat_theoryModel` proves that reading the development as a model of the deep embedding gives the same truth conditions, so every real-world valid formula holds actually (`rwValid_holds_actually`).
+
+**Quantified modal logic** (`Modality/QuantifiedActuality.lean`). The same comparison for first-order modal logic with actuality, over Kripke models with variable domains and actualist quantifiers. The closure properties and the characterization of `□(φ ↔ 𝒜φ)` carry over under every assignment. Variable domains add contingent logical truths of their own:
+
+| Result | Theorem |
+|---|---|
+| Both validities are closed under generalization | `RWValid.gen`, `GValid.gen` |
+| `𝒜∀xφ ↔ ∀x𝒜φ` is real-world valid, and generally valid over constant domains | `commute_rwValid`, `commute_gValid_constant` |
+| "Everything actually exists", `∀x 𝒜E!x`, is real-world valid; `□∀x 𝒜E!x` holds exactly when no accessible world has an object that does not actually exist | `allActual_rwValid`, `sat_box_allActual` |
+| Neither is generally valid, nor is its necessitation real-world valid, in any class containing a two-world model with a growing domain | `commute_not_gValid`, `allActual_not_gValid`, `box_allActual_not_rwValid` |
+| "Everything exists", `∀x E!x`, is generally valid | `allExist_gValid` |
 
 **The model** (`Model/Satisfiable.lean`). The theory does not decide whether anything is contingent. `Model.contingent_logical_truth` shows that in a model of *all* the axioms, the actuality truth for a contingent proposition holds at the actual world while its necessitation fails.
 
