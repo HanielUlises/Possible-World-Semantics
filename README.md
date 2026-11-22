@@ -17,7 +17,8 @@ The development is layered: an ontological **Grounding** core fixes the primitiv
 ```mermaid
 flowchart TD
     subgraph G["Grounding — ontological core"]
-        Ont["Ontology<br/>Enc · Situation · Object"]
+        Ont["Ontology<br/>Enc · VAC"]
+        Obj["Objects<br/>O! · A! · Situation"]
         Tru["Truth ⊨"]
         Par["Parthood ⊴"]
         Dep["Dependence ≺"]
@@ -29,18 +30,17 @@ flowchart TD
         AL["ActualityLogic · real-world vs general validity"]
     end
     subgraph S["Situation — worlds & lattice"]
-        Def["Definitions · actualWorld"]
+        Def["Definitions · actualIndex · actualWorld"]
         Ext["Extensionality"]
         Inf["Infimum · meet ∧"]
         Wld["Worlds"]
         Act["Actuality · 𝒜"]
     end
-    Ont --> Tru --> Par --> Dep
-    Ont --> Abs
-    Par --> Inf
     Fr --> Op
-    Op --> Abs
-    Op --> Def --> Ext --> Inf --> Wld
+    Ont --> Obj --> Tru --> Abs --> Ext --> Par --> Dep
+    Op --> Obj
+    Par --> Def
+    Abs --> Def --> Inf --> Wld
     Def --> Act
     AL --> Act
     subgraph X["Model — consistency"]
@@ -74,15 +74,24 @@ import Grounding.Dependence
 
 The development follows the Zalta–Fine tradition. Worlds and situations are not distinguished at the type level: `World` is the single domain, and `Situation` and `Object` are predicates over it.
 
-The central primitive is encoding (`Enc`). A situation encodes the properties that constitute its informational content. Parthood is defined encoding-first: `s ⊴ s'` holds iff every property encoded by `s` is also encoded by `s'`, matching the mereology of Barwise–Perry and the abstract object theory of Zalta.
+The central primitive is encoding (`Enc`). A situation encodes the properties that constitute its informational content. As in Zalta's theory, situations are defined as abstract objects that encode only propositional properties, the vacuous properties `VAC p` (written `[λy p]` by Zalta):
 
-Situated truth and obtaining are kept apart. `s ⊨ p` (`TrueIn`) is truth in a situation and is partial: a situation may make neither `p` nor `¬ₚp` true. `Obtains v p` is "p is the case at index v", where indices are the points over which `□` and `◊` quantify; the classical clauses (`Obtains_neg`, `Obtains_conj`, `Obtains_disj`, `Obtains_impl`) govern it alone. Following Zalta, a world is a situation that could make true exactly what is the case:
+```
+Object(x)     :=  O!(x) ∨ A!(x)
+Situation(x)  :=  A!(x) ∧ ∀F, x encodes F → ∃p, F = VAC p
+```
+
+`O!` (ordinary: possibly concrete) and `A!` (abstract: not possibly concrete) are defined from the primitive `Concrete` in `Grounding/Objects.lean`. Parthood is defined encoding-first: `s ⊴ s'` holds iff every property encoded by `s` is also encoded by `s'`, matching the mereology of Barwise–Perry and the abstract object theory of Zalta.
+
+Situated truth and obtaining are kept apart. `s ⊨ p` (`TrueIn`) is truth in a situation and is partial: a situation may make neither `p` nor `¬ₚp` true. `Obtains v p` is "p is the case at index v", where indices are the points over which `□` and `◊` quantify; the classical clauses (`Obtains_neg`, `Obtains_conj`, `Obtains_disj`, `Obtains_impl`) govern it alone. Following Zalta, a world is a situation that could make true exactly what is the case. Writing `@` for the actual index `actualIndex`:
 
 ```
 Worldhood(s)  :=  Situation(s) ∧ ◊(λv. ∀p, s ⊨ p ↔ Obtains v p)
 Actual(s)     :=  ∀p, s ⊨ p → Obtains @ p
 Possible(s)   :=  ◊(λv. ∀p, s ⊨ p → Obtains v p)
 ```
+
+The actual world is not postulated. `actualWorld` is the abstract object that `Comprehension` provides for the vacuous properties of what obtains at `@`, so that it encodes `VAC p` exactly when `Obtains @ p`. That it is a world faithful to `@` (`actualWorld_faithful`) is then a theorem. The one bridge it needs is `VAC_congr`: if `VAC p = VAC q`, then `p` and `q` obtain at the same indices. In Zalta's theory this follows from β-conversion; the development has no exemplification relation, so it is postulated directly.
 
 With these definitions the classical behaviour of truth at worlds, and the maximality and consistency of worlds, are theorems rather than postulates (`Situation/Worlds.lean`), and worlds are characterised as exactly the maximal possible situations (`worldhood_iff`).
 
@@ -97,13 +106,13 @@ Modal operators are defined over a Kripke frame rather than postulated. `Modalit
 
 Necessitation (`Nec`) and the collapse `◊□φ → □φ` (`PossNec`) are also theorems. Because `R` is universal, `□ p w` amounts to `∀ v, p v`: the modal layer is S5 with a single equivalence class of worlds, and it has no axioms of its own.
 
-Extensionality is a postulate. Situations are individuated by propositional content:
+Situations are individuated by propositional content:
 
 ```
 Situation(s) ∧ Situation(s') ∧ (∀p, s ⊨ p ↔ s' ⊨ p) → s = s'
 ```
 
-This cannot be derived from purely intensional primitives and must be stipulated, which is the standard move in both situation semantics and abstract object theory.
+This is a theorem (`situation_extensionality`). Situations that make the same propositions true encode the same vacuous properties, and since they encode nothing else, `abstract_extensionality` identifies them. The postulate is therefore made once, for abstract objects, as in Zalta's theory.
 
 ### The situation lattice
 
@@ -141,7 +150,7 @@ Zalta (1988) argued that a modal language with an actuality operator has logical
 | `□(φ ↔ 𝒜φ)` holds exactly when `φ` is non-contingent | `sat_box_actuality`, `sat_box_actuality_universal` |
 | `𝒜` is inert for real-world validity; `𝒜φ` is generally valid iff `φ` is real-world valid | `rwValid_act_iff`, `gValid_act_iff` |
 
-**The theory** (`Situation/Actuality.lean`). `𝒜 p` is *defined* as `p` evaluated at `actualWorld`. Then `actuality_truth` (`p ↔ 𝒜p` at the actual world) holds by definition, `box_actuality_truth_iff` shows that its necessitation holds exactly when `p` is necessary or impossible, and `contingent_actuality_truth_not_necessary` concludes that for contingent `p` it is not necessary. `sat_theoryModel` proves that reading the development as a model of the deep embedding gives the same truth conditions, so every real-world valid formula holds actually (`rwValid_holds_actually`).
+**The theory** (`Situation/Actuality.lean`). `𝒜 p` is *defined* as `p` evaluated at the actual index `actualIndex`. Then `actuality_truth` (`p ↔ 𝒜p` at the actual index) holds by definition, `box_actuality_truth_iff` shows that its necessitation holds exactly when `p` is necessary or impossible, and `contingent_actuality_truth_not_necessary` concludes that for contingent `p` it is not necessary. `sat_theoryModel` proves that reading the development as a model of the deep embedding gives the same truth conditions, so every real-world valid formula holds actually (`rwValid_holds_actually`).
 
 **The model** (`Model/Satisfiable.lean`). The theory does not decide whether anything is contingent. `Model.contingent_logical_truth` shows that in a model of *all* the axioms, the actuality truth for a contingent proposition holds at the actual world while its necessitation fails.
 
@@ -154,10 +163,8 @@ Every `axiom` declaration in the codebase, grouped by file. Definitions and theo
 | Axiom | File | Status |
 |---|---|---|
 | `World`, `Property`, `Propn` | `Grounding/Ontology` | primitive type |
-| `Object`, `Situation` | `Grounding/Ontology` | primitive predicate |
 | `Enc`, `Encp`, `VAC` | `Grounding/Ontology` | primitive relation / operator |
-| `Enc_VAC_complete` | `Grounding/Ontology` | situations encode only propositional properties `VAC p` |
-| `situation_is_object` | `Grounding/Ontology` | predicate inclusion postulate (OP-3) |
+| `Concrete` | `Grounding/Objects` | primitive predicate (E!) |
 | `neg` (¬ₚ), `conj` (∧ₚ), `disj` (∨ₚ), `impl` (→ₚ), `bic` | `Grounding/Propositions` | primitive connectives |
 | `bic_def`, `impl_as_disj` | `Grounding/Propositions` | definitional equations on `Propn` |
 | `neg_neg`, `deMorgan_conj`, `deMorgan_disj` | `Grounding/Propositions` | Boolean identities on `Propn` |
@@ -166,23 +173,20 @@ Every `axiom` declaration in the codebase, grouped by file. Definitions and theo
 | `Encp_def`, `TrueIn_def` | `Grounding/Truth` | Prover9-verified metatheorems |
 | `Obtains` | `Grounding/Truth` | primitive relation: a proposition is the case at an index |
 | `Obtains_neg`, `Obtains_conj`, `Obtains_disj`, `Obtains_impl` | `Grounding/Truth` | classical clauses for obtaining |
-| `Concrete` | `Grounding/AbstractObjects` | primitive predicate (E!) |
+| `VAC_congr` | `Grounding/Truth` | equal vacuous properties have the same obtaining conditions |
 | `ordinary_no_encoding` | `Grounding/AbstractObjects` | axiom β (ordinary objects encode nothing) |
 | `Comprehension` | `Grounding/AbstractObjects` | comprehension for abstract objects |
 | `abstract_extensionality` | `Grounding/AbstractObjects` | constitutive postulate |
 | `SitJoin`, `SitJoin_situation` | `Grounding/StructuredProps` | join existence |
 | `SitJoin_left`, `SitJoin_right`, `SitJoin_minimal` | `Grounding/StructuredProps` | join is the least upper bound |
-| `actualWorld` | `Situation/Definitions` | designated constant |
-| `situation_extensionality` | `Situation/Extensionality` | constitutive postulate |
-| `situation_closed_under_parthood` | `Situation/Theorems` | Prover9 Theorem 3, for abstract parts |
+| `actualIndex` | `Situation/Definitions` | designated constant: the actual index |
 | `meet`, `meet_situation`, `TrueIn_meet` | `Situation/Infimum` | meet existence and truth conditions |
-| `actualWorld_faithful` | `Situation/Worlds` | the actual world's truths are what obtains at the actual index |
 
 The modal layer (`Modality/Frames`, `Modality/Operators`) has no axioms: `R`, `Box` and `Diamond` are definitions, and `K`, `T`, `Four`, `Five`, `Nec` and `PossNec` are theorems.
 
-Formerly postulated, now derived: `world_maximal`, `world_consistent`, `maximal_consistent_possible_is_world`, `actualWorld_is_world` (`Situation/Worlds`); `situation_extensionality_via_truth`, `actual_implies_possible`, `actual_consistent`, `consistent_downward_closed` (`Situation/Theorems`).
+Formerly postulated, now derived: `situation_is_object`, `Enc_VAC_complete` (`Grounding/Objects`); `situation_extensionality` (`Situation/Extensionality`); `world_maximal`, `world_consistent`, `maximal_consistent_possible_is_world`, `actualWorld_is_world`, `actualWorld_faithful` (`Situation/Worlds`); `situation_extensionality_via_truth`, `situation_closed_under_parthood`, `actual_implies_possible`, `actual_consistent`, `consistent_downward_closed` (`Situation/Theorems`). Formerly primitive, now defined: `Object`, `Situation` (`Grounding/Objects`) and `actualWorld` (`Situation/Definitions`).
 
-`Obtains`, its four classical clauses and `actualWorld_faithful` were introduced on 2026-11-18 to repair [KI-1 and KI-5](#repaired-axioms), and were reviewed and accepted under the no-new-axioms rule. The four clauses relocate the former `TrueIn_neg`, `TrueIn_conj`, `TrueIn_disj` and `TrueIn_impl` from situated truth to obtaining, and `actualWorld_faithful` replaces `actualWorld_is_world`. It could be removed by defining `Situation` as Zalta does and deriving the actual world from `Comprehension`.
+`Obtains`, its four classical clauses and `actualWorld_faithful` were introduced on 2026-11-18 to repair [KI-1 and KI-5](#repaired-axioms), and were reviewed and accepted under the no-new-axioms rule. The four clauses relocate the former `TrueIn_neg`, `TrueIn_conj`, `TrueIn_disj` and `TrueIn_impl` from situated truth to obtaining. On 2026-11-22, `Object` and `Situation` were defined as in Zalta's theory and the former constant `actualWorld` was split into the primitive index `actualIndex` and a world defined by comprehension. This turned seven axioms into definitions or theorems, `actualWorld_faithful` among them, at the cost of one new axiom, `VAC_congr`, which was also reviewed and accepted.
 
 ## Consistency and a Model
 
@@ -194,7 +198,8 @@ The structure is small:
 - a proposition is a set of valuations, so the connectives are Boolean operations;
 - properties are propositions, and `VAC` is the identity;
 - objects are either indices, which are concrete and encode nothing (the ordinary objects), or abstract objects, one per set of properties (the situations);
-- `abs S ⊨ p` holds iff `p ∈ S`, and `Obtains v p` evaluates `p` at the valuation of `v`.
+- `abs S ⊨ p` holds iff `p ∈ S`, and `Obtains v p` evaluates `p` at the valuation of `v`;
+- the actual index is `idx true`, and the actual world, defined by comprehension as in the development, is the abstract object encoding what holds at `true` (`actualWorld_eq`).
 
 `Model.nondegenerate` shows that the theory is not degenerate in this structure:
 
@@ -263,7 +268,7 @@ Both were first closed by postulating `Nec` and `PossNec`. They are now theorems
 
 ### OP-3 — Situations are objects
 
-`TrueIn_def` and `Encp_def` both require an `Object x` hypothesis. `Situation` and `Object` are independent predicates with nothing forcing their extensions to overlap. The bridge `Situation(s) → Object(s)` was postulated as `situation_is_object` in `Grounding/Ontology.lean`.
+`TrueIn_def` and `Encp_def` both require an `Object x` hypothesis. `Situation` and `Object` are independent predicates with nothing forcing their extensions to overlap. The bridge `Situation(s) → Object(s)` was postulated as `situation_is_object` in `Grounding/Ontology.lean`. Since 2026-11-22 both predicates are defined as in Zalta's theory (`Grounding/Objects.lean`), and `situation_is_object` is a theorem.
 
 With this in place, `part_truth_mono` closes without `sorry`: the direction `s ⊴ s' → (s ⊨ p → s' ⊨ p)` is fully derived by unfolding `TrueIn_def` and `Encp_def` on both sides and applying encoding-monotonicity of `PartOf` directly.
 
