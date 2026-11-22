@@ -214,6 +214,8 @@
     .dg-node { fill: var(--ink); }
     .dg-halo { fill: var(--paper); }
     .dg-set  { fill: var(--accent); fill-opacity: 0.05; stroke: var(--accent); stroke-width: 1.4; }
+    .dg-wit  { stroke: var(--dim); stroke-width: 1; stroke-dasharray: 5 4; fill: none; }
+    .dg-box  { fill: var(--paper); stroke: var(--ink); stroke-width: 1.2; }
 
     @media (max-width: 520px) {
       h1 { font-size: 1.55rem; }
@@ -273,7 +275,11 @@
       valid, whereas □(<em>φ</em> ↔ 𝒜<em>φ</em>) holds exactly where <em>φ</em>
       is constant. A non-degenerate model of all the axioms, in which this
       biconditional is true but not necessary for a contingent proposition,
-      establishes the consistency of the theory.
+      establishes the consistency of the theory. In that model necessarily
+      equivalent propositions may be distinct, so the theory does not make
+      propositions intensional. The results on validity extend to quantified
+      modal logic with variable domains, where “everything actually exists” is
+      real-world valid but not necessary.
     </p>
   </section>
 
@@ -285,8 +291,8 @@
       The ontology is stratified into three typed domains: a domain of
       <em>worlds</em> (which comprises both possible worlds and proper situations),
       a domain of <em>properties</em>, and a domain of <em>propositions</em>.
-      The primitive predicate <em>Situation</em> carves out the sub-domain of
-      situations within the world domain; <em>Worldhood</em> further identifies
+      The predicate <em>Situation</em>, defined as in Zalta, carves out the
+      sub-domain of situations within the world domain; <em>Worldhood</em> further identifies
       those situations that could make true exactly what is the case.
     </p>
 
@@ -294,9 +300,9 @@
       The central primitive is the <em>encoding</em> relation, written
       enc(<em>s</em>, <em>F</em>), between a situation and a property. A situation
       encodes exactly those properties of the form VAC(<em>p</em>) — the vacuous
-      abstraction of some proposition <em>p</em> — distinguishing situations from
-      arbitrary abstract objects in Zalta's sense. <em>Parthood</em> is defined
-      encoding-first:
+      abstraction of some proposition <em>p</em>. Following Zalta, this is the
+      definition of a situation: an abstract object that encodes only such
+      properties. <em>Parthood</em> is defined encoding-first:
     </p>
 
     <span class="formula">
@@ -394,16 +400,12 @@
   </p>
 
   <p>
-    The primitive non-logical vocabulary consists of the predicates
-    <em>Obj</em> and <em>Sit</em>, the relations <em>enc</em>, <em>⊨</em>,
-    <em>Ob</em> and <em>E</em> (concreteness at an index), the operation
-    <em>VAC</em>, the actual world <em>@</em>, and the meet and join
-    operations. Formally:
+    The primitive non-logical vocabulary consists of the relations
+    <em>enc</em>, <em>⊨</em>, <em>Ob</em> and <em>E</em> (concreteness at an
+    index), the operation <em>VAC</em>, and the actual index <em>@</em>.
+    Objecthood, situationhood, the actual world, and meet and join are
+    defined. Formally:
   </p>
-
-  <span class="formula">
-    Obj, Sit : W → Prop
-  </span>
 
   <span class="formula">
     enc : W × P → Prop
@@ -426,7 +428,7 @@
   </span>
 
   <span class="formula">
-    @ : W &emsp; ⊓, ⊔ : W × W → W
+    @ : W
   </span>
 
   <p>
@@ -440,51 +442,61 @@
   <h2>Constitutive Principles</h2>
 
   <p>
-    The development rests upon four constitutive principles governing the
-    interaction between situations, properties, propositions, and indices.
+    The development rests upon three constitutive principles governing the
+    interaction between objects, properties, propositions, and indices.
   </p>
 
   <p>
-    First, situations encode only vacuous abstractions:
-  </p>
-
-  <span class="formula">
-    Sit(s) ∧ enc(s,F) → ∃p(F = VAC(p))
-  </span>
-
-  <p>
-    Second, every situation is an object:
+    First, truth in an object is reducible to encoding:
   </p>
 
   <span class="formula">
-    Sit(s) → Obj(s)
+    x ⊨ p ↔ enc(x,VAC(p))
   </span>
 
   <p>
-    Third, truth in a situation is reducible to encoding:
-  </p>
-
-  <span class="formula">
-    s ⊨ p ↔ enc(s,VAC(p))
-  </span>
-
-  <p>
-    Fourth, obtaining at an index is classical:
+    Second, obtaining at an index is classical, and equal vacuous properties
+    have the same obtaining conditions (in Zalta's theory, a consequence of
+    β-conversion):
   </p>
 
   <span class="formula">
     Ob(v,¬p) ↔ ¬Ob(v,p) &emsp; Ob(v,p ∧ q) ↔ Ob(v,p) ∧ Ob(v,q)
   </span>
 
+  <span class="formula">
+    VAC(p) = VAC(q) → (Ob(v,p) ↔ Ob(v,q))
+  </span>
+
   <p>
-    These principles constitute the entire bridge between the propositional,
-    ontological and modal layers of the theory. All subsequent interaction between truth,
-    encoding, and mereology is mediated through them.
+    Third, abstract objects obey Zalta's comprehension and identity
+    principles, and ordinary objects encode nothing:
+  </p>
+
+  <span class="formula">
+    ∃x(A!x ∧ ∀F(enc(x,F) ↔ φ(F))) &emsp; A!x ∧ A!y ∧ ∀F(enc(x,F) ↔ enc(y,F)) → x = y
+  </span>
+
+  <p>
+    These principles, with the propositional identities, constitute the
+    entire bridge between the propositional, ontological and modal layers of
+    the theory. That situations are objects, that they encode only vacuous
+    abstractions, that they are individuated by their truths, and that the
+    actual world and meets behave as intended are all theorems.
   </p>
 </section>
 
 <section>
   <h2>Definitional Extensions</h2>
+
+  <p>
+    Objects and situations are defined as in Zalta, from ordinariness
+    (possible concreteness) and abstractness:
+  </p>
+
+  <span class="formula">
+    Obj(x) :⟺ O!x ∨ A!x &emsp; Sit(x) :⟺ A!x ∧ ∀F(enc(x,F) → ∃p(F = VAC(p)))
+  </span>
 
   <p>
     Parthood is introduced as inclusion in encoded content:
@@ -542,8 +554,8 @@
   </span>
 
   <p>
-    The actuality operator evaluates a condition at the actual world, whatever
-    the index:
+    The actuality operator evaluates a condition at the actual index, whatever
+    the index of evaluation:
   </p>
 
   <span class="formula">
@@ -637,15 +649,47 @@
   </span>
 
   <p>
-    The sole world-theoretic postulate concerns the designated actual world,
-    whose truths are exactly what obtains at it; from it follow that the actual
-    world is a world and is actual. No proper part of a world is itself a
-    world.
+    The actual world is not postulated. It is the abstract object that
+    encodes exactly the vacuous abstractions of what obtains at the actual
+    index, and that its truths are exactly what obtains there is a theorem;
+    from it follow that the actual world is a world and is actual. No proper
+    part of a world is itself a world.
   </p>
 
   <span class="formula">
-    Sit(@) ∧ ∀p(@ ⊨ p ↔ Ob(@,p))
+    Sit(w@) ∧ ∀p(w@ ⊨ p ↔ Ob(@,p))
   </span>
+
+  <figure>
+    <svg viewBox="0 0 560 200" role="img" aria-label="The actual world obtained by comprehension from the actual index">
+      <defs>
+        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path class="dg-node" d="M0 0 L10 5 L0 10 z"/>
+        </marker>
+      </defs>
+      <rect class="dg-box" x="70" y="70" width="44" height="44"/>
+      <text class="dg-sym"  x="92"  y="99"  text-anchor="middle" font-size="20">@</text>
+      <text class="dg-note" x="92"  y="52"  text-anchor="middle" font-size="13">actual index</text>
+      <text class="dg-note" x="92"  y="142" text-anchor="middle" font-size="13">what obtains:</text>
+      <text class="dg-note" x="92"  y="160" text-anchor="middle" font-size="13">Ob(@, p)</text>
+      <path class="dg-edge" d="M124 92 L392 92" marker-end="url(#arrow)"/>
+      <text class="dg-note" x="258" y="80"  text-anchor="middle" font-size="13">comprehension</text>
+      <text class="dg-note" x="258" y="114" text-anchor="middle" font-size="12">encode VAC(p) for each p that obtains</text>
+      <circle class="dg-halo" cx="420" cy="92" r="9"/><circle class="dg-node" cx="420" cy="92" r="5.5"/>
+      <text class="dg-sym"  x="420" y="66"  text-anchor="middle" font-size="19">w<tspan dy="4" font-size="13">@</tspan></text>
+      <text class="dg-note" x="420" y="128" text-anchor="middle" font-size="13">actual world</text>
+      <text class="dg-note" x="420" y="148" text-anchor="middle" font-size="13">w@ ⊨ p ↔ Ob(@, p)</text>
+    </svg>
+    <figcaption>
+      <span class="fig-num">Figure 1.</span> The two roles of actuality. The
+      actual index <em>@</em> is a primitive point of evaluation; the actual
+      world <em>w</em><sub>@</sub> is the abstract object that comprehension
+      provides for the vacuous properties of what obtains there. That
+      <em>w</em><sub>@</sub> is a situation whose truths are exactly what
+      obtains is a theorem.
+    </figcaption>
+  </figure>
+
 </section>
 
 <section>
@@ -686,17 +730,17 @@
       <text class="dg-sym" x="218" y="326" text-anchor="start"  font-size="18">s ∧ s′</text>
       <text class="dg-sym" x="200" y="448" text-anchor="middle" font-size="19">⊥</text>
       <!-- annotations -->
-      <text class="dg-note" x="354" y="64"  font-size="13">maximal element — a world</text>
+      <text class="dg-note" x="354" y="64"  font-size="13">maximal possible situation — a world</text>
       <text class="dg-note" x="354" y="194" font-size="13">⊴-incomparable situations</text>
       <text class="dg-note" x="354" y="324" font-size="13">meet — greatest lower bound</text>
       <text class="dg-note" x="354" y="424" font-size="13">least element — null situation</text>
     </svg>
     <figcaption>
-      <span class="fig-num">Figure 1.</span> A fragment of the meet-semilattice
+      <span class="fig-num">Figure 2.</span> A fragment of the meet-semilattice
       ⟨<em>Sit</em>, ⊴⟩ drawn as a Hasse diagram; edges denote covering under
       parthood, read upward. Two ⊴-incomparable situations <em>s</em>,
       <em>s</em>′ possess a greatest lower bound <em>s</em> ∧ <em>s</em>′, while
-      the world <em>w</em> sits at the maximal stratum.
+      the world <em>w</em> is maximal among the possible situations.
     </figcaption>
   </figure>
 
@@ -714,9 +758,10 @@
   <p>
     Parthood is therefore not merely analogous to but identical with
     propositional containment, and the entire order may be recovered from the
-    family of truth-sets. Binary meets are postulated and characterized
-    truth-theoretically — the conjunction of two situations makes true precisely
-    those propositions made true by both:
+    family of truth-sets. Binary meets are defined by comprehension, as the
+    abstract object encoding what both situations encode, and their
+    truth condition is a theorem — the meet of two situations makes true
+    precisely those propositions made true by both:
   </p>
 
   <span class="formula">
@@ -739,7 +784,7 @@
       <text class="dg-note" x="280" y="145" text-anchor="middle" font-size="12">= ⟦s⟧ ∩ ⟦s′⟧</text>
     </svg>
     <figcaption>
-      <span class="fig-num">Figure 2.</span> The meet realized as intersection
+      <span class="fig-num">Figure 3.</span> The meet realized as intersection
       of truth-sets. Because the parthood order coincides with inclusion of
       truth-sets, the greatest lower bound of <em>s</em> and <em>s</em>′ is the
       set of propositions true in both, and the ⊴-inequalities are read directly
@@ -751,12 +796,13 @@
     That <em>s</em> ∧ <em>s</em>′ is a lower bound, and the greatest such,
     then follows immediately: the two inequalities and the universal property are
     derived theorems rather than further postulates, and the structure
-    ⟨<em>Sit</em>, ⊴, ∧⟩ is a meet-semilattice. Worlds occupy its maximal
-    stratum — a world decides every proposition and harbours no contradiction,
-    so no proper part of a world is itself a world, and worlds are precisely the
-    ⊴-maximal elements. Arbitrary joins are not assumed: the development commits
-    only to the meet-semilattice together with this distinguished class of
-    maximal elements, and not to a complete lattice.
+    ⟨<em>Sit</em>, ⊴, ∧⟩ is a meet-semilattice. Binary joins are defined in the
+    same way, so the order is in fact a lattice, but arbitrary joins are not
+    assumed. Worlds are maximal among the possible situations — a world decides
+    every proposition and harbours no contradiction, so no proper part of a world
+    is itself a world, and no possible situation properly extends one. They are
+    not maximal outright: the situation that makes everything true lies above
+    every world, but it is impossible.
   </p>
 </section>
 
@@ -806,7 +852,7 @@
       <text class="dg-note" x="280" y="85"  text-anchor="middle" font-size="12">mutually accessible</text>
     </svg>
     <figcaption>
-      <span class="fig-num">Figure 3.</span> The two-world countermodel. Since
+      <span class="fig-num">Figure 4.</span> The two-world countermodel. Since
       𝒜<em>φ</em> is evaluated at <em>@</em> from every world, the actuality
       biconditional holds at the actual world but fails at <em>w</em>, and its
       necessitation fails at <em>@</em>.
@@ -823,6 +869,50 @@
     actual world. If logical truth is real-world validity, the theory thus
     contains logical truths that are not necessary, as Zalta (1988) argued.
   </p>
+
+  <p>
+    The same comparison extends to first-order modal logic with variable
+    domains, where the quantifier ranges over what exists at the world of
+    evaluation. The closure results and the characterization carry over under
+    every assignment, and the domains add contingent logical truths of their
+    own. “Everything exists”, ∀<em>y</em> E!<em>y</em>, is generally valid and
+    hence necessary. “Everything actually exists”, ∀<em>y</em> 𝒜E!<em>y</em>, is
+    real-world valid, but its necessitation holds at a world exactly when no
+    accessible world has an object that does not actually exist:
+  </p>
+
+  <span class="formula">
+    𝔐, w ⊨ □∀y 𝒜E!y &nbsp;↔&nbsp; ∀v(wRv → d(v) ⊆ d(@))
+  </span>
+
+  <figure>
+    <svg viewBox="0 0 560 220" role="img" aria-label="Two-world model with a growing domain">
+      <rect class="dg-set" x="70"  y="55" width="150" height="80" rx="10"/>
+      <rect class="dg-set" x="340" y="55" width="150" height="80" rx="10"/>
+      <path class="dg-edge" d="M220 95 L340 95"/>
+      <text class="dg-note" x="280" y="85"  text-anchor="middle" font-size="12">mutually accessible</text>
+      <text class="dg-sym"  x="145" y="42"  text-anchor="middle" font-size="18">@</text>
+      <text class="dg-sym"  x="415" y="42"  text-anchor="middle" font-size="18">v</text>
+      <circle class="dg-node" cx="145" cy="95" r="4.5"/>
+      <text class="dg-sym"  x="145" y="120" text-anchor="middle" font-size="15">a</text>
+      <circle class="dg-node" cx="395" cy="95" r="4.5"/>
+      <text class="dg-sym"  x="395" y="120" text-anchor="middle" font-size="15">a</text>
+      <circle class="dg-node" cx="440" cy="95" r="4.5"/>
+      <text class="dg-sym"  x="440" y="120" text-anchor="middle" font-size="15">b</text>
+      <text class="dg-note" x="145" y="165" text-anchor="middle" font-size="13">d(@) = {a}</text>
+      <text class="dg-note" x="145" y="186" text-anchor="middle" font-size="13">∀y 𝒜E!y holds</text>
+      <text class="dg-note" x="415" y="165" text-anchor="middle" font-size="13">d(v) = {a, b}</text>
+      <text class="dg-note" x="415" y="186" text-anchor="middle" font-size="13">∀y 𝒜E!y fails</text>
+    </svg>
+    <figcaption>
+      <span class="fig-num">Figure 5.</span> A model with a growing domain,
+      drawn with each world's domain inside it. The object <em>b</em> exists
+      at <em>v</em> but not actually, so “everything actually exists” holds at
+      <em>@</em>, fails at <em>v</em>, and is not necessary. Every predicate
+      may have the same extension at both worlds: the contingency comes from
+      the domains alone.
+    </figcaption>
+  </figure>
 </section>
 
 <section>
@@ -830,12 +920,13 @@
 
   <p>
     The theory has a model. Take two valuations, of which one is actual; let
-    propositions and properties be sets of valuations; let the objects be one
-    index for each valuation, which is concrete and encodes nothing, together
-    with one abstract object for each set of properties. Truth in a situation is
-    encoding, and obtaining at an index is membership of its valuation. Every
-    axiom of the theory holds in this structure, and the model is
-    non-degenerate:
+    propositions and properties be sets of valuations carrying a tag bit, with
+    the connectives acting on the sets and combining the tags; let the objects
+    be one index for each valuation, which is concrete and encodes nothing,
+    together with one abstract object for each set of properties. Truth in a
+    situation is encoding, and obtaining at an index is membership of its
+    valuation, which ignores the tag. Every axiom of the theory holds in this
+    structure, and the model is non-degenerate:
   </p>
 
   <div class="table-wrap">
@@ -847,6 +938,7 @@
         <tr><td>A partial, possible situation below a world</td><td>the situation encoding nothing</td></tr>
         <tr><td>An impossible situation</td><td>the situation encoding everything</td></tr>
         <tr><td>Ordinary and abstract objects</td><td>the indices and the encoding objects</td></tr>
+        <tr><td>Distinct but necessarily equivalent propositions</td><td>the contingent proposition with either tag</td></tr>
       </tbody>
     </table>
   </div>
@@ -856,6 +948,63 @@
     true at the actual world but not necessary. The correspondence between the
     model and the axioms is verified mechanically.
   </p>
+
+  <figure>
+    <svg viewBox="0 0 560 420" role="img" aria-label="Some situations of the model ordered by parthood">
+      <defs>
+        <marker id="arrow-dim" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path class="dg-node" d="M0 0 L10 5 L0 10 z"/>
+        </marker>
+      </defs>
+      <!-- parthood edges -->
+      <path class="dg-edge" d="M280 60 L190 160"/>
+      <path class="dg-edge" d="M280 60 L370 160"/>
+      <path class="dg-edge" d="M190 160 L100 270"/>
+      <path class="dg-edge" d="M190 160 L190 270"/>
+      <path class="dg-edge" d="M190 160 L300 270"/>
+      <path class="dg-edge" d="M370 160 L300 270"/>
+      <path class="dg-edge" d="M100 270 L200 370"/>
+      <path class="dg-edge" d="M190 270 L200 370"/>
+      <path class="dg-edge" d="M300 270 L200 370"/>
+      <!-- index witnesses -->
+      <path class="dg-wit" d="M178 160 L70 160" marker-end="url(#arrow-dim)"/>
+      <path class="dg-wit" d="M382 160 L490 160" marker-end="url(#arrow-dim)"/>
+      <rect class="dg-box" x="30"  y="142" width="36" height="36"/>
+      <rect class="dg-box" x="494" y="142" width="36" height="36"/>
+      <text class="dg-sym" x="48"  y="166" text-anchor="middle" font-size="16">ι<tspan dy="3" font-size="11">1</tspan></text>
+      <text class="dg-sym" x="512" y="166" text-anchor="middle" font-size="16">ι<tspan dy="3" font-size="11">0</tspan></text>
+      <text class="dg-note" x="48"  y="198" text-anchor="middle" font-size="12">= @</text>
+      <!-- nodes -->
+      <circle class="dg-halo" cx="280" cy="60"  r="8"/><circle class="dg-node" cx="280" cy="60"  r="5"/>
+      <circle class="dg-halo" cx="190" cy="160" r="8"/><circle class="dg-node" cx="190" cy="160" r="5"/>
+      <circle class="dg-halo" cx="370" cy="160" r="8"/><circle class="dg-node" cx="370" cy="160" r="5"/>
+      <circle class="dg-halo" cx="100" cy="270" r="8"/><circle class="dg-node" cx="100" cy="270" r="5"/>
+      <circle class="dg-halo" cx="190" cy="270" r="8"/><circle class="dg-node" cx="190" cy="270" r="5"/>
+      <circle class="dg-halo" cx="300" cy="270" r="8"/><circle class="dg-node" cx="300" cy="270" r="5"/>
+      <circle class="dg-halo" cx="200" cy="370" r="8"/><circle class="dg-node" cx="200" cy="370" r="5"/>
+      <!-- labels -->
+      <text class="dg-note" x="280" y="40"  text-anchor="middle" font-size="13">everything — impossible</text>
+      <text class="dg-sym"  x="190" y="140" text-anchor="middle" font-size="18">w<tspan dy="3" font-size="12">@</tspan></text>
+      <text class="dg-sym"  x="370" y="140" text-anchor="middle" font-size="18">w<tspan dy="3" font-size="12">0</tspan></text>
+      <text class="dg-note" x="88"  y="275" text-anchor="end" font-size="13">only c</text>
+      <text class="dg-note" x="178" y="275" text-anchor="end" font-size="13">only c′</text>
+      <text class="dg-sym"  x="314" y="276" text-anchor="start" font-size="15">w<tspan dy="3" font-size="10">@</tspan><tspan dy="-3" font-style="normal"> ⊓ </tspan>w<tspan dy="3" font-size="10">0</tspan></text>
+      <text class="dg-note" x="200" y="398" text-anchor="middle" font-size="13">nothing</text>
+      <text class="dg-note" x="124" y="152" text-anchor="middle" font-size="11">matches</text>
+      <text class="dg-note" x="436" y="152" text-anchor="middle" font-size="11">matches</text>
+    </svg>
+    <figcaption>
+      <span class="fig-num">Figure 6.</span> Some situations of the model,
+      ordered by parthood and read upward. The worlds <em>w</em><sub>@</sub>
+      and <em>w</em><sub>0</sub> make true what holds at either valuation, and
+      each matches the index drawn beside it; their meet makes true what holds
+      at both. The situation making everything true is impossible. The
+      situations making only <em>c</em> and only <em>c</em>′ true are distinct,
+      although <em>c</em> and <em>c</em>′ differ only in their tag and are
+      necessarily equivalent.
+    </figcaption>
+  </figure>
+
 </section>
 
   <!-- Resolved obligations -->
@@ -906,7 +1055,8 @@
         hypothesis. Since situationhood and objecthood are independent primitives,
         their overlap had to be postulated: Sit(<em>s</em>) → Obj(<em>s</em>).
         With this in place, the monotonicity direction of Theorem 4 closes
-        without any open obligation.
+        without any open obligation. Situations and objects have since been
+        defined as in Zalta, and the inclusion is now a theorem.
       </p>
     </div>
 
