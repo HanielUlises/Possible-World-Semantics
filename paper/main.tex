@@ -90,14 +90,18 @@ Kripke models with a designated world. General validity is closed under
 necessitation and real-world validity is not; the two notions separate
 on every class containing a two-world model; and
 $\Box(\varphi \leftrightarrow \Act\varphi)$ holds at a world exactly
-when $\varphi$ is constant on the worlds accessible from it. We then
+when $\varphi$ is constant on the worlds accessible from it. The
+results extend to quantified modal logic with variable domains, where
+``everything actually exists'' is real-world valid but not necessary
+even when every predicate is rigid. We then
 apply these results to an axiomatic theory of situations and worlds in
 the tradition of Zalta, in which the actuality operator is definable
 and the worlds are exactly the maximal possible situations. The theory,
 read as a model of the logic of actuality, validates every real-world
 valid formula at its actual world, and it has a non-degenerate model in
 which the actuality biconditional for a contingent proposition is true
-but not necessary. We also show that the theory must distinguish truth
+but not necessary, and in which necessarily equivalent propositions may
+be distinct. We also show that the theory must distinguish truth
 in a situation from truth at an index: if the two are identified, there
 is at most one situation. All results have been verified in an
 interactive proof assistant.
@@ -142,7 +146,10 @@ when $\varphi$ is constant on the worlds accessible from it
 real-world validity into general validity, so that the necessary truth
 in the vicinity is $\Act(\varphi \leftrightarrow \Act\varphi)$ rather
 than $\varphi \leftrightarrow \Act\varphi$
-(Corollary~\ref{cor:actually-necessary}).
+(Corollary~\ref{cor:actually-necessary}). The results extend to
+first-order modal logic with variable domains, where the domains
+themselves give rise to contingent logical truths, such as
+``everything actually exists'' (Section~\ref{sec:quantified}).
 
 Our second aim is to show that the phenomenon arises within a
 substantive metaphysical theory, and not merely in arbitrary Kripke
@@ -164,8 +171,9 @@ is required to be classical, the theory admits at most one situation
 (Proposition~\ref{prop:collapse}).
 
 Section~\ref{sec:logic} introduces the logic of actuality and the two
-notions of validity, and Section~\ref{sec:results} establishes the
-results on validity and necessitation. Section~\ref{sec:theory}
+notions of validity, Section~\ref{sec:results} establishes the
+results on validity and necessitation, and Section~\ref{sec:quantified}
+extends them to quantified modal logic. Section~\ref{sec:theory}
 presents the theory of situations and worlds and the actuality operator
 within it, and Section~\ref{sec:model} constructs a model of the
 theory. Section~\ref{sec:related} discusses related work.
@@ -398,6 +406,161 @@ associated with the actuality biconditional. It is not necessary that
 $\varphi$ holds if and only if $\varphi$ actually holds; it is
 necessary, and generally valid, that this biconditional actually holds.
 
+\section{Quantified modal logic}
+\label{sec:quantified}
+
+The results of Section~\ref{sec:results} extend to first-order modal
+logic with variable domains. The extension brings contingent logical
+truths of a new kind, which depend on the domains of a model rather
+than on contingent atomic facts.
+
+\begin{definition}
+Let $\Pi$ be a set of predicate symbols and let $x, y, z, \ldots$
+range over a countable set of variables. The language $\Lang^\forall(\Pi)$
+is given by the grammar
+\[
+  \varphi \Coloneqq P(y_1, \ldots, y_n) \mid y = z \mid \bot \mid
+  \neg\varphi \mid \varphi \wedge \varphi \mid \varphi \to \varphi \mid
+  \forall y\,\varphi \mid \Box\varphi \mid \Act\varphi
+  \qquad (P \in \Pi).
+\]
+We write $E!y$ for $\neg\forall z\,\neg(z = y)$, where $z$ is a
+variable distinct from $y$.
+\end{definition}
+
+\begin{definition}
+A \emph{quantified model} is a tuple
+$\Mod = \langle W, R, \at, D, d, I\rangle$, where $W$, $R$ and $\at$
+are as in Section~\ref{sec:logic}, $D$ is a set of objects,
+$d\colon W \to \mathcal{P}(D)$ assigns to each world its domain, and
+$I$ assigns to each predicate symbol $P$ and world $w$ a set
+$I(P,w)$ of finite sequences of objects. An \emph{assignment} is a map
+$g$ from variables to $D$, and $g[y \mapsto a]$ is the assignment that
+differs from $g$ at most in sending $y$ to $a$. Truth at a world under
+an assignment is defined by
+\begin{align*}
+  \Mod, w, g &\models P(y_1, \ldots, y_n) &&\text{iff}\quad
+    (g(y_1), \ldots, g(y_n)) \in I(P,w),\\
+  \Mod, w, g &\models y = z &&\text{iff}\quad g(y) = g(z),\\
+  \Mod, w, g &\models \forall y\,\varphi &&\text{iff}\quad
+    \Mod, w, g[y \mapsto a] \models \varphi \text{ for all } a \in d(w),\\
+  \Mod, w, g &\models \Box\varphi &&\text{iff}\quad
+    \Mod, v, g \models \varphi \text{ for all } v \text{ with } wRv,\\
+  \Mod, w, g &\models \Act\varphi &&\text{iff}\quad
+    \Mod, \at, g \models \varphi,
+\end{align*}
+with the Boolean clauses as before.
+\end{definition}
+
+The quantifier ranges over the objects that exist at the world of
+evaluation, while a free variable may denote an object that does not
+exist there. Accordingly, $\Mod, w, g \models E!y$ if and only if
+$g(y) \in d(w)$. A formula is \emph{real-world valid} in a class
+$\Kl$ of quantified models if it is true at the actual world of every
+model in $\Kl$ under every assignment, and \emph{generally valid} in
+$\Kl$ if it is true at every world of every model in $\Kl$ under every
+assignment. We write $\Kl^\forall_{\mathrm{all}}$ for the class of all
+quantified models, $\Kl^\forall_{\mathrm{u}}$ for those with universal
+accessibility, and $\Kl^\forall_{\mathrm{c}}$ for those with constant
+domains, in which $d(w) = d(v)$ for all worlds $w, v$.
+
+\begin{proposition}
+\label{prop:q-closure}
+Let $\Kl$ be a class of quantified models. Proposition~\ref{prop:closure},
+Theorems~\ref{thm:rw} and~\ref{thm:characterization}, and
+Proposition~\ref{prop:inert}\textup{(i)--(ii)} hold for
+$\Lang^\forall(\Pi)$ and $\Kl$, with truth at a world taken under an
+arbitrary assignment $g$. Moreover, if $\RWv{\Kl} \varphi$, then
+$\RWv{\Kl} \forall y\,\varphi$, and likewise for general validity.
+\end{proposition}
+
+\begin{proof}
+The proofs of Section~\ref{sec:results} go through with $g$ fixed,
+since $\Box$ and $\Act$ do not change the assignment. For the last
+claim, validity quantifies over all assignments, so $\varphi$ is true
+under $g[y \mapsto a]$ for every $a$.
+\end{proof}
+
+We consider three formulas: the commutation
+$\Act\forall y\,\varphi \leftrightarrow \forall y\,\Act\varphi$ of the
+actuality operator with the quantifier; $\forall y\,\Act E!y$,
+``everything actually exists''; and $\forall y\, E!y$, ``everything
+exists''.
+
+\begin{theorem}
+\label{thm:q-truths}
+Let $\Mod$ be a quantified model, $w$ a world of $\Mod$ and $g$ an
+assignment.
+\begin{enumerate}[label=(\roman*)]
+\item $\Mod, w, g \models \Act\forall y\,\varphi \leftrightarrow
+  \forall y\,\Act\varphi$ if and only if $\varphi$ holds at $\at$ under
+  $g[y \mapsto a]$ for all $a \in d(\at)$ exactly when it does so for
+  all $a \in d(w)$. Hence the commutation is real-world valid in every
+  class, and generally valid in $\Kl^\forall_{\mathrm{c}}$.
+\item $\Mod, w, g \models \forall y\,\Act E!y$ if and only if
+  $d(w) \subseteq d(\at)$, and
+  $\Mod, w, g \models \Box\forall y\,\Act E!y$ if and only if
+  $d(v) \subseteq d(\at)$ for every $v$ with $wRv$. Hence
+  $\forall y\,\Act E!y$ is real-world valid in every class, and
+  generally valid in $\Kl^\forall_{\mathrm{c}}$.
+\item $\forall y\, E!y$ is generally valid in
+  $\Kl^\forall_{\mathrm{all}}$.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) By the truth clauses, $\Act\forall y\,\varphi$ holds at $w$ if and
+only if $\varphi$ holds at $\at$ under $g[y \mapsto a]$ for all
+$a \in d(\at)$, and $\forall y\,\Act\varphi$ holds at $w$ if and only
+if the same is true for all $a \in d(w)$. At $w = \at$, and in models
+with constant domains, the two coincide.
+(ii) $\Act E!y$ holds under $g[y \mapsto a]$ if and only if
+$a \in d(\at)$, which gives the first claim, and the second follows by
+the clause for $\Box$. The inclusion is trivial at $\at$ and holds
+everywhere when domains are constant.
+(iii) Under $g[y \mapsto a]$ with $a \in d(w)$, the formula $E!y$
+holds at $w$.
+\end{proof}
+
+\begin{definition}
+Let $\mathfrak{G} = \langle \{0,1\}, \{0,1\}^2, 1, \{0,1\}, d_G,
+I_G\rangle$, where $d_G(1) = \{1\}$, $d_G(0) = \{0,1\}$, and
+$I_G(P,w)$ contains every sequence. Thus $\mathfrak{G}$ has two
+mutually accessible worlds, every predicate has the same extension at
+both, and the non-actual world has an object that does not actually
+exist. Clearly $\mathfrak{G} \in \Kl^\forall_{\mathrm{u}}$.
+\end{definition}
+
+\begin{theorem}
+\label{thm:q-separation}
+Suppose that $\mathfrak{G} \in \Kl$. Then neither
+$\forall y\,\Act E!y$ nor $\Act\forall y\,E!y \leftrightarrow
+\forall y\,\Act E!y$ is generally valid in $\Kl$, and the
+necessitation of neither is real-world valid in $\Kl$. In particular,
+real-world validity in $\Kl^\forall_{\mathrm{u}}$ is not closed under
+necessitation, although both formulas are generally valid in
+$\Kl^\forall_{\mathrm{c}}$.
+\end{theorem}
+
+\begin{proof}
+In $\mathfrak{G}$, $d_G(0) \not\subseteq d_G(1)$, so by
+Theorem~\ref{thm:q-truths}(ii) the formula $\forall y\,\Act E!y$ fails
+at $0$; since $1 R 0$, its necessitation fails at $1$. For the
+commutation with $\varphi = E!y$, the formula $E!y$ holds at $1$ under
+$g[y \mapsto a]$ for every $a \in d_G(1)$, but not for $a = 0 \in
+d_G(0)$, so by Theorem~\ref{thm:q-truths}(i) the commutation fails at
+$0$, and its necessitation fails at $1$.
+\end{proof}
+
+The contrast between Theorem~\ref{thm:q-truths}(iii) and
+Theorem~\ref{thm:q-separation} is instructive. ``Everything exists'' is
+generally valid and hence necessary, because the quantifier ranges over
+what exists at each world. ``Everything actually exists'' is a logical
+truth only in the real-world sense: it fails at any world with an
+object that does not actually exist. In $\mathfrak{G}$ every predicate
+is rigid, so the failure of necessitation owes nothing to contingent
+atomic facts; it is produced by the variation of the domains alone.
+
 \section{Actuality in a theory of situations and worlds}
 \label{sec:theory}
 
@@ -425,8 +588,7 @@ primitive vocabulary consists of:
   \Prop$, written $s \models p$;
 \item \emph{obtaining at an index}, $\Obt \subseteq \Dom \times
   \Prop$, where $\Obt(v,p)$ expresses that $p$ is the case at $v$;
-\item a constant $\at \in \Dom$, the actual index;
-\item operations $\meet, \join\colon \Dom \times \Dom \to \Dom$.
+\item a constant $\at \in \Dom$, the actual index.
 \end{enumerate}
 
 The modal operators act on conditions on indices. Accessibility is
@@ -453,7 +615,7 @@ We use the following abbreviations:
 
 \subsection{Axioms}
 
-The axioms of $\T$ fall into five groups. Free variables are
+The axioms of $\T$ fall into four groups. Free variables are
 universally quantified.
 
 \begin{enumerate}[label=(T\arabic*), leftmargin=3.2em]
@@ -481,11 +643,6 @@ universally quantified.
   $\exists x\,(\Abs(x) \wedge \forall F\,(\Enc(x,F) \leftrightarrow
   \varphi(F)))$. Abstract objects that encode the same properties are
   identical.
-\item \label{ax:lattice} \emph{Meet and join.} If $\Sit(s)$ and
-  $\Sit(s')$, then $\Sit(s \meet s')$ and $\Sit(s \join s')$. For all
-  $s, s', u$: $(s \meet s') \models p \leftrightarrow (s \models p
-  \wedge s' \models p)$; $s \partof s \join s'$ and $s' \partof s \join s'$;
-  and if $s \partof u$ and $s' \partof u$, then $s \join s' \partof u$.
 \end{enumerate}
 
 Axiom group~\ref{ax:obtains} imposes the classical truth conditions on
@@ -506,9 +663,16 @@ there is a unique abstract object $\aw$ such that
   \Enc(\aw, F) \;\leftrightarrow\; \exists p\,
     \bigl(F = \VAC(p) \wedge \Obt(\at, p)\bigr)
 \]
-for every property $F$. We call $\aw$ the \emph{actual world}. The
-basic principles of situations and of the actual world are then
-theorems of $\T$, rather than axioms.
+for every property $F$. We call $\aw$ the \emph{actual world}. In the
+same way, for objects $s$ and $s'$ let the \emph{meet} $s \meet s'$ and
+the \emph{join} $s \join s'$ be the unique abstract objects such that
+\[
+  \Enc(s \meet s', F) \leftrightarrow \Enc(s,F) \wedge \Enc(s',F),
+  \qquad
+  \Enc(s \join s', F) \leftrightarrow \Enc(s,F) \vee \Enc(s',F).
+\]
+The basic principles of situations, of the actual world and of meet
+and join are then theorems of $\T$, rather than axioms.
 
 \begin{proposition}
 \label{prop:situations}
@@ -519,6 +683,11 @@ theorems of $\T$, rather than axioms.
 \item If $\Sit(s)$, $\Abs(x)$ and $x \partof s$, then $\Sit(x)$.
 \item $\Sit(\aw)$, and $\aw \models p \leftrightarrow \Obt(\at, p)$ for
   every $p$.
+\item If $\Sit(s)$ and $\Sit(s')$, then $\Sit(s \meet s')$ and
+  $\Sit(s \join s')$. For all $s, s', u$:
+  $(s \meet s') \models p \leftrightarrow (s \models p \wedge
+  s' \models p)$; $s \partof s \join s'$ and $s' \partof s \join s'$;
+  and if $s \partof u$ and $s' \partof u$, then $s \join s' \partof u$.
 \end{enumerate}
 \end{proposition}
 
@@ -538,6 +707,11 @@ of the form $\VAC(p)$.
 $\VAC(p)$. Moreover, $\aw \models p$ if and only if
 $\Obt(\at, q)$ for some $q$ with $\VAC(p) = \VAC(q)$, which by the last
 clause of~\ref{ax:obtains} is equivalent to $\Obt(\at, p)$.
+(v) The meet and join of situations are abstract and encode only
+properties encoded by $s$ or $s'$, hence only properties of the form
+$\VAC(p)$. The truth condition of the meet follows from
+$x \models p \leftrightarrow \Enc(x, \VAC(p))$, and the parthood claims
+from the encoding conditions of the join.
 \end{proof}
 
 Part~(iv) relates the actual world to the actual index: what is true in
@@ -620,8 +794,9 @@ is at most one situation.
 \end{proposition}
 
 \begin{proof}
-Let $s, s' \in \Dom$ and $p \in \Prop$. By the schema and the meet
-axiom in~\ref{ax:lattice}, the truth of $\pneg p$ in $s \meet s'$ can
+Let $s, s' \in \Dom$ and $p \in \Prop$. By the schema and the truth
+condition of the meet in Proposition~\ref{prop:situations}(v), which
+holds for all objects, the truth of $\pneg p$ in $s \meet s'$ can
 be computed in two ways:
 \[
   \neg\bigl(s \models p \wedge s' \models p\bigr)
@@ -741,11 +916,19 @@ section.
 \label{sec:model}
 
 We construct a model $\N$ of $\T$. Let $\mathbb{B} = \{0,1\}$ be a set
-of two valuations, with $1$ the actual valuation, and for
-$b \in \mathbb{B}$ let $S_b = \{p \subseteq \mathbb{B} : b \in p\}$.
+of two valuations, with $1$ the actual valuation. A proposition is a
+pair $p = (|p|, t)$ of a set $|p| \subseteq \mathbb{B}$ of valuations
+and a \emph{tag} $t \in \{0,1\}$. For $b \in \mathbb{B}$ let
+$S_b = \{p : b \in |p|\}$.
 \begin{itemize}
-\item $\Prop = \Pty = \mathcal{P}(\mathbb{B})$, the propositional
-  operations are the Boolean operations, and $\VAC$ is the identity.
+\item $\Prop = \Pty = \mathcal{P}(\mathbb{B}) \times \{0,1\}$, and
+  $\VAC$ is the identity. The operations act on the sets of valuations
+  as the Boolean operations and combine the tags by maximum:
+  $\pneg(P,t) = (\mathbb{B} \setminus P, t)$,
+  $(P,t) \pand (Q,u) = (P \cap Q, \max(t,u))$,
+  $(P,t) \por (Q,u) = (P \cup Q, \max(t,u))$,
+  $p \pimp q = \pneg p \por q$ and
+  $p \piff q = (p \pimp q) \pand (q \pimp p)$.
 \item $\Dom = \{\iota_b : b \in \mathbb{B}\} \sqcup
   \{\alpha_S : S \subseteq \Pty\}$. The elements $\iota_b$ are the
   \emph{indices} and the elements $\alpha_S$ are the \emph{abstract
@@ -755,15 +938,16 @@ $b \in \mathbb{B}$ let $S_b = \{p \subseteq \mathbb{B} : b \in p\}$.
   if $F \in S$, and $\Encp(x,p)$ holds if and only if $\Enc(x,p)$.
 \item $x \models p$ if and only if $\Encp(x,p)$; thus
   $\alpha_S \models p$ if and only if $p \in S$.
-\item $\Obt(\iota_b, p)$ if and only if $b \in p$, and
-  $\Obt(\alpha_S, p)$ if and only if $1 \in p$.
+\item $\Obt(\iota_b, p)$ if and only if $b \in |p|$, and
+  $\Obt(\alpha_S, p)$ if and only if $1 \in |p|$.
 \item $\at = \iota_1$.
-\item $x \meet y = \alpha_{\{F : \Enc(x,F) \wedge \Enc(y,F)\}}$ and
-  $x \join y = \alpha_{\{F : \Enc(x,F) \vee \Enc(y,F)\}}$.
 \end{itemize}
-Since every property is of the form $\VAC(p)$, the situations of $\N$
-are exactly the abstract objects $\alpha_S$. The actual world is
-$\aw = \alpha_{S_1}$, since $\Obt(\iota_1, p)$ if and only if $1 \in p$.
+Obtaining ignores the tag. Since every property is of the form
+$\VAC(p)$, the situations of $\N$ are exactly the abstract objects
+$\alpha_S$. The actual world is $\aw = \alpha_{S_1}$, since
+$\Obt(\iota_1, p)$ if and only if $1 \in |p|$, and the meet and join of
+$x$ and $y$ are $\alpha_{\{F : \Enc(x,F) \wedge \Enc(y,F)\}}$ and
+$\alpha_{\{F : \Enc(x,F) \vee \Enc(y,F)\}}$.
 
 \begin{theorem}
 \label{thm:model}
@@ -774,7 +958,8 @@ relative to higher-order logic.
 \begin{proof}
 We verify the axiom groups in turn.
 \ref{ax:boolean} holds because $\mathcal{P}(\mathbb{B})$ is a Boolean
-algebra.
+algebra, negation preserves tags, and maximum is commutative and
+associative.
 \ref{ax:encoding} holds by definition.
 \ref{ax:obtains} holds because, for fixed $v$, $\Obt(v,\cdot)$ is
 membership of a fixed valuation, and because $\VAC$ is the identity.
@@ -784,10 +969,6 @@ index, so every $\alpha_S$ is abstract. Comprehension for a condition
 $\varphi$ is witnessed by $\alpha_{\{F : \varphi(F)\}}$, and abstract
 objects encoding the same properties have the same index set $S$ and
 are therefore identical.
-\ref{ax:lattice} holds because meet and join are intersection and union
-of encoded properties; in particular the properties encoded by
-$x \join y$ form the least set containing those encoded by $x$ and by
-$y$.
 \end{proof}
 
 \begin{theorem}
@@ -795,13 +976,16 @@ $y$.
 In $\N$:
 \begin{enumerate}[label=(\roman*)]
 \item $\aw = \alpha_{S_1}$ and $\alpha_{S_0}$ are distinct worlds;
-\item the proposition $c = \{1\}$ is contingent: it obtains at
+\item the proposition $c = (\{1\}, 0)$ is contingent: it obtains at
   $\iota_1$ and does not obtain at $\iota_0$;
 \item the situation $\alpha_\varnothing$ is partial and possible but is
   not a world, and $\alpha_\varnothing \partof \aw$ with
   $\alpha_\varnothing \neq \aw$;
 \item the situation $\alpha_{\Pty}$ is not possible;
-\item there are both ordinary and abstract objects.
+\item there are both ordinary and abstract objects;
+\item the propositions $c$ and $c' = (\{1\}, 1)$ are distinct but
+  necessarily equivalent, and the possible situation $\alpha_{\{c\}}$
+  makes $c$ true but not $c'$.
 \end{enumerate}
 \end{theorem}
 
@@ -815,7 +999,16 @@ no property, so it is a part of every object.
 (iv) $\alpha_{\Pty}$ makes both $c$ and $\pneg c$ true, so it is not
 consistent, and hence not possible by Theorem~\ref{thm:worlds}(iv).
 (v) The indices are ordinary and the $\alpha_S$ are abstract.
+(vi) $c$ and $c'$ differ in their tag, and $\Obt(v, c)$ and
+$\Obt(v, c')$ both depend only on $\{1\}$. The situation
+$\alpha_{\{c\}}$ makes only $c$ true, and $c$ obtains at $\iota_1$.
 \end{proof}
+
+By part~(vi), the identities~\ref{ax:boolean} do not make the
+propositions of $\T$ intensional: necessarily equivalent propositions
+may be distinct, and situations may distinguish them. Truth in a
+situation is therefore hyperintensional in $\N$, as in Zalta's theory,
+although the propositional identities hold.
 
 \begin{corollary}
 \label{cor:contingent-truth}
@@ -881,25 +1074,32 @@ necessitation and real-world validity is not, and the two notions
 separate on every class containing a two-world model. The actuality
 biconditional is real-world valid, its necessitation holds exactly
 where its argument is constant, and its actualization is generally
-valid. The same holds for the definable actuality operator of a theory
-of situations and worlds. That theory is a model of the logic of
+valid. These facts carry over to quantified modal logic with variable
+domains, where ``everything actually exists'' is real-world valid but
+not necessary, even when every predicate is rigid, while ``everything
+exists'' is generally valid.
+
+The same holds for the definable actuality operator of a theory of
+situations and worlds. That theory is a model of the logic of
 actuality, and it has a non-degenerate model in which the biconditional
 for a contingent proposition is true but not necessary. The theory
 requires truth in a situation to be distinguished from truth at an
-index. Situations and the actual world are defined as in Zalta's
-theory, and the principles that govern them are theorems; the only
-postulate this adds to the theory of encoding and abstract objects is
-that equal vacuous properties have the same obtaining conditions, which
-in Zalta's theory follows from $\beta$-conversion.
+index. Situations, the actual world, and meet and join are defined as
+in Zalta's theory, and the principles that govern them are theorems;
+the only postulate this adds to the theory of encoding and abstract
+objects is that equal vacuous properties have the same obtaining
+conditions, which in Zalta's theory follows from $\beta$-conversion.
+Although the propositional identities hold, the theory does not make
+propositions intensional: its model has distinct but necessarily
+equivalent propositions, and situations that distinguish them.
 
-Two questions remain open. The identities~\ref{ax:boolean} make
-propositions coarse-grained, whereas the propositions of Zalta's theory
-are hyperintensional; a model of a variant of $\T$ with distinct but
-necessarily equivalent propositions would bring the theory closer to
-its source. The extension of the results
-of Section~\ref{sec:results} to quantified modal logic, where the
-actuality operator interacts with variable domains, is of independent
-interest.
+Two directions remain. The domain of $\T$ is constant, so the
+quantified contingent truths of Section~\ref{sec:quantified} do not
+arise within it; a version of $\T$ with a domain of concrete objects
+varying across indices would bring them into the theory. And with a
+primitive exemplification relation satisfying $\beta$-conversion, the
+remaining postulate on vacuous properties should become derivable, as
+it is in Zalta's theory.
 
 \appendix
 
@@ -912,13 +1112,15 @@ verified in the Lean~4 proof assistant \cite{demoura2021}. The
 formalization is available at
 \url{https://github.com/HanielUlises/Possible-World-Semantics}.
 
-The logic of Section~\ref{sec:logic} is formalized as a deep embedding,
-and the results of Section~\ref{sec:results} are proved for an
+The logics of Sections~\ref{sec:logic} and~\ref{sec:quantified} are
+formalized as deep embeddings, and the results of
+Sections~\ref{sec:results} and~\ref{sec:quantified} are proved for an
 arbitrary class of models using only the logic of the proof assistant.
 The theory $\T$ is formalized as a shallow embedding in which the sorts,
-the primitive vocabulary and the axioms~\ref{ax:boolean}--\ref{ax:lattice}
-are postulated; there are 42 postulates in all. Objects, situations and
-the actual world are defined, as in Section~\ref{sec:theory}. Propositions
+the primitive vocabulary and the axioms~\ref{ax:boolean}--\ref{ax:abstract}
+are postulated; there are 34 postulates in all. Objects, situations,
+the actual world, meet and join are defined, as in
+Section~\ref{sec:theory}. Propositions
 \ref{prop:collapse} and~\ref{prop:empty} are proved with the additional
 assumptions of the variant theories as explicit hypotheses. The model
 $\N$ is formalized independently of the postulates of $\T$: each axiom
@@ -941,8 +1143,14 @@ Corollary~\ref{cor:universal} & \texttt{sat\_box\_actuality\_universal} \\
 Theorem~\ref{thm:separation} & \texttt{actuality\_not\_gValid}, \texttt{box\_actuality\_not\_rwValid}, \\
  & \texttt{rwValid\_not\_closed\_under\_nec}, \texttt{rwValid\_strictly\_weaker} \\
 Proposition~\ref{prop:inert} & \texttt{rwValid\_act\_iff}, \texttt{gValid\_act\_iff}, \texttt{act\_imp\_box\_act\_gValid} \\
+Proposition~\ref{prop:q-closure} & \texttt{RWValid.gen}, \texttt{GValid.gen}, \texttt{sat\_box\_actuality} (quantified) \\
+Theorem~\ref{thm:q-truths} & \texttt{sat\_commute}, \texttt{commute\_gValid\_constant}, \texttt{sat\_allActual}, \\
+ & \texttt{sat\_box\_allActual}, \texttt{allActual\_gValid\_constant}, \texttt{allExist\_gValid} \\
+Theorem~\ref{thm:q-separation} & \texttt{allActual\_not\_gValid}, \texttt{box\_allActual\_not\_rwValid}, \\
+ & \texttt{commute\_not\_gValid}, \texttt{box\_commute\_not\_rwValid} \\
 Proposition~\ref{prop:situations} & \texttt{situation\_is\_object}, \texttt{Enc\_VAC\_complete}, \texttt{situation\_extensionality}, \\
- & \texttt{situation\_closed\_under\_parthood}, \texttt{actualWorld\_faithful} \\
+ & \texttt{situation\_closed\_under\_parthood}, \texttt{actualWorld\_faithful}, \\
+ & \texttt{meet\_situation}, \texttt{TrueIn\_meet}, \texttt{SitJoin\_situation}, \texttt{SitJoin\_minimal} \\
 Theorem~\ref{thm:worlds} & \texttt{world\_index}, \texttt{world\_TrueIn\_neg}, \texttt{world\_maximal}, \\
  & \texttt{possible\_consistent}, \texttt{worldhood\_iff}, \texttt{actualWorld\_is\_world} \\
 Proposition~\ref{prop:collapse} & \texttt{classical\_truth\_collapse}, \texttt{classical\_truth\_one\_situation} \\
@@ -950,7 +1158,8 @@ Proposition~\ref{prop:empty} & \texttt{tautological\_worldhood\_empty} \\
 Theorem~\ref{thm:theory-actuality} & \texttt{actuality\_truth}, \texttt{box\_actuality\_truth\_iff}, \\
  & \texttt{contingent\_actuality\_truth\_not\_necessary} \\
 Theorem~\ref{thm:agreement} & \texttt{sat\_theoryModel}, \texttt{rwValid\_holds\_actually} \\
-Theorems~\ref{thm:model} and~\ref{thm:nondegenerate} & \texttt{Model/Satisfiable.lean}, \texttt{Model.nondegenerate} \\
+Theorems~\ref{thm:model} and~\ref{thm:nondegenerate} & \texttt{Model/Satisfiable.lean}, \texttt{Model.nondegenerate}, \\
+ & \texttt{Model.hyperintensional} \\
 Corollary~\ref{cor:contingent-truth} & \texttt{Model.contingent\_logical\_truth} \\
 \bottomrule
 \end{tabular}
