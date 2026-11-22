@@ -4,6 +4,7 @@ import Grounding.Propositions
 import Grounding.Parthood
 import Situation.Definitions
 import Situation.Theorems
+import Grounding.AbstractObjects
 
 /-
   WORLD-THEORETIC RESULTS
@@ -12,8 +13,9 @@ import Situation.Theorems
   what obtains (`Worldhood`).  This file derives the classical
   behaviour of truth at worlds, maximality and consistency of worlds,
   and the converse characterisation of worlds as maximal possible
-  situations.  All of these were previously postulated; the only
-  remaining postulate here concerns the designated actual world.
+  situations.  All of these were previously postulated, as was the
+  faithfulness of the actual world, which now follows from its
+  definition by comprehension.
 -/
 
 /--
@@ -93,21 +95,44 @@ theorem worldhood_iff (s : World) :
   ⟨fun hw => ⟨hw.1, world_maximal s hw, world_possible s hw⟩,
    fun ⟨hs, hmax, hpos⟩ => maximal_possible_is_world s hs hmax hpos⟩
 
+/-- The defining property of the actual world: it is abstract and
+    encodes exactly the vacuous properties of what obtains at the
+    actual index. -/
+theorem actualWorld_spec :
+    A! actualWorld ∧
+      ∀ F : Property, Enc actualWorld F ↔
+        ∃ p : Propn, F = VAC p ∧ Obtains actualIndex p :=
+  Classical.choose_spec
+    (Comprehension (fun F => ∃ p : Propn, F = VAC p ∧ Obtains actualIndex p))
+
+/-- The actual world is a situation. -/
+theorem actualWorld_situation : Situation actualWorld :=
+  ⟨actualWorld_spec.1, fun F hF => by
+    obtain ⟨p, hp, _⟩ := (actualWorld_spec.2 F).mp hF
+    exact ⟨p, hp⟩⟩
+
 /--
   The actual world is a situation whose truths are exactly what
   obtains at the actual index.
 
-  This is the one postulate of this file: it identifies the
-  designated constant `actualWorld`, used both as a situation and as
-  the index of evaluation, with a world faithful to that index.
+  This was formerly postulated.  It now follows from the definition of
+  `actualWorld` by comprehension, with `VAC_congr` to pass from
+  `VAC p = VAC q` to the obtaining of p.
 -/
-axiom actualWorld_faithful :
-  Situation actualWorld ∧ ∀ p : Propn, (actualWorld ⊨ p) ↔ Obtains actualWorld p
+theorem actualWorld_faithful :
+    Situation actualWorld ∧ ∀ p : Propn, (actualWorld ⊨ p) ↔ Obtains actualIndex p := by
+  refine ⟨actualWorld_situation, fun p => ?_⟩
+  rw [TrueIn_iff_Enc actualWorld (situation_is_object _ actualWorld_situation) p,
+    actualWorld_spec.2]
+  constructor
+  · rintro ⟨q, hq, hob⟩
+    exact (VAC_congr p q hq actualIndex).mpr hob
+  · exact fun hob => ⟨p, rfl, hob⟩
 
 /-- The actual world is a world. -/
 theorem actualWorld_is_world : Worldhood actualWorld :=
   ⟨actualWorld_faithful.1,
-   (Diamond_iff_exists _ _).mpr ⟨actualWorld, R_refl actualWorld, actualWorld_faithful.2⟩⟩
+   (Diamond_iff_exists _ _).mpr ⟨actualIndex, R_refl actualIndex, actualWorld_faithful.2⟩⟩
 
 /-- The actual world is actual. -/
 theorem actualWorld_actual : Actual actualWorld :=

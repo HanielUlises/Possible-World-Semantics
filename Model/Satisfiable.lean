@@ -31,6 +31,9 @@
   * Situated truth is encoding, so `abs S ⊨ p` iff `p ∈ S`: partial
     in general.  Obtaining is evaluation at the index's valuation,
     with abstract objects evaluated at the actual valuation.
+  * The actual index is `idx true`.  The actual world is defined, as in
+    the development, by comprehension; it is the abstract object that
+    encodes what holds at the actual valuation (`actualWorld_eq`).
 -/
 
 namespace Model
@@ -91,7 +94,7 @@ def Concrete (_ : World) : World → Prop
   | idx _ => True
   | abs _ => False
 
-def actualWorld : World := abs (fun F => F true)
+def actualIndex : World := idx true
 
 def SitJoin (x y : World) : World := abs (fun F => Enc x F ∨ Enc y F)
 
@@ -137,14 +140,14 @@ def ExtEq (s s' : World) : Prop :=
   Situation s ∧ Situation s' ∧ Agree s s'
 
 def Actual (s : World) : Prop :=
-  ∀ p : Propn, (s ⊨ p) → Obtains actualWorld p
+  ∀ p : Propn, (s ⊨ p) → Obtains actualIndex p
 
 def Possible (s : World) : Prop :=
-  ◊ (fun v => ∀ p : Propn, (s ⊨ p) → Obtains v p) actualWorld
+  ◊ (fun v => ∀ p : Propn, (s ⊨ p) → Obtains v p) actualIndex
 
 def Worldhood (s : World) : Prop :=
   Situation s ∧
-  ◊ (fun v => ∀ p : Propn, (s ⊨ p) ↔ Obtains v p) actualWorld
+  ◊ (fun v => ∀ p : Propn, (s ⊨ p) ↔ Obtains v p) actualIndex
 
 def Maximal₁ (s : World) : Prop :=
   ∀ p : Propn, (s ⊨ p) ∨ (s ⊨ ¬ₚ p)
@@ -156,7 +159,7 @@ def Consistent (s : World) : Prop :=
   ¬ ∃ p : Propn, (s ⊨ p) ∧ (s ⊨ ¬ₚ p)
 
 def Actually (p : World → Prop) : World → Prop :=
-  fun _ => p actualWorld
+  fun _ => p actualIndex
 
 notation "𝒜" => Actually
 
@@ -261,6 +264,11 @@ theorem Obtains_impl :
     Obtains v (p →ₚ q) ↔ (Obtains v p → Obtains v q) := by
   intro v p q; cases v <;> exact Iff.rfl
 
+theorem VAC_congr :
+  ∀ (p q : Propn), VAC p = VAC q →
+    ∀ v : World, Obtains v p ↔ Obtains v q :=
+  fun _ _ h _ => by simp only [VAC, id] at h; subst h; exact Iff.rfl
+
 theorem ordinary_no_encoding :
   ∀ x : World, O! x → □ (fun _ => ¬ ∃ F : Property, Enc x F) x := by
   intro x hx
@@ -273,6 +281,9 @@ theorem Comprehension :
     ∃ x : World,
       A! x ∧ ∀ F : Property, Enc x F ↔ φ F :=
   fun φ => ⟨abs φ, abs_abstract φ, fun _ => Iff.rfl⟩
+
+noncomputable def actualWorld : World :=
+  Classical.choose (Comprehension (fun F => ∃ p : Propn, F = VAC p ∧ Obtains actualIndex p))
 
 theorem abstract_extensionality :
   ∀ x y : World,
@@ -308,10 +319,6 @@ theorem TrueIn_meet :
     (meet s s' ⊨ p) ↔ ((s ⊨ p) ∧ (s' ⊨ p)) :=
   fun _ _ _ => Iff.rfl
 
-theorem actualWorld_faithful :
-  Situation actualWorld ∧ ∀ p : Propn, (actualWorld ⊨ p) ↔ Obtains actualWorld p :=
-  ⟨abs_situation _, fun _ => Iff.rfl⟩
-
 /-! ## Non-degeneracy
 
   The model refutes each collapse found in earlier versions of the
@@ -320,6 +327,17 @@ theorem actualWorld_faithful :
   than worlds, possibility is a real constraint, and ordinary and
   abstract objects coexist.
 -/
+
+/-- The actual world is the abstract object encoding what holds at the
+    actual valuation. -/
+theorem actualWorld_eq : actualWorld = abs (fun F => F true) := by
+  have spec := Classical.choose_spec
+    (Comprehension (fun F => ∃ p : Propn, F = VAC p ∧ Obtains actualIndex p))
+  apply abstract_extensionality _ _ spec.1 (abs_abstract _)
+  intro F
+  refine (spec.2 F).trans ⟨fun ⟨p, hp, hob⟩ => ?_, fun h => ⟨F, rfl, h⟩⟩
+  subst hp
+  exact hob
 
 /-- The world that makes true exactly what holds at the non-actual
     valuation. -/
@@ -334,21 +352,23 @@ def emptySituation : World := abs (fun _ => False)
 /-- The situation that makes everything true. -/
 def trivialSituation : World := abs (fun _ => True)
 
-theorem actualWorld_is_world : Worldhood actualWorld :=
-  ⟨abs_situation _, diamond_intro (idx true) fun _ => Iff.rfl⟩
+theorem actualWorld_is_world : Worldhood actualWorld := by
+  rw [actualWorld_eq]
+  exact ⟨abs_situation _, diamond_intro (idx true) fun _ => Iff.rfl⟩
 
 theorem otherWorld_is_world : Worldhood otherWorld :=
   ⟨abs_situation _, diamond_intro (idx false) fun _ => Iff.rfl⟩
 
 theorem worlds_distinct : actualWorld ≠ otherWorld := by
+  rw [actualWorld_eq]
   intro h
   have h' := congrFun (World.abs.inj h) contingentProp
   have : (true = true) = (false = true) := h'
   exact Bool.noConfusion (cast this rfl)
 
 theorem contingent :
-    ◊ (fun v => Obtains v contingentProp) actualWorld ∧
-    ◊ (fun v => Obtains v (¬ₚ contingentProp)) actualWorld :=
+    ◊ (fun v => Obtains v contingentProp) actualIndex ∧
+    ◊ (fun v => Obtains v (¬ₚ contingentProp)) actualIndex :=
   ⟨diamond_intro (idx true) rfl,
    diamond_intro (idx false) (fun h => Bool.noConfusion h)⟩
 
@@ -357,6 +377,7 @@ theorem emptySituation_partial : Partial₁ emptySituation :=
 
 theorem emptySituation_strict_part :
     (emptySituation ⊴ actualWorld) ∧ emptySituation ≠ actualWorld := by
+  rw [actualWorld_eq]
   refine ⟨fun _ h => h.elim, fun h => ?_⟩
   have h' := congrFun (World.abs.inj h) contingentProp
   have : False = (true = true) := h'
@@ -383,7 +404,7 @@ theorem trivialSituation_impossible : ¬ Possible trivialSituation := by
 
 theorem ordinary_and_abstract_exist :
     O! (idx true) ∧ A! actualWorld :=
-  ⟨idx_ordinary true, abs_abstract _⟩
+  ⟨idx_ordinary true, actualWorld_eq ▸ abs_abstract _⟩
 
 /-- A contingent logical truth in a model of the whole theory: the
     actuality truth for `contingentProp` holds at the actual world, as
@@ -392,9 +413,9 @@ theorem ordinary_and_abstract_exist :
     actually does. -/
 theorem contingent_logical_truth :
     (fun w => Obtains w contingentProp ↔
-      𝒜 (fun v => Obtains v contingentProp) w) actualWorld ∧
+      𝒜 (fun v => Obtains v contingentProp) w) actualIndex ∧
     ¬ □ (fun w => Obtains w contingentProp ↔
-      𝒜 (fun v => Obtains v contingentProp) w) actualWorld :=
+      𝒜 (fun v => Obtains v contingentProp) w) actualIndex :=
   ⟨Iff.rfl, fun h => Bool.noConfusion ((h (idx false) trivial).mpr rfl)⟩
 
 /-- The model is non-degenerate. -/
@@ -404,8 +425,8 @@ theorem nondegenerate :
       emptySituation ≠ actualWorld) ∧
     (Possible emptySituation ∧ ¬ Worldhood emptySituation) ∧
     ¬ Possible trivialSituation ∧
-    (◊ (fun v => Obtains v contingentProp) actualWorld ∧
-      ◊ (fun v => Obtains v (¬ₚ contingentProp)) actualWorld) ∧
+    (◊ (fun v => Obtains v contingentProp) actualIndex ∧
+      ◊ (fun v => Obtains v (¬ₚ contingentProp)) actualIndex) ∧
     (O! (idx true) ∧ A! actualWorld) :=
   ⟨⟨actualWorld_is_world, otherWorld_is_world, worlds_distinct⟩,
    ⟨emptySituation_partial, emptySituation_strict_part.1,

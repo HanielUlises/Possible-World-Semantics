@@ -15,6 +15,7 @@ example (hw : TautologicalWorldhood actualWorld)
 
 -- Neither collapse needs an axiom beyond the inventory: the first uses
 -- `TrueIn_meet` and, through the extensionality of situations,
--- `abstract_extensionality`; the second none.
+-- `abstract_extensionality`; the second uses only `Comprehension`,
+-- through the definition of `actualWorld`.
 #print axioms classical_truth_one_situation
 #print axioms tautological_worldhood_empty

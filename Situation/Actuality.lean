@@ -6,13 +6,13 @@ import Situation.Theorems
 /-
   ACTUALITY AND CONTINGENT LOGICAL TRUTH
 
-  The actuality operator 𝒜 evaluates a condition at the designated
-  actual world, whatever the index of evaluation.  It is defined, not
+  The actuality operator 𝒜 evaluates a condition at the actual index,
+  whatever the index of evaluation.  It is defined, not
   postulated: no axiom is added.
 
   The central facts:
 
-  * `actuality_truth`: p ↔ 𝒜p holds at the actual world, for every p,
+  * `actuality_truth`: p ↔ 𝒜p holds at the actual index, for every p,
     by definition alone.  It is a logical truth in the real-world sense.
   * `box_actuality_truth_iff`: its necessitation holds exactly when p
     is non-contingent, so `contingent_actuality_truth_not_necessary`:
@@ -27,20 +27,20 @@ import Situation.Theorems
 -/
 
 /-- The actuality operator: 𝒜 p holds at any index iff p holds at the
-    actual world. -/
+    actual index. -/
 def Actually (p : World → Prop) : World → Prop :=
-  fun _ => p actualWorld
+  fun _ => p actualIndex
 
 notation "𝒜" => Actually
 
-/-- At the actual world, 𝒜 p is just p. -/
+/-- At the actual index, 𝒜 p is just p. -/
 theorem actually_at_actual (p : World → Prop) :
-    𝒜 p actualWorld ↔ p actualWorld :=
+    𝒜 p actualIndex ↔ p actualIndex :=
   Iff.rfl
 
-/-- The actuality truth: p ↔ 𝒜p holds at the actual world, for every p. -/
+/-- The actuality truth: p ↔ 𝒜p holds at the actual index, for every p. -/
 theorem actuality_truth (p : World → Prop) :
-    (fun w => p w ↔ 𝒜 p w) actualWorld :=
+    (fun w => p w ↔ 𝒜 p w) actualIndex :=
   Iff.rfl
 
 /-- 𝒜 is rigid: its value does not depend on the index. -/
@@ -70,16 +70,16 @@ theorem box_actuality_truth_iff (p : World → Prop) (w : World) :
     □ (fun v => p v ↔ 𝒜 p v) w ↔ (Necessary p w ∨ Impossible p w) := by
   constructor
   · intro h
-    rcases Classical.em (p actualWorld) with ha | hna
+    rcases Classical.em (p actualIndex) with ha | hna
     · exact Or.inl fun v hv => (h v hv).mpr ha
     · exact Or.inr fun v hv hpv => hna ((h v hv).mp hpv)
   · rintro (hnec | himp) v hv
-    · exact ⟨fun _ => hnec actualWorld trivial, fun _ => hnec v hv⟩
+    · exact ⟨fun _ => hnec actualIndex trivial, fun _ => hnec v hv⟩
     · exact ⟨fun hpv => absurd hpv (himp v hv),
-             fun ha => absurd ha (himp actualWorld trivial)⟩
+             fun ha => absurd ha (himp actualIndex trivial)⟩
 
 /-- A contingent logical truth: for contingent p, the actuality truth
-    p ↔ 𝒜p, which holds at the actual world for every p, is not
+    p ↔ 𝒜p, which holds at the actual index for every p, is not
     necessary. -/
 theorem contingent_actuality_truth_not_necessary (p : World → Prop) (w : World)
     (hc : Contingent p w) :
@@ -91,17 +91,17 @@ theorem contingent_actuality_truth_not_necessary (p : World → Prop) (w : World
       (Diamond_monotone p _ w (fun _ hp hnp => hnp hp) hc.1)
 
 /-- The actuality truth for a proposition: q obtains iff it actually
-    obtains, at the actual world. -/
+    obtains, at the actual index. -/
 theorem obtains_actuality_truth (q : Propn) :
-    (fun w => Obtains w q ↔ 𝒜 (fun v => Obtains v q) w) actualWorld :=
+    (fun w => Obtains w q ↔ 𝒜 (fun v => Obtains v q) w) actualIndex :=
   Iff.rfl
 
 /-- If a proposition's obtaining is contingent, the actuality truth
     for it is not necessary. -/
 theorem obtains_actuality_truth_not_necessary (q : Propn)
-    (hc : Contingent (fun v => Obtains v q) actualWorld) :
-    ¬ □ (fun w => Obtains w q ↔ 𝒜 (fun v => Obtains v q) w) actualWorld :=
-  contingent_actuality_truth_not_necessary _ actualWorld hc
+    (hc : Contingent (fun v => Obtains v q) actualIndex) :
+    ¬ □ (fun w => Obtains w q ↔ 𝒜 (fun v => Obtains v q) w) actualIndex :=
+  contingent_actuality_truth_not_necessary _ actualIndex hc
 
 /-- Actuality of a situation is the actualisation of its possibility
     condition: s is actual iff, actually, everything true in s obtains. -/
@@ -113,12 +113,12 @@ theorem actual_iff_actually (s : World) (w : World) :
 
 open ActualityLogic in
 /-- The development read as a model of the deep embedding: indices are
-    worlds, accessibility is R, the actual world is `actualWorld`, and
+    worlds, accessibility is R, the designated actual world is `actualIndex`, and
     an atom is a proposition, true where it obtains. -/
 noncomputable def theoryModel : ActualityLogic.Model Propn where
   W      := World
   R      := R
-  actual := actualWorld
+  actual := actualIndex
   val    := fun q v => Obtains v q
 
 open ActualityLogic in
@@ -144,7 +144,7 @@ theorem sat_theoryModel (φ : ActualityLogic.Formula Propn) (v : World) :
   | conj φ ψ ihφ ihψ => exact and_congr (ihφ v) (ihψ v)
   | impl φ ψ ihφ ihψ => exact imp_congr (ihφ v) (ihψ v)
   | box φ ih => exact forall_congr' fun u => imp_congr Iff.rfl (ih u)
-  | act φ ih => exact ih actualWorld
+  | act φ ih => exact ih actualIndex
 
 open ActualityLogic in
 /-- The development's model is universal, hence in every class the
@@ -154,7 +154,7 @@ theorem theoryModel_universal : UniversalModels theoryModel :=
 
 open ActualityLogic in
 /-- Every real-world valid formula over universal models holds at the
-    actual world of the development. -/
+    actual index of the development. -/
 theorem rwValid_holds_actually (φ : ActualityLogic.Formula Propn)
-    (h : RWValid UniversalModels φ) : interp φ actualWorld :=
-  (sat_theoryModel φ actualWorld).mp (h theoryModel theoryModel_universal)
+    (h : RWValid UniversalModels φ) : interp φ actualIndex :=
+  (sat_theoryModel φ actualIndex).mp (h theoryModel theoryModel_universal)

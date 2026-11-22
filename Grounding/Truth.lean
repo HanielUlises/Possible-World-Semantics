@@ -76,6 +76,20 @@ axiom Obtains_impl :
   ∀ (v : World) (p q : Propn),
     Obtains v (p →ₚ q) ↔ (Obtains v p → Obtains v q)
 
+/--
+  Equal vacuous properties have the same obtaining conditions.
+
+  In Zalta's theory this follows from β-conversion: an object
+  exemplifies `[λy p]` iff p, so if `[λy p] = [λy q]` then p and q are
+  materially equivalent.  The development has no exemplification
+  relation, so the consequence is postulated directly, at every index.
+  It is weaker than injectivity of `VAC` and is compatible with
+  necessarily equivalent but distinct propositions.
+-/
+axiom VAC_congr :
+  ∀ (p q : Propn), VAC p = VAC q →
+    ∀ v : World, Obtains v p ↔ Obtains v q
+
 /-- Truth in an object is encoding of the corresponding vacuous
     property. -/
 theorem TrueIn_iff_Enc (x : World) (hx : Object x) (p : Propn) :

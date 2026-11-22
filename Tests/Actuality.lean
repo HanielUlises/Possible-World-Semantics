@@ -15,11 +15,11 @@ example (C : ModelClass Nat) (φ : Formula Nat) (h : GValid C φ) :
     GValid C (.box φ) :=
   h.nec
 
--- In the development, the actuality truth holds at the actual world
+-- In the development, the actuality truth holds at the actual index
 -- for every condition, and fails to be necessary for contingent ones.
-example (p : World → Prop) : (fun w => p w ↔ 𝒜 p w) actualWorld :=
+example (p : World → Prop) : (fun w => p w ↔ 𝒜 p w) actualIndex :=
   actuality_truth p
 
-example (p : World → Prop) (hc : Contingent p actualWorld) :
-    ¬ □ (fun v => p v ↔ 𝒜 p v) actualWorld :=
-  contingent_actuality_truth_not_necessary p actualWorld hc
+example (p : World → Prop) (hc : Contingent p actualIndex) :
+    ¬ □ (fun v => p v ↔ 𝒜 p v) actualIndex :=
+  contingent_actuality_truth_not_necessary p actualIndex hc

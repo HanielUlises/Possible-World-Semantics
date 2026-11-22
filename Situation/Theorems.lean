@@ -36,7 +36,7 @@ theorem maximal₁_not_partial₁ :
 /-- Actual situations are possible: the actual index witnesses it. -/
 theorem actual_implies_possible :
     ∀ s : World, Actual s → Possible s :=
-  fun _ h => (Diamond_iff_exists _ _).mpr ⟨actualWorld, R_refl actualWorld, h⟩
+  fun _ h => (Diamond_iff_exists _ _).mpr ⟨actualIndex, R_refl actualIndex, h⟩
 
 /-- Maximality₂ implies non-partiality₂. -/
 theorem maximal₂_not_partial₂ :
@@ -116,7 +116,7 @@ theorem consistent_downward_closed :
 theorem actual_consistent :
     ∀ s : World, Actual s → Consistent s :=
   fun _ h ⟨p, hp, hnp⟩ =>
-    (Obtains_neg actualWorld p).mp (h (¬ₚ p) hnp) (h p hp)
+    (Obtains_neg actualIndex p).mp (h (¬ₚ p) hnp) (h p hp)
 
 /-- Partial₂ and Maximal₁ are jointly satisfiable. -/
 theorem partial₂_compatible_with_maximal₁ :

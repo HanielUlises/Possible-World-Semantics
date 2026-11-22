@@ -41,7 +41,7 @@ theorem classical_truth_one_situation
 
 /-- Worldhood with a tautology in place of obtaining. -/
 def TautologicalWorldhood (s : World) : Prop :=
-  Situation s ∧ ◊ (fun _ => ∀ p : Propn, (s ⊨ p) ↔ True) actualWorld
+  Situation s ∧ ◊ (fun _ => ∀ p : Propn, (s ⊨ p) ↔ True) actualIndex
 
 /-- If the actual world is a world in the tautological sense and
     negation is classical at it, there are no propositions. -/

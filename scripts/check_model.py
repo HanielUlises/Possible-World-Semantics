@@ -24,7 +24,7 @@ MODEL = ROOT / "Model" / "Satisfiable.lean"
 # non-degeneracy results, and must therefore match the development.
 COPIED_DEFS = [
     "R", "Box", "Diamond", "OrdinaryObject", "AbstractObject", "Object",
-    "Situation", "PartOf", "Agree", "ExtEq", "Actual",
+    "Situation", "PartOf", "Agree", "ExtEq", "actualWorld", "Actual",
     "Possible", "Worldhood", "Maximal₁", "Partial₁", "Consistent",
     "Actually",
 ]

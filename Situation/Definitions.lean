@@ -2,6 +2,7 @@ import Grounding.Ontology
 import Grounding.Truth
 import Grounding.Parthood
 import Modality.Operators
+import Grounding.AbstractObjects
 
 /-
   CORE DEFINITIONS OF SITUATION SEMANTICS
@@ -15,9 +16,21 @@ import Modality.Operators
 -/
 
 /--
-  The actual world relative to which modal evaluation is carried out.
+  The actual index: the point of evaluation at which "p is the case"
+  means that p is true simpliciter.
 -/
-axiom actualWorld : World
+axiom actualIndex : World
+
+/--
+  The actual world (Zalta 1993): the abstract object that encodes
+  exactly the vacuous properties `VAC p` of the propositions p that
+  obtain at the actual index.  It exists by `Comprehension`, and is
+  unique by `abstract_extensionality`.  That it is a situation whose
+  truths are exactly what obtains is a theorem
+  (`actualWorld_faithful`, Situation/Worlds.lean).
+-/
+noncomputable def actualWorld : World :=
+  Classical.choose (Comprehension (fun F => ∃ p : Propn, F = VAC p ∧ Obtains actualIndex p))
 
 /--
   Persistence of a proposition.
@@ -48,7 +61,7 @@ def Persistent (p : Propn) : Prop :=
   to truth tout court.
 -/
 def Actual (s : World) : Prop :=
-  ∀ p : Propn, (s ⊨ p) → Obtains actualWorld p
+  ∀ p : Propn, (s ⊨ p) → Obtains actualIndex p
 
 
 /--
@@ -61,7 +74,7 @@ def Actual (s : World) : Prop :=
   situations with possible worlds.
 -/
 def Possible (s : World) : Prop :=
-  ◊ (fun v => ∀ p : Propn, (s ⊨ p) → Obtains v p) actualWorld
+  ◊ (fun v => ∀ p : Propn, (s ⊨ p) → Obtains v p) actualIndex
 
 /--
   Worldhood.
@@ -76,7 +89,7 @@ def Possible (s : World) : Prop :=
 -/
 def Worldhood (s : World) : Prop :=
   Situation s ∧
-  ◊ (fun v => ∀ p : Propn, (s ⊨ p) ↔ Obtains v p) actualWorld
+  ◊ (fun v => ∀ p : Propn, (s ⊨ p) ↔ Obtains v p) actualIndex
 
 /--
   Maximality (first sense).
