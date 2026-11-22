@@ -5,7 +5,9 @@
   development holds, and in which the theory is not degenerate: there
   are two distinct worlds, a contingent proposition, a partial
   situation strictly below a world, an impossible situation, and an
-  ordinary object alongside abstract ones.
+  ordinary object alongside abstract ones.  Propositions are
+  hyperintensional: there are distinct but necessarily equivalent
+  propositions, and a situation that makes one true but not the other.
 
   The file imports nothing from the development.  Each primitive is
   given a concrete definition under its original name, each defined
@@ -21,8 +23,11 @@
 
   The structure:
   * `Val := Bool` indexes two valuations; `true` is the actual one.
-  * A proposition is a set of valuations, so the connectives are
-    Boolean operations and the propositional identities hold.
+  * A proposition is a set of valuations together with a tag bit.
+    The connectives are Boolean operations on the sets and join the
+    tags, so the propositional identities hold; obtaining ignores the
+    tag, so propositions that differ only in their tag are distinct but
+    necessarily equivalent (`hyperintensional`).
   * Properties are propositions and `VAC` is the identity, so every
     property is propositional.
   * Objects are either modal indices `idx v`, which are concrete and
@@ -43,8 +48,17 @@ namespace Model
 /-- Valuations.  `true` is the actual valuation. -/
 abbrev Val := Bool
 
-/-- A proposition is a set of valuations. -/
-abbrev Propn : Type := Val → Prop
+/-- A proposition is a set of valuations together with a tag.  The
+    tag plays no role in obtaining, so propositions that differ only
+    in their tag are necessarily equivalent but distinct. -/
+structure Propn where
+  holds : Val → Prop
+  tag   : Bool
+
+/-- Propositions with the same valuations and the same tag are equal. -/
+theorem Propn.ext' {p q : Propn} (h₁ : p.holds = q.holds) (h₂ : p.tag = q.tag) :
+    p = q := by
+  cases p; cases q; cases h₁; cases h₂; rfl
 
 /-- Every property is propositional. -/
 abbrev Property : Type := Propn
@@ -71,13 +85,13 @@ def TrueIn (x : World) (p : Propn) : Prop := Encp x p
 
 notation:30 x " ⊨ " p => TrueIn x p
 
-def neg (p : Propn) : Propn := fun v => ¬ p v
+def neg (p : Propn) : Propn := ⟨fun v => ¬ p.holds v, p.tag⟩
 
-def conj (p q : Propn) : Propn := fun v => p v ∧ q v
+def conj (p q : Propn) : Propn := ⟨fun v => p.holds v ∧ q.holds v, p.tag || q.tag⟩
 
-def disj (p q : Propn) : Propn := fun v => p v ∨ q v
+def disj (p q : Propn) : Propn := ⟨fun v => p.holds v ∨ q.holds v, p.tag || q.tag⟩
 
-def impl (p q : Propn) : Propn := fun v => p v → q v
+def impl (p q : Propn) : Propn := disj (neg p) q
 
 def bic (p q : Propn) : Propn := conj (impl p q) (impl q p)
 
@@ -87,8 +101,8 @@ infixl:65 " ∨ₚ " => disj
 infixr:60 " →ₚ " => impl
 
 def Obtains : World → Propn → Prop
-  | idx v, p => p v
-  | abs _, p => p true
+  | idx v, p => p.holds v
+  | abs _, p => p.holds true
 
 def Concrete (_ : World) : World → Prop
   | idx _ => True
@@ -190,43 +204,41 @@ theorem bic_def :
 
 theorem neg_neg :
   ∀ p : Propn, neg (neg p) = p :=
-  fun _ => funext fun _ => propext
-    ⟨fun h => Classical.byContradiction h, fun h hn => hn h⟩
+  fun _ => Propn.ext' (funext fun _ => propext
+    ⟨fun h => Classical.byContradiction h, fun h hn => hn h⟩) rfl
 
 theorem deMorgan_conj :
   ∀ p q : Propn, neg (conj p q) = disj (neg p) (neg q) :=
-  fun p _ => funext fun v => propext
-    ⟨fun h => (Classical.em (p v)).elim
+  fun p _ => Propn.ext' (funext fun v => propext
+    ⟨fun h => (Classical.em (p.holds v)).elim
         (fun hp => Or.inr fun hq => h ⟨hp, hq⟩) Or.inl,
-     fun h ⟨hp, hq⟩ => h.elim (· hp) (· hq)⟩
+     fun h ⟨hp, hq⟩ => h.elim (· hp) (· hq)⟩) rfl
 
 theorem deMorgan_disj :
   ∀ p q : Propn, neg (disj p q) = conj (neg p) (neg q) :=
-  fun _ _ => funext fun _ => propext
+  fun _ _ => Propn.ext' (funext fun _ => propext
     ⟨fun h => ⟨fun hp => h (Or.inl hp), fun hq => h (Or.inr hq)⟩,
-     fun ⟨hnp, hnq⟩ h => h.elim hnp hnq⟩
+     fun ⟨hnp, hnq⟩ h => h.elim hnp hnq⟩) rfl
 
 theorem impl_as_disj :
   ∀ p q : Propn, impl p q = disj (neg p) q :=
-  fun p _ => funext fun v => propext
-    ⟨fun h => (Classical.em (p v)).elim (fun hp => Or.inr (h hp)) Or.inl,
-     fun h hp => h.elim (absurd hp) id⟩
+  fun _ _ => rfl
 
 theorem conj_comm :
   ∀ p q : Propn, conj p q = conj q p :=
-  fun _ _ => funext fun _ => propext and_comm
+  fun _ _ => Propn.ext' (funext fun _ => propext and_comm) (Bool.or_comm _ _)
 
 theorem disj_comm :
   ∀ p q : Propn, disj p q = disj q p :=
-  fun _ _ => funext fun _ => propext or_comm
+  fun _ _ => Propn.ext' (funext fun _ => propext or_comm) (Bool.or_comm _ _)
 
 theorem conj_assoc :
   ∀ p q r : Propn, conj (conj p q) r = conj p (conj q r) :=
-  fun _ _ _ => funext fun _ => propext and_assoc
+  fun _ _ _ => Propn.ext' (funext fun _ => propext and_assoc) (Bool.or_assoc _ _ _)
 
 theorem disj_assoc :
   ∀ p q r : Propn, disj (disj p q) r = disj p (disj q r) :=
-  fun _ _ _ => funext fun _ => propext or_assoc
+  fun _ _ _ => Propn.ext' (funext fun _ => propext or_assoc) (Bool.or_assoc _ _ _)
 
 theorem Encp_def :
   ∀ x : World, ∀ p : Propn,
@@ -259,7 +271,10 @@ theorem Obtains_disj :
 theorem Obtains_impl :
   ∀ (v : World) (p q : Propn),
     Obtains v (p →ₚ q) ↔ (Obtains v p → Obtains v q) := by
-  intro v p q; cases v <;> exact Iff.rfl
+  intro v p q
+  cases v <;>
+    exact ⟨fun h hp => h.elim (absurd hp) id,
+      fun h => (Classical.em _).elim (fun hp => Or.inr (h hp)) Or.inl⟩
 
 theorem VAC_congr :
   ∀ (p q : Propn), VAC p = VAC q →
@@ -304,7 +319,7 @@ theorem abstract_extensionality :
 
 /-- The actual world is the abstract object encoding what holds at the
     actual valuation. -/
-theorem actualWorld_eq : actualWorld = abs (fun F => F true) := by
+theorem actualWorld_eq : actualWorld = abs (fun F => F.holds true) := by
   have spec := Classical.choose_spec
     (Comprehension (fun F => ∃ p : Propn, F = VAC p ∧ Obtains actualIndex p))
   apply abstract_extensionality _ _ spec.1 (abs_abstract _)
@@ -315,10 +330,10 @@ theorem actualWorld_eq : actualWorld = abs (fun F => F true) := by
 
 /-- The world that makes true exactly what holds at the non-actual
     valuation. -/
-def otherWorld : World := abs (fun F => F false)
+def otherWorld : World := abs (fun F => F.holds false)
 
 /-- A contingent proposition: true at the actual valuation only. -/
-def contingentProp : Propn := fun b => b = true
+def contingentProp : Propn := ⟨fun b => b = true, false⟩
 
 /-- The situation that makes nothing true. -/
 def emptySituation : World := abs (fun _ => False)
@@ -391,6 +406,30 @@ theorem contingent_logical_truth :
     ¬ □ (fun w => Obtains w contingentProp ↔
       𝒜 (fun v => Obtains v contingentProp) w) actualIndex :=
   ⟨Iff.rfl, fun h => Bool.noConfusion ((h (idx false) trivial).mpr rfl)⟩
+
+/-- A proposition necessarily equivalent to `contingentProp` but
+    distinct from it. -/
+def variantProp : Propn := ⟨fun b => b = true, true⟩
+
+/-- The situation that makes `contingentProp` true and nothing else. -/
+def singletonSituation : World := abs (fun F => F = contingentProp)
+
+/-- Propositions are hyperintensional: `contingentProp` and
+    `variantProp` are distinct but necessarily equivalent, and a
+    possible situation makes the first true but not the second. -/
+theorem hyperintensional :
+    contingentProp ≠ variantProp ∧
+    □ (fun v => Obtains v contingentProp ↔ Obtains v variantProp) actualIndex ∧
+    Situation singletonSituation ∧ Possible singletonSituation ∧
+    (singletonSituation ⊨ contingentProp) ∧ ¬ (singletonSituation ⊨ variantProp) :=
+  ⟨fun h => Bool.noConfusion (congrArg Propn.tag h),
+   fun v _ => by cases v <;> exact Iff.rfl,
+   abs_situation _,
+   diamond_intro (idx true) fun _ h => by
+     have h' : _ = contingentProp := h
+     subst h'; rfl,
+   rfl,
+   fun h => Bool.noConfusion (congrArg Propn.tag h)⟩
 
 /-- The model is non-degenerate. -/
 theorem nondegenerate :

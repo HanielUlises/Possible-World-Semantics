@@ -192,7 +192,7 @@ Formerly postulated, now derived: `situation_is_object`, `Enc_VAC_complete` (`Gr
 The structure is small:
 
 - two valuations, `true` (actual) and `false`, serve as indices;
-- a proposition is a set of valuations, so the connectives are Boolean operations;
+- a proposition is a set of valuations with a tag bit; the connectives are Boolean operations on the sets and take the disjunction of the tags, and obtaining ignores the tag;
 - properties are propositions, and `VAC` is the identity;
 - objects are either indices, which are concrete and encode nothing (the ordinary objects), or abstract objects, one per set of properties (the situations);
 - `abs S ⊨ p` holds iff `p ∈ S`, and `Obtains v p` evaluates `p` at the valuation of `v`;
@@ -208,6 +208,8 @@ The structure is small:
 | Possible situations that are not worlds | `emptySituation` |
 | An impossible situation | `trivialSituation`, which makes everything true |
 | Ordinary and abstract objects | `idx true`, `actualWorld` |
+
+`Model.hyperintensional` shows that the axioms do not make propositions intensional, although the propositional identities hold. `contingentProp` and `variantProp` differ only in their tag, so they obtain at the same indices but are distinct, and the possible situation `singletonSituation` makes the first true but not the second.
 
 ### Repaired axioms
 

@@ -86,7 +86,7 @@ def main() -> int:
         m = re.match(r"theorem\s+(\S+)\s*:\s*(.*?)\s*:=", b, re.S)
         if m:
             theorems[m.group(1)] = norm(m.group(2))
-        m = re.match(r"(?:noncomputable\s+)?(?:def|abbrev|inductive)\s+(\S+)", b)
+        m = re.match(r"(?:noncomputable\s+)?(?:def|abbrev|inductive|structure)\s+(\S+)", b)
         if m:
             defined.add(m.group(1))
             model_defs[m.group(1)] = norm(b)
