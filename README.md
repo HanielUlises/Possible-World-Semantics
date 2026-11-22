@@ -116,7 +116,7 @@ This is a theorem (`situation_extensionality`). Situations that make the same pr
 
 ### The situation lattice
 
-Under parthood `⊴`, situations form a meet-semilattice: `⟨Sit, ⊴, ∧⟩`. Worlds are the maximal elements (maximal consistent content); the meet `s ∧ s'` is the greatest lower bound, whose content is exactly what `s` and `s'` share.
+Under parthood `⊴`, situations form a meet-semilattice: `⟨Sit, ⊴, ∧⟩`. Worlds are the maximal elements (maximal consistent content); the meet `s ∧ s'` is the greatest lower bound, whose content is exactly what `s` and `s'` share. Like the actual world, the meet is not postulated: `meet s s'` is the abstract object that `Comprehension` gives for the properties encoded by both `s` and `s'`, and its truth conditions (`TrueIn_meet`) are a theorem. The join `SitJoin` is defined in the same way.
 
 ```mermaid
 graph TD
@@ -177,16 +177,13 @@ Every `axiom` declaration in the codebase, grouped by file. Definitions and theo
 | `ordinary_no_encoding` | `Grounding/AbstractObjects` | axiom β (ordinary objects encode nothing) |
 | `Comprehension` | `Grounding/AbstractObjects` | comprehension for abstract objects |
 | `abstract_extensionality` | `Grounding/AbstractObjects` | constitutive postulate |
-| `SitJoin`, `SitJoin_situation` | `Grounding/StructuredProps` | join existence |
-| `SitJoin_left`, `SitJoin_right`, `SitJoin_minimal` | `Grounding/StructuredProps` | join is the least upper bound |
 | `actualIndex` | `Situation/Definitions` | designated constant: the actual index |
-| `meet`, `meet_situation`, `TrueIn_meet` | `Situation/Infimum` | meet existence and truth conditions |
 
 The modal layer (`Modality/Frames`, `Modality/Operators`) has no axioms: `R`, `Box` and `Diamond` are definitions, and `K`, `T`, `Four`, `Five`, `Nec` and `PossNec` are theorems.
 
-Formerly postulated, now derived: `situation_is_object`, `Enc_VAC_complete` (`Grounding/Objects`); `situation_extensionality` (`Situation/Extensionality`); `world_maximal`, `world_consistent`, `maximal_consistent_possible_is_world`, `actualWorld_is_world`, `actualWorld_faithful` (`Situation/Worlds`); `situation_extensionality_via_truth`, `situation_closed_under_parthood`, `actual_implies_possible`, `actual_consistent`, `consistent_downward_closed` (`Situation/Theorems`). Formerly primitive, now defined: `Object`, `Situation` (`Grounding/Objects`) and `actualWorld` (`Situation/Definitions`).
+Formerly postulated, now derived: `situation_is_object`, `Enc_VAC_complete` (`Grounding/Objects`); `SitJoin_situation`, `SitJoin_left`, `SitJoin_right`, `SitJoin_minimal` (`Grounding/StructuredProps`); `meet_situation`, `TrueIn_meet` (`Situation/Infimum`); `situation_extensionality` (`Situation/Extensionality`); `world_maximal`, `world_consistent`, `maximal_consistent_possible_is_world`, `actualWorld_is_world`, `actualWorld_faithful` (`Situation/Worlds`); `situation_extensionality_via_truth`, `situation_closed_under_parthood`, `actual_implies_possible`, `actual_consistent`, `consistent_downward_closed` (`Situation/Theorems`). Formerly primitive, now defined: `Object`, `Situation` (`Grounding/Objects`), `SitJoin` (`Grounding/StructuredProps`), `actualWorld` (`Situation/Definitions`) and `meet` (`Situation/Infimum`).
 
-`Obtains`, its four classical clauses and `actualWorld_faithful` were introduced on 2026-11-18 to repair [KI-1 and KI-5](#repaired-axioms), and were reviewed and accepted under the no-new-axioms rule. The four clauses relocate the former `TrueIn_neg`, `TrueIn_conj`, `TrueIn_disj` and `TrueIn_impl` from situated truth to obtaining. On 2026-11-22, `Object` and `Situation` were defined as in Zalta's theory and the former constant `actualWorld` was split into the primitive index `actualIndex` and a world defined by comprehension. This turned seven axioms into definitions or theorems, `actualWorld_faithful` among them, at the cost of one new axiom, `VAC_congr`, which was also reviewed and accepted.
+`Obtains`, its four classical clauses and `actualWorld_faithful` were introduced on 2026-11-18 to repair [KI-1 and KI-5](#repaired-axioms), and were reviewed and accepted under the no-new-axioms rule. The four clauses relocate the former `TrueIn_neg`, `TrueIn_conj`, `TrueIn_disj` and `TrueIn_impl` from situated truth to obtaining. On 2026-11-22, `Object` and `Situation` were defined as in Zalta's theory and the former constant `actualWorld` was split into the primitive index `actualIndex` and a world defined by comprehension. This turned seven axioms into definitions or theorems, `actualWorld_faithful` among them, at the cost of one new axiom, `VAC_congr`, which was also reviewed and accepted. The meet and join of situations were then defined by comprehension as well, as the abstract objects encoding the properties that both, respectively either, of their arguments encode; this removed eight further axioms and added none.
 
 ## Consistency and a Model
 
