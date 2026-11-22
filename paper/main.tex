@@ -9,6 +9,8 @@
 \usepackage{booktabs}
 \usepackage{enumitem}
 \usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning}
 \usepackage[hidelinks]{hyperref}
 
 \emergencystretch=2em
@@ -255,8 +257,34 @@ $V_2(a) = \{1\}$ for every $a \in \Phi$. Thus $\Two$ has two mutually
 accessible worlds, the actual world $1$ and the world $0$, and every
 atom is true at the actual world only. Clearly
 $\Two \in \Kl_{\mathrm{u}} \subseteq \Kl_{\mathrm{S5}} \subseteq
-\Kl_{\mathrm{all}}$.
+\Kl_{\mathrm{all}}$; see Figure~\ref{fig:two}.
 \end{definition}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    world/.style={circle, draw, minimum size=9mm, inner sep=0pt},
+    acc/.style={-{Stealth[length=2mm]}, semithick},
+    note/.style={font=\small, align=center}]
+  \node[world, double, double distance=1pt] (w1) at (0,0) {$1$};
+  \node[world] (w0) at (4.2,0) {$0$};
+  \node[above=1mm of w1, font=\small] {$\at$};
+  \draw[acc] (w1) to[bend left=18] (w0);
+  \draw[acc] (w0) to[bend left=18] (w1);
+  \draw[acc] (w1) to[out=200, in=160, looseness=6] (w1);
+  \draw[acc] (w0) to[out=20, in=-20, looseness=6] (w0);
+  \node[note, below=3mm of w1] {$a$, \ $\Act a$\\[1pt]
+    $a \leftrightarrow \Act a$};
+  \node[note, below=3mm of w0] {$\neg a$, \ $\Act a$\\[1pt]
+    $\neg(a \leftrightarrow \Act a)$};
+\end{tikzpicture}
+\caption{The model $\Two$. Every world accesses every world, and the
+actual world $1$ is marked by a double circle. Since $\Act a$ takes its
+value from $1$, the biconditional $a \leftrightarrow \Act a$ holds at
+$1$ but fails at $0$, so $\Box(a \leftrightarrow \Act a)$ fails at
+$1$.}
+\label{fig:two}
+\end{figure}
 
 \section{Validity, necessitation and the actuality biconditional}
 \label{sec:results}
@@ -528,8 +556,38 @@ I_G\rangle$, where $d_G(1) = \{1\}$, $d_G(0) = \{0,1\}$, and
 $I_G(P,w)$ contains every sequence. Thus $\mathfrak{G}$ has two
 mutually accessible worlds, every predicate has the same extension at
 both, and the non-actual world has an object that does not actually
-exist. Clearly $\mathfrak{G} \in \Kl^\forall_{\mathrm{u}}$.
+exist; see Figure~\ref{fig:growing}. Clearly
+$\mathfrak{G} \in \Kl^\forall_{\mathrm{u}}$.
 \end{definition}
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    world/.style={draw, rounded corners=3pt, minimum width=24mm,
+      minimum height=13mm},
+    obj/.style={circle, fill, inner sep=1.4pt},
+    acc/.style={{Stealth[length=2mm]}-{Stealth[length=2mm]}, semithick},
+    note/.style={font=\small, align=center}]
+  \node[world, double, double distance=1pt] (w1) at (0,0) {};
+  \node[world] (w0) at (5,0) {};
+  \node[above=1mm of w1, font=\small] {world $1$ \ ($\at$)};
+  \node[above=1mm of w0, font=\small] {world $0$};
+  \node[obj, label={[font=\small]below:$1$}] at (0,0.05) {};
+  \node[obj, label={[font=\small]below:$1$}] at (4.5,0.05) {};
+  \node[obj, label={[font=\small]below:$0$}] at (5.5,0.05) {};
+  \draw[acc] (w1) -- (w0);
+  \node[note, below=3mm of w1] {$d_G(1) = \{1\}$\\[1pt]
+    $\forall y\,\Act E!y$};
+  \node[note, below=3mm of w0] {$d_G(0) = \{0,1\}$\\[1pt]
+    $\neg\forall y\,\Act E!y$};
+\end{tikzpicture}
+\caption{The model $\mathfrak{G}$, with the domain of each world drawn
+inside it; both worlds also access themselves. The object $0$ exists at
+the non-actual world but not at the actual one, so ``everything
+actually exists'' holds at $1$ and fails at $0$. Every predicate has
+the same extension at both worlds.}
+\label{fig:growing}
+\end{figure}
 
 \begin{theorem}
 \label{thm:q-separation}
@@ -1008,7 +1066,53 @@ By part~(vi), the identities~\ref{ax:boolean} do not make the
 propositions of $\T$ intensional: necessarily equivalent propositions
 may be distinct, and situations may distinguish them. Truth in a
 situation is therefore hyperintensional in $\N$, as in Zalta's theory,
-although the propositional identities hold.
+although the propositional identities hold. Figure~\ref{fig:situations}
+shows the situations of Theorem~\ref{thm:nondegenerate} and their
+relations.
+
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture}[
+    sit/.style={font=\small, inner sep=2pt},
+    idx/.style={draw, font=\small, minimum size=7mm, inner sep=1pt},
+    part/.style={semithick},
+    wit/.style={-{Stealth[length=2mm]}, dashed, thin}]
+  \node[sit] (top)  at (0,3.6)  {$\alpha_{\Pty}$};
+  \node[sit] (w1)   at (-1.6,2.4) {$\aw = \alpha_{S_1}$};
+  \node[sit] (w0)   at (1.6,2.4)  {$\alpha_{S_0}$};
+  \node[sit] (c)    at (-2.9,1.2) {$\alpha_{\{c\}}$};
+  \node[sit] (cp)   at (-1.6,1.2) {$\alpha_{\{c'\}}$};
+  \node[sit] (m)    at (0.4,1.2)  {$\aw \meet \alpha_{S_0}$};
+  \node[sit] (bot)  at (-0.9,0)   {$\alpha_\varnothing$};
+  \draw[part] (top) -- (w1);
+  \draw[part] (top) -- (w0);
+  \draw[part] (w1) -- (c);
+  \draw[part] (w1) -- (cp);
+  \draw[part] (w1) -- (m);
+  \draw[part] (w0) -- (m);
+  \draw[part] (c) -- (bot);
+  \draw[part] (cp) -- (bot);
+  \draw[part] (m) -- (bot);
+  \node[idx] (i1) at (-5.2,2.4) {$\iota_1$};
+  \node[idx] (i0) at (4.6,2.4)  {$\iota_0$};
+  \node[below=0.5mm of i1, font=\footnotesize] {$= \at$};
+  \draw[wit] (w1) -- (i1);
+  \draw[wit] (w0) -- (i0);
+  \node[font=\footnotesize, right=1mm of top] {impossible};
+  \node[font=\footnotesize, right=1mm of w0, xshift=-1mm, yshift=-3.5mm] {world};
+  \node[font=\footnotesize, left=1mm of w1, xshift=1mm, yshift=-3.5mm] {world};
+\end{tikzpicture}
+\caption{Some situations of $\N$, ordered by parthood: a line rises
+from a part to a whole. The worlds $\aw$ and $\alpha_{S_0}$ are the
+maximal possible situations, and their meet makes true exactly the
+propositions true at both valuations; $\alpha_{\Pty}$ makes everything
+true and is impossible. The situations $\alpha_{\{c\}}$ and
+$\alpha_{\{c'\}}$ are distinct, although $c$ and $c'$ are necessarily
+equivalent. A dashed arrow leads from a world to the index whose
+obtaining it matches; the indices are ordinary objects and encode
+nothing.}
+\label{fig:situations}
+\end{figure}
 
 \begin{corollary}
 \label{cor:contingent-truth}
