@@ -23,9 +23,10 @@ MODEL = ROOT / "Model" / "Satisfiable.lean"
 # Definitions that occur in axiom statements or in the model's
 # non-degeneracy results, and must therefore match the development.
 COPIED_DEFS = [
-    "R", "Box", "Diamond", "OrdinaryObject", "AbstractObject", "PartOf",
-    "Agree", "ExtEq", "Actual", "Possible", "Worldhood", "Maximal₁",
-    "Partial₁", "Consistent", "Actually",
+    "R", "Box", "Diamond", "OrdinaryObject", "AbstractObject", "Object",
+    "Situation", "PartOf", "Agree", "ExtEq", "Actual",
+    "Possible", "Worldhood", "Maximal₁", "Partial₁", "Consistent",
+    "Actually",
 ]
 
 # Notations that occur in axiom statements.
@@ -67,7 +68,7 @@ def source_defs_and_notations():
         for f in sorted((ROOT / d).glob("*.lean")):
             text = strip_comments(f.read_text())
             for b in blocks(text):
-                m = re.match(r"def\s+(\S+)", b)
+                m = re.match(r"(?:noncomputable\s+)?def\s+(\S+)", b)
                 if m:
                     defs[m.group(1)] = norm(b)
             for line in text.splitlines():
@@ -85,7 +86,7 @@ def main() -> int:
         m = re.match(r"theorem\s+(\S+)\s*:\s*(.*?)\s*:=", b, re.S)
         if m:
             theorems[m.group(1)] = norm(m.group(2))
-        m = re.match(r"(?:def|abbrev|inductive)\s+(\S+)", b)
+        m = re.match(r"(?:noncomputable\s+)?(?:def|abbrev|inductive)\s+(\S+)", b)
         if m:
             defined.add(m.group(1))
             model_defs[m.group(1)] = norm(b)

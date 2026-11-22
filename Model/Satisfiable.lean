@@ -64,12 +64,6 @@ def Enc : World → Property → Prop
 
 def Encp (x : World) (p : Propn) : Prop := Enc x (VAC p)
 
-def Object (_ : World) : Prop := True
-
-def Situation : World → Prop
-  | idx _ => False
-  | abs _ => True
-
 def TrueIn (x : World) (p : Propn) : Prop := Encp x p
 
 notation:30 x " ⊨ " p => TrueIn x p
@@ -125,6 +119,12 @@ def AbstractObject (x : World) : Prop :=
 notation "O!" => OrdinaryObject
 notation "A!" => AbstractObject
 
+def Object (x : World) : Prop :=
+  O! x ∨ A! x
+
+def Situation (x : World) : Prop :=
+  A! x ∧ ∀ F : Property, Enc x F → ∃ p : Propn, F = VAC p
+
 def PartOf (x y : World) : Prop :=
   ∀ F : Property, Enc x F → Enc y F
 
@@ -179,15 +179,10 @@ theorem abs_abstract (S : Property → Prop) : A! (abs S) :=
 theorem not_abstract_idx (b : Val) : ¬ A! (idx b) :=
   fun h => h (idx_ordinary b)
 
+theorem abs_situation (S : Property → Prop) : Situation (abs S) :=
+  ⟨abs_abstract S, fun F _ => ⟨F, rfl⟩⟩
+
 /-! ## The axioms, restated verbatim and proved -/
-
-theorem Enc_VAC_complete :
-  ∀ (s : World) (F : Property),
-    Situation s → Enc s F → ∃ p : Propn, F = VAC p :=
-  fun _ F _ _ => ⟨F, rfl⟩
-
-theorem situation_is_object : ∀ s : World, Situation s → Object s :=
-  fun _ _ => trivial
 
 theorem bic_def :
   ∀ p q : Propn, bic p q = conj (impl p q) (impl q p) :=
@@ -292,7 +287,7 @@ theorem abstract_extensionality :
 
 theorem SitJoin_situation : ∀ s s' : World,
     Situation s → Situation s' → Situation (SitJoin s s') :=
-  fun _ _ _ _ => trivial
+  fun _ _ _ _ => abs_situation _
 
 theorem SitJoin_left : ∀ s s' : World, (s ⊴ SitJoin s s') :=
   fun _ _ _ h => Or.inl h
@@ -304,35 +299,18 @@ theorem SitJoin_minimal : ∀ s s' u : World,
     (s ⊴ u) → (s' ⊴ u) → (SitJoin s s' ⊴ u) :=
   fun _ _ _ h₁ h₂ F h => h.elim (h₁ F) (h₂ F)
 
-theorem situation_extensionality :
-  ∀ s s' : World, ExtEq s s' → s = s' := by
-  intro s s' ⟨hs, hs', h⟩
-  cases s with
-  | idx _ => exact hs.elim
-  | abs S =>
-    cases s' with
-    | idx _ => exact hs'.elim
-    | abs T => exact congrArg abs (funext fun F => propext (h F))
-
 theorem meet_situation : ∀ s s' : World,
     Situation s → Situation s' → Situation (meet s s') :=
-  fun _ _ _ _ => trivial
+  fun _ _ _ _ => abs_situation _
 
 theorem TrueIn_meet :
   ∀ (s s' : World) (p : Propn),
     (meet s s' ⊨ p) ↔ ((s ⊨ p) ∧ (s' ⊨ p)) :=
   fun _ _ _ => Iff.rfl
 
-theorem situation_closed_under_parthood :
-  ∀ s x : World, Situation s → A! x → (x ⊴ s) → Situation x := by
-  intro _ x _ hx _
-  cases x with
-  | idx b => exact absurd hx (not_abstract_idx b)
-  | abs _ => trivial
-
 theorem actualWorld_faithful :
   Situation actualWorld ∧ ∀ p : Propn, (actualWorld ⊨ p) ↔ Obtains actualWorld p :=
-  ⟨trivial, fun _ => Iff.rfl⟩
+  ⟨abs_situation _, fun _ => Iff.rfl⟩
 
 /-! ## Non-degeneracy
 
@@ -357,10 +335,10 @@ def emptySituation : World := abs (fun _ => False)
 def trivialSituation : World := abs (fun _ => True)
 
 theorem actualWorld_is_world : Worldhood actualWorld :=
-  ⟨trivial, diamond_intro (idx true) fun _ => Iff.rfl⟩
+  ⟨abs_situation _, diamond_intro (idx true) fun _ => Iff.rfl⟩
 
 theorem otherWorld_is_world : Worldhood otherWorld :=
-  ⟨trivial, diamond_intro (idx false) fun _ => Iff.rfl⟩
+  ⟨abs_situation _, diamond_intro (idx false) fun _ => Iff.rfl⟩
 
 theorem worlds_distinct : actualWorld ≠ otherWorld := by
   intro h

@@ -1,4 +1,4 @@
-import Grounding.Ontology
+import Grounding.Objects
 import Grounding.Propositions
 
 /-
@@ -75,3 +75,10 @@ axiom Obtains_disj :
 axiom Obtains_impl :
   ∀ (v : World) (p q : Propn),
     Obtains v (p →ₚ q) ↔ (Obtains v p → Obtains v q)
+
+/-- Truth in an object is encoding of the corresponding vacuous
+    property. -/
+theorem TrueIn_iff_Enc (x : World) (hx : Object x) (p : Propn) :
+    (x ⊨ p) ↔ Enc x (VAC p) := by
+  rw [TrueIn_def x p hx, Encp_def x p hx]
+  exact ⟨fun ⟨F, hF, he⟩ => hF ▸ he, fun he => ⟨VAC p, rfl, he⟩⟩

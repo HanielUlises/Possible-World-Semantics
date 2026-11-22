@@ -20,7 +20,7 @@ theorem partOf_antisymm_enc (x y : World) (hxy : x ⊴ y) (hyx : y ⊴ x) (F : P
 
 /-- Auxiliary: parthood implies truth-monotonicity.
     If s ⊴ s' then every proposition true in s is true in s'.
-    Resolves OP-3 via situation_is_object. -/
+    Resolves OP-3 via situation_is_object, now a theorem. -/
 theorem part_truth_mono (s s' : World)
     (hs   : Situation s)
     (hs'  : Situation s')
@@ -37,7 +37,7 @@ theorem part_truth_mono (s s' : World)
   exact ⟨F, hF, hss' F henc⟩
 
 /-- If every proposition true in s is true in s', then s is a part of s'.
-    Closes OP-2 via Enc_VAC_complete. -/
+    Closes OP-2 via Enc_VAC_complete, now a theorem. -/
 theorem truth_mono_to_part (s s' : World)
     (hs  : Situation s)
     (hs' : Situation s')

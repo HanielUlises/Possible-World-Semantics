@@ -49,9 +49,11 @@ theorem maximal₂_not_partial₂ :
     (Zalta 1993, Theorem 3, which ranges over abstract objects).
     Without the A! hypothesis every ordinary object, which encodes
     nothing and is therefore a part of everything, would count as a
-    situation. -/
-axiom situation_closed_under_parthood :
-  ∀ s x : World, Situation s → A! x → (x ⊴ s) → Situation x
+    situation.  Formerly postulated; it follows from the definition
+    of `Situation`, since a part encodes only what the whole does. -/
+theorem situation_closed_under_parthood :
+    ∀ s x : World, Situation s → A! x → (x ⊴ s) → Situation x :=
+  fun _ _ hs hx hxs => ⟨hx, fun F hF => hs.2 F (hxs F hF)⟩
 
 /-- Parthood is monotone with respect to truth.
     If x is a part of y and p is persistent, truth of p

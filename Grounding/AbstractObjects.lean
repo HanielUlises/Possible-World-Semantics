@@ -1,14 +1,13 @@
-import Grounding.Ontology
+import Grounding.Objects
 import Grounding.Truth
 import Modality.Operators
 
 /-
   ABSTRACT AND ORDINARY OBJECTS
 
-  This file introduces the concrete/abstract distinction following
-  Zalta's abstract object theory.  Concreteness is a primitive modal
-  predicate; ordinariness and abstractness are defined from it via
-  possibility and its negation.
+  The axioms of Zalta's abstract object theory.  Concreteness,
+  ordinariness and abstractness are introduced in Grounding/Objects.lean,
+  where situations are defined from them.
 
   The comprehension principle for abstract objects is postulated as an
   axiom: for every property-predicate φ there exists an abstract object
@@ -17,41 +16,7 @@ import Modality.Operators
   a clean two-sorted ontology within the single `World` type.
 -/
 
--- §1  Primitives
-/--
-  Concreteness predicate (existence predicate, E!).
-
-  `Concrete w x` holds when x is spatiotemporally located at world w.
-  Concreteness is world-relative: an object may be concrete at some
-  worlds and not others.
--/
-axiom Concrete : World → World → Prop
-
--- §2  Defined notions
-/--
-  Ordinary object (O!).
-
-  x is ordinary iff it is possibly concrete — there exists some world
-  at which x is spatiotemporally located.
--/
-def OrdinaryObject (x : World) : Prop :=
-  ◊ (fun w => Concrete w x) x
-
-/--
-  Abstract object (A!).
-
-  x is abstract iff it is not possibly concrete — it is necessarily
-  non-concrete.  This is the negation of ordinariness rather than an
-  independent primitive.
--/
-def AbstractObject (x : World) : Prop :=
-  ¬ ◊ (fun w => Concrete w x) x
-
--- Convenient notations
-notation "O!" => OrdinaryObject
-notation "A!" => AbstractObject
-
--- §3  Axioms
+-- §1  Axioms
 /--
   Ordinary objects cannot encode properties (axiom β).
 
@@ -80,7 +45,7 @@ axiom Comprehension :
     ∃ x : World,
       A! x ∧ ∀ F : Property, Enc x F ↔ φ F
 
--- §4  Theorems
+-- §2  Theorems
 /--
   Abstract and ordinary objects are disjoint (A! and O! partition objects).
 
@@ -120,7 +85,7 @@ theorem abstract_objects_encode :
   obtain ⟨x, hA, hspec⟩ := Comprehension (fun G => G = F)
   exact ⟨x, hA, (hspec F).mpr rfl⟩
 
--- §5  Identity of abstract objects
+-- §3  Identity of abstract objects
 /--
   Encoding-identity of abstract objects (Zalta's identityₐ).
 
@@ -158,10 +123,11 @@ theorem identityA_trans (x y z : World)
   Extensionality for abstract objects.
 
   Abstract objects that encode exactly the same properties are identical.
-  Like `situation_extensionality`, this cannot be derived from the
-  intensional primitives — Enc is a bare relation with nothing forcing
-  coextensive encoders to coincide — and must be postulated.  It is the
-  encoding-level analogue of the extensionality of situations.
+  This cannot be derived from the intensional primitives — Enc is a
+  bare relation with nothing forcing coextensive encoders to coincide —
+  and must be postulated.  Since situations are abstract objects, the
+  extensionality of situations follows from it
+  (Situation/Extensionality.lean).
 -/
 axiom abstract_extensionality :
   ∀ x y : World,
