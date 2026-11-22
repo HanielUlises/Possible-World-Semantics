@@ -96,9 +96,6 @@ def Concrete (_ : World) : World → Prop
 
 def actualIndex : World := idx true
 
-def SitJoin (x y : World) : World := abs (fun F => Enc x F ∨ Enc y F)
-
-def meet (x y : World) : World := abs (fun F => Enc x F ∧ Enc y F)
 
 /-! ## Definitions copied verbatim from the development -/
 
@@ -295,29 +292,6 @@ theorem abstract_extensionality :
     cases y with
     | idx b => exact absurd hy (not_abstract_idx b)
     | abs T => exact congrArg abs (funext fun F => propext (h F))
-
-theorem SitJoin_situation : ∀ s s' : World,
-    Situation s → Situation s' → Situation (SitJoin s s') :=
-  fun _ _ _ _ => abs_situation _
-
-theorem SitJoin_left : ∀ s s' : World, (s ⊴ SitJoin s s') :=
-  fun _ _ _ h => Or.inl h
-
-theorem SitJoin_right : ∀ s s' : World, (s' ⊴ SitJoin s s') :=
-  fun _ _ _ h => Or.inr h
-
-theorem SitJoin_minimal : ∀ s s' u : World,
-    (s ⊴ u) → (s' ⊴ u) → (SitJoin s s' ⊴ u) :=
-  fun _ _ _ h₁ h₂ F h => h.elim (h₁ F) (h₂ F)
-
-theorem meet_situation : ∀ s s' : World,
-    Situation s → Situation s' → Situation (meet s s') :=
-  fun _ _ _ _ => abs_situation _
-
-theorem TrueIn_meet :
-  ∀ (s s' : World) (p : Propn),
-    (meet s s' ⊨ p) ↔ ((s ⊨ p) ∧ (s' ⊨ p)) :=
-  fun _ _ _ => Iff.rfl
 
 /-! ## Non-degeneracy
 

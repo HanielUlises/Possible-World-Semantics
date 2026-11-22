@@ -8,52 +8,47 @@ import Situation.Theorems
   INFIMUM (MEET) OF SITUATIONS
 
   The meet of two situations is the largest situation
-  that is a part of both.  Since situations are individuated
-  by their propositional content (via extensionality), the
-  meet is characterised by the propositions true in both.
+  that is a part of both.  It is defined, as in Zalta's theory, by
+  comprehension: the meet of s and s' is the abstract object that
+  encodes exactly the properties encoded by both.  Its truth
+  conditions and its situationhood, formerly postulated, are
+  theorems.
 
   This is the situation-semantic analogue of set-theoretic
   intersection restricted to the situational domain.
 -/
 
 /--
-  The meet of s and s' is a world that makes exactly the
-  propositions true that are true in both s and s'.
-
-  Its existence is not derivable from the primitives alone
-  and is therefore postulated.
+  The meet of s and s': the abstract object that encodes exactly the
+  properties encoded by both s and s'.  It exists by `Comprehension`
+  and is unique by `abstract_extensionality`.
 -/
-axiom meet : World → World → World
+noncomputable def meet (s s' : World) : World :=
+  Classical.choose (Comprehension (fun F => Enc s F ∧ Enc s' F))
+
+/-- The defining property of the meet. -/
+theorem meet_spec (s s' : World) :
+    A! (meet s s') ∧ ∀ F : Property, Enc (meet s s') F ↔ (Enc s F ∧ Enc s' F) :=
+  Classical.choose_spec (Comprehension (fun F => Enc s F ∧ Enc s' F))
 
 /--
   The meet is itself a situation when its components are.
+  Formerly postulated.
 -/
-axiom meet_situation : ∀ s s' : World,
-    Situation s → Situation s' → Situation (meet s s')
+theorem meet_situation : ∀ s s' : World,
+    Situation s → Situation s' → Situation (meet s s') :=
+  fun s s' hs _ => ⟨(meet_spec s s').1, fun F hF => hs.2 F (((meet_spec s s').2 F).mp hF).1⟩
 
 /--
   The meet makes precisely the shared truths true.
+  Formerly postulated.
 -/
-axiom TrueIn_meet :
-  ∀ (s s' : World) (p : Propn),
-    (meet s s' ⊨ p) ↔ ((s ⊨ p) ∧ (s' ⊨ p))
-
-/-
-  Open proof obligation OP-4: lattice structure of meet.
-
-  meet_le_left, meet_le_right, and meet_greatest all require
-  connecting TrueIn_meet (which governs truth) to PartOf
-  (which is defined over Enc). This bridge does not exist
-  without truth_mono_to_part (OP-2).
-
-  Specifically:
-    meet_le_left  needs: (meet s s' ⊨ p → s ⊨ p) → meet s s' ⊴ s
-    meet_le_right needs: (meet s s' ⊨ p → s' ⊨ p) → meet s s' ⊴ s'
-    meet_greatest needs: (x ⊨ p → meet s s' ⊨ p) → x ⊴ meet s s'
-
-  All three reduce to truth_mono_to_part.
-  See README.md § Open Proof Obligations, OP-4.
--/
+theorem TrueIn_meet :
+    ∀ (s s' : World) (p : Propn),
+      (meet s s' ⊨ p) ↔ ((s ⊨ p) ∧ (s' ⊨ p)) := by
+  intro s s' p
+  rw [TrueIn_iff_Enc _ (object_total _), (meet_spec s s').2,
+    TrueIn_iff_Enc _ (object_total _), TrueIn_iff_Enc _ (object_total _)]
 
 /-- The meet is a part of its left argument.
     Every proposition true at the meet is true at the left component

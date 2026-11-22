@@ -31,27 +31,42 @@ def Supports (s : World) (i : Infon) : Prop :=
 def MinimalFor (i : Infon) (s : World) : Prop :=
   Supports s i ∧ ∀ s' : World, Situation s' → Supports s' i → (s ⊴ s')
 
-/-- The join of two situations is their least upper bound in the parthood order. -/
-axiom SitJoin : World → World → World
+/-- The join of two situations is their least upper bound in the
+    parthood order.  It is defined by comprehension: the abstract
+    object that encodes exactly the properties encoded by either
+    component.  Its existence and lattice properties, formerly
+    postulated, are theorems. -/
+noncomputable def SitJoin (s s' : World) : World :=
+  Classical.choose (Comprehension (fun F => Enc s F ∨ Enc s' F))
+
+/-- The defining property of the join. -/
+theorem SitJoin_spec (s s' : World) :
+    A! (SitJoin s s') ∧ ∀ F : Property, Enc (SitJoin s s') F ↔ (Enc s F ∨ Enc s' F) :=
+  Classical.choose_spec (Comprehension (fun F => Enc s F ∨ Enc s' F))
 
 /-- The join of two situations is itself a situation.
     Informational content is closed under combination. -/
-axiom SitJoin_situation : ∀ s s' : World,
-    Situation s → Situation s' → Situation (SitJoin s s')
+theorem SitJoin_situation : ∀ s s' : World,
+    Situation s → Situation s' → Situation (SitJoin s s') :=
+  fun s s' hs hs' => ⟨(SitJoin_spec s s').1, fun F hF =>
+    (((SitJoin_spec s s').2 F).mp hF).elim (hs.2 F) (hs'.2 F)⟩
 
 /-- The left component is a part of the join.
     The join extends each constituent situation. -/
-axiom SitJoin_left : ∀ s s' : World, (s ⊴ SitJoin s s')
+theorem SitJoin_left : ∀ s s' : World, (s ⊴ SitJoin s s') :=
+  fun s s' F hF => ((SitJoin_spec s s').2 F).mpr (Or.inl hF)
 
 /-- The right component is a part of the join. -/
-axiom SitJoin_right : ∀ s s' : World, (s' ⊴ SitJoin s s')
+theorem SitJoin_right : ∀ s s' : World, (s' ⊴ SitJoin s s') :=
+  fun s s' F hF => ((SitJoin_spec s s').2 F).mpr (Or.inr hF)
 
 /-- The join is the least upper bound: any situation containing both
     components also contains their join.
     This is the universal property of the join as a binary supremum
     in the partial order of situations ordered by parthood. -/
-axiom SitJoin_minimal : ∀ s s' u : World,
-    (s ⊴ u) → (s' ⊴ u) → (SitJoin s s' ⊴ u)
+theorem SitJoin_minimal : ∀ s s' u : World,
+    (s ⊴ u) → (s' ⊴ u) → (SitJoin s s' ⊴ u) :=
+  fun s s' _ h₁ h₂ F hF => (((SitJoin_spec s s').2 F).mp hF).elim (h₁ F) (h₂ F)
 
 /-- The join inherits support from its left component.
     Any infon supported by a situation is also supported by any larger situation,
