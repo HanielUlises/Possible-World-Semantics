@@ -216,6 +216,13 @@ Earlier versions of the axioms collapsed in four ways. All four are repaired, an
 - **KI-3 — `situation_closed_under_parthood` covered ordinary objects.** An ordinary object encodes nothing, so it is part of every situation and became a situation. The axiom now ranges over abstract parts only, as in Zalta's Theorem 3.
 - **KI-5 — Worldhood left no propositions.** `Worldhood` made every proposition true, `¬ₚp` included, so with `actualWorld_is_world` the axioms proved `Propn` empty. It now uses Zalta's clause, with `Obtains v p` for "p is the case".
 
+`Situation/Variants.lean` machine-checks the two main collapses against the current axioms. Each variant's extra assumption is a hypothesis, so no axiom is added:
+
+| Variant | Consequence | Theorem |
+|---|---|---|
+| Negation classical for `⊨` at every object (KI-1) | any two objects make the same propositions true; at most one situation | `classical_truth_collapse`, `classical_truth_one_situation` |
+| Worldhood with a tautology in place of obtaining (KI-5) | if the actual world is a world and negation is classical there, `Propn` is empty | `tautological_worldhood_empty` |
+
 ## Open Proof Obligations
 
 None. Every `sorry` must correspond to exactly one row here; the codebase currently has none.
