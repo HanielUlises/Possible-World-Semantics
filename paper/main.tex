@@ -28,6 +28,7 @@
 \newcommand{\Mod}{\mathfrak{M}}
 \newcommand{\Kl}{\mathsf{K}}
 \newcommand{\at}{@}
+\newcommand{\aw}{w_{\at}}
 \newcommand{\RWv}[1]{\models^{#1}_{\mathrm{rw}}}
 \newcommand{\Gv}[1]{\models^{#1}_{\mathrm{g}}}
 \newcommand{\nRWv}[1]{\not\models^{#1}_{\mathrm{rw}}}
@@ -147,7 +148,10 @@ Our second aim is to show that the phenomenon arises within a
 substantive metaphysical theory, and not merely in arbitrary Kripke
 models. We consider an axiomatic theory of situations and worlds in the
 tradition of Zalta's theory of abstract objects
-\cite{zalta1983,zalta1993}. In this theory the actuality operator is
+\cite{zalta1983,zalta1993}. As in Zalta's theory, situations are
+abstract objects that encode only propositional properties, and the
+actual world is obtained by comprehension
+(Proposition~\ref{prop:situations}). The actuality operator is
 definable without further axioms (Section~\ref{sec:theory}). Read as a
 model of the logic of actuality, the theory validates every real-world
 valid formula at its actual world (Theorem~\ref{thm:agreement}), and it
@@ -413,8 +417,7 @@ primitive vocabulary consists of:
   $\pand, \por, \pimp, \piff\colon \Prop \times \Prop \to \Prop$;
 \item a map $\VAC\colon \Prop \to \Pty$, sending $p$ to the property
   of being such that $p$;
-\item predicates $\Obj, \Sit \subseteq \Dom$ (being an object, being a
-  situation) and a relation $\Conc \subseteq \Dom \times \Dom$, where
+\item a relation $\Conc \subseteq \Dom \times \Dom$, where
   $\Conc(w,x)$ expresses that $x$ is concrete at the index $w$;
 \item encoding relations $\Enc \subseteq \Dom \times \Pty$ and
   $\Encp \subseteq \Dom \times \Prop$;
@@ -422,7 +425,7 @@ primitive vocabulary consists of:
   \Prop$, written $s \models p$;
 \item \emph{obtaining at an index}, $\Obt \subseteq \Dom \times
   \Prop$, where $\Obt(v,p)$ expresses that $p$ is the case at $v$;
-\item a constant $\at \in \Dom$, the actual world;
+\item a constant $\at \in \Dom$, the actual index;
 \item operations $\meet, \join\colon \Dom \times \Dom \to \Dom$.
 \end{enumerate}
 
@@ -438,6 +441,10 @@ We use the following abbreviations:
     \Diamond(\lambda w.\,\Conc(w,x))(x) &&\text{(ordinary object)}\\
   \Abs(x) &\;:\Longleftrightarrow\; \neg\Ord(x)
     &&\text{(abstract object)}\\
+  \Obj(x) &\;:\Longleftrightarrow\; \Ord(x) \vee \Abs(x)
+    &&\text{(object)}\\
+  \Sit(x) &\;:\Longleftrightarrow\; \Abs(x) \wedge \forall F\,
+    (\Enc(x,F) \to \exists p\, F = \VAC(p)) &&\text{(situation)}\\
   \Max(s) &\;:\Longleftrightarrow\; \forall p\,
     (s \models p \;\vee\; s \models \pneg p) &&\text{(maximality)}\\
   \Cons(s) &\;:\Longleftrightarrow\; \neg\exists p\,
@@ -446,7 +453,7 @@ We use the following abbreviations:
 
 \subsection{Axioms}
 
-The axioms of $\T$ fall into seven groups. Free variables are
+The axioms of $\T$ fall into five groups. Free variables are
 universally quantified.
 
 \begin{enumerate}[label=(T\arabic*), leftmargin=3.2em]
@@ -457,9 +464,7 @@ universally quantified.
   $p \piff q = (p \pimp q) \pand (q \pimp p)$.
 \item \label{ax:encoding} \emph{Encoding and truth.} If $\Obj(x)$, then
   $\Encp(x,p) \leftrightarrow \Enc(x, \VAC(p))$ and
-  $x \models p \leftrightarrow \Encp(x,p)$. Every situation is an
-  object, and every property encoded by a situation is of the form
-  $\VAC(p)$.
+  $x \models p \leftrightarrow \Encp(x,p)$.
 \item \label{ax:obtains} \emph{Obtaining.} For every index $v$,
   \begin{align*}
     \Obt(v, \pneg p) &\leftrightarrow \neg\Obt(v,p), &
@@ -467,6 +472,7 @@ universally quantified.
     \Obt(v, p \por q) &\leftrightarrow \Obt(v,p) \vee \Obt(v,q), &
     \Obt(v, p \pimp q) &\leftrightarrow (\Obt(v,p) \to \Obt(v,q)).
   \end{align*}
+  If $\VAC(p) = \VAC(q)$, then $\Obt(v,p) \leftrightarrow \Obt(v,q)$.
 \item \label{ax:abstract} \emph{Abstract objects.} Ordinary objects
   necessarily encode no property:
   $\Ord(x) \to \Box(\lambda w.\,\neg\exists F\,\Enc(x,F))(x)$. For
@@ -475,23 +481,67 @@ universally quantified.
   $\exists x\,(\Abs(x) \wedge \forall F\,(\Enc(x,F) \leftrightarrow
   \varphi(F)))$. Abstract objects that encode the same properties are
   identical.
-\item \label{ax:ext} \emph{Situations.} Situations that make the same
-  propositions true are identical. If $\Sit(s)$, $\Abs(x)$ and
-  $x \partof s$, then $\Sit(x)$.
 \item \label{ax:lattice} \emph{Meet and join.} If $\Sit(s)$ and
   $\Sit(s')$, then $\Sit(s \meet s')$ and $\Sit(s \join s')$. For all
   $s, s', u$: $(s \meet s') \models p \leftrightarrow (s \models p
   \wedge s' \models p)$; $s \partof s \join s'$ and $s' \partof s \join s'$;
   and if $s \partof u$ and $s' \partof u$, then $s \join s' \partof u$.
-\item \label{ax:actual} \emph{The actual world.} $\Sit(\at)$, and
-  $\at \models p \leftrightarrow \Obt(\at, p)$ for every $p$.
 \end{enumerate}
 
 Axiom group~\ref{ax:obtains} imposes the classical truth conditions on
 obtaining and not on truth in a situation, so that the latter may be
 partial; Proposition~\ref{prop:collapse} shows that this is
-unavoidable. Axiom group~\ref{ax:actual} relates the two roles of
-$\at$, as a situation and as the index of evaluation.
+unavoidable. The last clause of~\ref{ax:obtains} states that equal
+vacuous properties have the same obtaining conditions. In Zalta's theory
+it follows from $\beta$-conversion: an object exemplifies the property
+of being such that $p$ if and only if $p$. Since $\T$ has no
+exemplification relation, the consequence is postulated directly. It is
+weaker than injectivity of $\VAC$.
+
+\subsection{Situations and the actual world}
+
+By the comprehension and identity principles in~\ref{ax:abstract},
+there is a unique abstract object $\aw$ such that
+\[
+  \Enc(\aw, F) \;\leftrightarrow\; \exists p\,
+    \bigl(F = \VAC(p) \wedge \Obt(\at, p)\bigr)
+\]
+for every property $F$. We call $\aw$ the \emph{actual world}. The
+basic principles of situations and of the actual world are then
+theorems of $\T$, rather than axioms.
+
+\begin{proposition}
+\label{prop:situations}
+\begin{enumerate}[label=(\roman*)]
+\item Every situation is an object, and every property encoded by a
+  situation is of the form $\VAC(p)$.
+\item Situations that make the same propositions true are identical.
+\item If $\Sit(s)$, $\Abs(x)$ and $x \partof s$, then $\Sit(x)$.
+\item $\Sit(\aw)$, and $\aw \models p \leftrightarrow \Obt(\at, p)$ for
+  every $p$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+For every object $x$, \ref{ax:encoding} gives
+$x \models p \leftrightarrow \Enc(x, \VAC(p))$, and every $x$ is an
+object, since $\Abs = \neg\Ord$.
+(i) is immediate from the definition of $\Sit$.
+(ii) Let $s, s'$ be situations that make the same propositions true. If
+$\Enc(s,F)$, then $F = \VAC(p)$ for some $p$ by (i), so $s \models p$,
+hence $s' \models p$ and $\Enc(s',F)$; and symmetrically. Thus $s$ and
+$s'$ are abstract objects encoding the same properties, and they are
+identical by~\ref{ax:abstract}.
+(iii) Every property encoded by $x$ is encoded by $s$, and is therefore
+of the form $\VAC(p)$.
+(iv) $\aw$ is abstract and encodes only properties of the form
+$\VAC(p)$. Moreover, $\aw \models p$ if and only if
+$\Obt(\at, q)$ for some $q$ with $\VAC(p) = \VAC(q)$, which by the last
+clause of~\ref{ax:obtains} is equivalent to $\Obt(\at, p)$.
+\end{proof}
+
+Part~(iv) relates the actual world to the actual index: what is true in
+$\aw$ is exactly what is the case.
 
 \subsection{Worlds}
 
@@ -523,7 +573,7 @@ The following are theorems of $\T$.
 \item If $\World(w)$, then $\Max(w)$, $\Cons(w)$ and $\Poss(w)$.
 \item If $\Poss(s)$, then $\Cons(s)$.
 \item $\World(s) \leftrightarrow \Sit(s) \wedge \Max(s) \wedge \Poss(s)$.
-\item $\World(\at)$ and $\Actual(\at)$. If $\Actual(s)$, then
+\item $\World(\aw)$ and $\Actual(\aw)$. If $\Actual(s)$, then
   $\Poss(s)$ and $\Cons(s)$.
 \end{enumerate}
 \end{theorem}
@@ -542,8 +592,9 @@ $\Poss(s)$; it suffices to show that $\Obt(v,p)$ implies
 $s \models p$. By maximality, $s \models p$ or $s \models \pneg p$, and
 the second alternative yields $\Obt(v,\pneg p)$, which is incompatible
 with $\Obt(v,p)$.
-(vi) By~\ref{ax:actual}, the index $\at$ witnesses $\World(\at)$, and
-$\Actual(\at)$ is one direction of~\ref{ax:actual}. If $\Actual(s)$,
+(vi) By Proposition~\ref{prop:situations}(iv), the index $\at$
+witnesses $\World(\aw)$, and $\Actual(\aw)$ is one direction of it. If
+$\Actual(s)$,
 then $\at$ witnesses $\Poss(s)$, and $\Cons(s)$ follows by (iv).
 \end{proof}
 
@@ -579,8 +630,9 @@ be computed in two ways:
 \]
 If exactly one of $s \models p$ and $s' \models p$ holds, the left-hand
 side is true and the right-hand side is false. Hence
-$s \models p \leftrightarrow s' \models p$. By the extensionality
-axiom in~\ref{ax:ext}, any two situations are identical.
+$s \models p \leftrightarrow s' \models p$. By
+Proposition~\ref{prop:situations}(ii), any two situations are
+identical.
 \end{proof}
 
 The schema of Proposition~\ref{prop:collapse} also forces every
@@ -592,14 +644,14 @@ worldhood is replaced by a tautology.
 \label{prop:empty}
 Let $\World^\top(s)$ abbreviate $\Sit(s) \wedge
 \Diamond(\lambda v.\,\forall p\,(s \models p \leftrightarrow
-\top))(\at)$. If $\World^\top(\at)$ and
-$\at \models \pneg p \leftrightarrow \neg(\at \models p)$ for every
+\top))(\at)$. If $\World^\top(\aw)$ and
+$\aw \models \pneg p \leftrightarrow \neg(\aw \models p)$ for every
 $p$, then $\Prop$ is empty.
 \end{proposition}
 
 \begin{proof}
-The assumption $\World^\top(\at)$ gives $\at \models p$ for every $p$,
-and in particular $\at \models p$ and $\at \models \pneg p$, which
+The assumption $\World^\top(\aw)$ gives $\aw \models p$ for every $p$,
+and in particular $\aw \models p$ and $\aw \models \pneg p$, which
 together with the clause for negation is a contradiction for any
 $p \in \Prop$.
 \end{proof}
@@ -681,7 +733,7 @@ $\Mod_\T, \at \models \varphi$.
 Theorem~\ref{thm:agreement} shows that the operator defined in $\T$ is
 the actuality operator of Crossley and Humberstone, and that every
 formula real-world valid over universal models holds at the actual
-world of $\T$. The theory does not determine whether any proposition is
+index of $\T$. The theory does not determine whether any proposition is
 contingent; this is settled in the model constructed in the next
 section.
 
@@ -701,16 +753,17 @@ $b \in \mathbb{B}$ let $S_b = \{p \subseteq \mathbb{B} : b \in p\}$.
 \item $\Conc(w,x)$ holds if and only if $x$ is an index.
   $\Enc(\iota_b, F)$ never holds, $\Enc(\alpha_S, F)$ holds if and only
   if $F \in S$, and $\Encp(x,p)$ holds if and only if $\Enc(x,p)$.
-\item $\Obj = \Dom$, and $\Sit(x)$ holds if and only if $x$ is an
-  abstract object.
 \item $x \models p$ if and only if $\Encp(x,p)$; thus
   $\alpha_S \models p$ if and only if $p \in S$.
 \item $\Obt(\iota_b, p)$ if and only if $b \in p$, and
   $\Obt(\alpha_S, p)$ if and only if $1 \in p$.
-\item $\at = \alpha_{S_1}$.
+\item $\at = \iota_1$.
 \item $x \meet y = \alpha_{\{F : \Enc(x,F) \wedge \Enc(y,F)\}}$ and
   $x \join y = \alpha_{\{F : \Enc(x,F) \vee \Enc(y,F)\}}$.
 \end{itemize}
+Since every property is of the form $\VAC(p)$, the situations of $\N$
+are exactly the abstract objects $\alpha_S$. The actual world is
+$\aw = \alpha_{S_1}$, since $\Obt(\iota_1, p)$ if and only if $1 \in p$.
 
 \begin{theorem}
 \label{thm:model}
@@ -722,37 +775,31 @@ relative to higher-order logic.
 We verify the axiom groups in turn.
 \ref{ax:boolean} holds because $\mathcal{P}(\mathbb{B})$ is a Boolean
 algebra.
-\ref{ax:encoding} holds by definition, since every property is of the
-form $\VAC(p)$.
+\ref{ax:encoding} holds by definition.
 \ref{ax:obtains} holds because, for fixed $v$, $\Obt(v,\cdot)$ is
-membership of a fixed valuation.
+membership of a fixed valuation, and because $\VAC$ is the identity.
 For~\ref{ax:abstract}: every index is concrete at every index, hence
 ordinary, and encodes no property; no $\alpha_S$ is concrete at any
 index, so every $\alpha_S$ is abstract. Comprehension for a condition
 $\varphi$ is witnessed by $\alpha_{\{F : \varphi(F)\}}$, and abstract
 objects encoding the same properties have the same index set $S$ and
 are therefore identical.
-For~\ref{ax:ext}: the situations are the $\alpha_S$, and $\alpha_S$
-makes true exactly the members of $S$, which gives extensionality; an
-abstract part of a situation is some $\alpha_T$, hence a situation.
 \ref{ax:lattice} holds because meet and join are intersection and union
 of encoded properties; in particular the properties encoded by
 $x \join y$ form the least set containing those encoded by $x$ and by
 $y$.
-\ref{ax:actual} holds since $\at \models p$ if and only if $1 \in p$, if
-and only if $\Obt(\at, p)$.
 \end{proof}
 
 \begin{theorem}
 \label{thm:nondegenerate}
 In $\N$:
 \begin{enumerate}[label=(\roman*)]
-\item $\alpha_{S_1}$ and $\alpha_{S_0}$ are distinct worlds;
+\item $\aw = \alpha_{S_1}$ and $\alpha_{S_0}$ are distinct worlds;
 \item the proposition $c = \{1\}$ is contingent: it obtains at
   $\iota_1$ and does not obtain at $\iota_0$;
 \item the situation $\alpha_\varnothing$ is partial and possible but is
-  not a world, and $\alpha_\varnothing \partof \at$ with
-  $\alpha_\varnothing \neq \at$;
+  not a world, and $\alpha_\varnothing \partof \aw$ with
+  $\alpha_\varnothing \neq \aw$;
 \item the situation $\alpha_{\Pty}$ is not possible;
 \item there are both ordinary and abstract objects.
 \end{enumerate}
@@ -839,16 +886,17 @@ of situations and worlds. That theory is a model of the logic of
 actuality, and it has a non-degenerate model in which the biconditional
 for a contingent proposition is true but not necessary. The theory
 requires truth in a situation to be distinguished from truth at an
-index.
+index. Situations and the actual world are defined as in Zalta's
+theory, and the principles that govern them are theorems; the only
+postulate this adds to the theory of encoding and abstract objects is
+that equal vacuous properties have the same obtaining conditions, which
+in Zalta's theory follows from $\beta$-conversion.
 
-Three questions remain open. The identities~\ref{ax:boolean} make
+Two questions remain open. The identities~\ref{ax:boolean} make
 propositions coarse-grained, whereas the propositions of Zalta's theory
 are hyperintensional; a model of a variant of $\T$ with distinct but
 necessarily equivalent propositions would bring the theory closer to
-its source. If situations are defined, as in Zalta's theory, as
-abstract objects encoding only propositional properties, the actual
-world should be obtainable by comprehension and axiom
-group~\ref{ax:actual} derivable. Finally, the extension of the results
+its source. The extension of the results
 of Section~\ref{sec:results} to quantified modal logic, where the
 actuality operator interacts with variable domains, is of independent
 interest.
@@ -868,8 +916,9 @@ The logic of Section~\ref{sec:logic} is formalized as a deep embedding,
 and the results of Section~\ref{sec:results} are proved for an
 arbitrary class of models using only the logic of the proof assistant.
 The theory $\T$ is formalized as a shallow embedding in which the sorts,
-the primitive vocabulary and the axioms~\ref{ax:boolean}--\ref{ax:actual}
-are postulated; there are 48 postulates in all. Propositions
+the primitive vocabulary and the axioms~\ref{ax:boolean}--\ref{ax:lattice}
+are postulated; there are 42 postulates in all. Objects, situations and
+the actual world are defined, as in Section~\ref{sec:theory}. Propositions
 \ref{prop:collapse} and~\ref{prop:empty} are proved with the additional
 assumptions of the variant theories as explicit hypotheses. The model
 $\N$ is formalized independently of the postulates of $\T$: each axiom
@@ -892,6 +941,8 @@ Corollary~\ref{cor:universal} & \texttt{sat\_box\_actuality\_universal} \\
 Theorem~\ref{thm:separation} & \texttt{actuality\_not\_gValid}, \texttt{box\_actuality\_not\_rwValid}, \\
  & \texttt{rwValid\_not\_closed\_under\_nec}, \texttt{rwValid\_strictly\_weaker} \\
 Proposition~\ref{prop:inert} & \texttt{rwValid\_act\_iff}, \texttt{gValid\_act\_iff}, \texttt{act\_imp\_box\_act\_gValid} \\
+Proposition~\ref{prop:situations} & \texttt{situation\_is\_object}, \texttt{Enc\_VAC\_complete}, \texttt{situation\_extensionality}, \\
+ & \texttt{situation\_closed\_under\_parthood}, \texttt{actualWorld\_faithful} \\
 Theorem~\ref{thm:worlds} & \texttt{world\_index}, \texttt{world\_TrueIn\_neg}, \texttt{world\_maximal}, \\
  & \texttt{possible\_consistent}, \texttt{worldhood\_iff}, \texttt{actualWorld\_is\_world} \\
 Proposition~\ref{prop:collapse} & \texttt{classical\_truth\_collapse}, \texttt{classical\_truth\_one\_situation} \\
