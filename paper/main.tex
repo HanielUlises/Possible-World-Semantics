@@ -103,7 +103,11 @@ read as a model of the logic of actuality, validates every real-world
 valid formula at its actual world, and it has a non-degenerate model in
 which the actuality biconditional for a contingent proposition is true
 but not necessary, and in which necessarily equivalent propositions may
-be distinct. We also show that the theory must distinguish truth
+be distinct. Since concreteness in the theory is relative to an index,
+actualist quantification over the concrete objects is definable, and
+the quantified contingent logical truths arise within the theory as
+well: ``everything concrete is actually concrete'' holds at its actual
+world, and in the model it is not necessary. We also show that the theory must distinguish truth
 in a situation from truth at an index: if the two are identified, there
 is at most one situation. All results have been verified in an
 interactive proof assistant.
@@ -166,7 +170,14 @@ model of the logic of actuality, the theory validates every real-world
 valid formula at its actual world (Theorem~\ref{thm:agreement}), and it
 has a non-degenerate model in which the actuality biconditional for a
 contingent proposition is true but not necessary
-(Section~\ref{sec:model}). The theory distinguishes truth in a
+(Section~\ref{sec:model}). The quantifiers of the theory range over a
+single domain, but concreteness is relative to an index, so the
+concrete objects at an index form a domain that may vary. Actualist
+quantification over them is definable, the theory is a model of
+quantified modal logic with these domains
+(Theorem~\ref{thm:q-agreement}), and in the model of the theory
+``everything concrete is actually concrete'' is true but not necessary
+(Corollary~\ref{cor:q-contingent-truth}). The theory distinguishes truth in a
 situation, which is partial, from truth at an index, which is
 classical. This distinction cannot be dropped: if truth in a situation
 is required to be classical, the theory admits at most one situation
@@ -970,6 +981,93 @@ index of $\T$. The theory does not determine whether any proposition is
 contingent; this is settled in the model constructed in the next
 section.
 
+\subsection{Actualist quantification}
+\label{sec:theory-quantified}
+
+The quantifiers of $\T$, like those of Zalta's theory, range over the
+single domain $\Dom$, which is the same at every index. Concreteness,
+however, is relative to an index, and the objects concrete at an index
+$v$, the set $\{x \in \Dom : \Conc(v,x)\}$, may vary with $v$.
+Quantification restricted to them is actualist quantification. For a
+binary condition $\varphi$ on objects and indices, let
+\[
+  (\forall^{\Conc} \varphi)(v) \;:\Longleftrightarrow\;
+    \forall x\,(\Conc(v,x) \to \varphi(x,v)).
+\]
+Write $\mathrm{AC}$ for $\forall^{\Conc}(\lambda x.\,\Act(\lambda
+v.\,\Conc(v,x)))$, ``everything concrete is actually concrete'', and
+$\mathrm{CC}$ for the commutation
+$\lambda w.\,\bigl(\Act(\forall^{\Conc}\Conc')(w) \leftrightarrow
+\forall^{\Conc}(\lambda x.\,\Act(\Conc'(x)))(w)\bigr)$, where
+$\Conc'(x,v)$ is $\Conc(v,x)$.
+
+\begin{theorem}
+\label{thm:theory-quantified}
+In $\T$, for every index $w$:
+\begin{enumerate}[label=(\roman*)]
+\item $\mathrm{AC}(\at)$ and $\mathrm{CC}(\at)$ hold, and
+  $\Box\forall^{\Conc}\Conc'$ holds at $w$;
+\item $(\Box\,\mathrm{AC})(w)$ holds if and only if
+  $\Conc(v,x) \to \Conc(\at,x)$ for all $v$ and $x$;
+\item if $\Conc(v,x)$ and $\neg\Conc(\at,x)$ for some $v$ and $x$,
+  then neither $(\Box\,\mathrm{AC})(w)$ nor $(\Box\,\mathrm{CC})(w)$
+  holds.
+\end{enumerate}
+\end{theorem}
+
+\begin{proof}
+(i) At $\at$, both $\mathrm{AC}$ and $\mathrm{CC}$ compare the
+objects concrete at $\at$ with themselves, and
+$\forall^{\Conc}\Conc'$ holds at every index by definition.
+(ii) The left-hand side states that whatever is concrete at an index
+$v$ is concrete at $\at$. (iii) The first claim follows from (ii). For
+the second, $\Act(\forall^{\Conc}\Conc')$ holds at $v$ by (i), but
+$\forall^{\Conc}(\lambda y.\,\Act(\Conc'(y)))$ fails at $v$, since
+$x$ is concrete at $v$ and not at $\at$.
+\end{proof}
+
+Theorem~\ref{thm:theory-quantified} is the counterpart in $\T$ of
+Theorems~\ref{thm:q-truths} and~\ref{thm:q-separation}. The next
+theorem shows that it is an instance of them: $\mathrm{AC}$ is the
+translation of $\forall y\,\Act E!y$ into $\T$.
+
+\begin{definition}
+Let $\Pi$ be a set of predicate symbols and let $I$ assign to each
+$P \in \Pi$ and index $v$ a set $I(P,v)$ of finite sequences of
+objects. The quantified model $\Mod^\forall_{\T,I} = \langle \Dom,
+\Dom \times \Dom, \at, \Dom, d_\T, I\rangle$ has domains
+$d_\T(v) = \{x : \Conc(v,x)\}$. The translation $\tr{\cdot}_I$
+sends a formula of $\Lang^\forall(\Pi)$ and an assignment $g$ to a
+condition on indices: $\tr{P(y_1,\ldots,y_n)}_I^g(v)$ is
+$(g(y_1),\ldots,g(y_n)) \in I(P,v)$, $\tr{y = z}_I^g$ is
+$\lambda v.\,g(y) = g(z)$, $\tr{\forall y\,\varphi}_I^g$ is
+$\forall^{\Conc}(\lambda a\,v.\,\tr{\varphi}_I^{g[y\mapsto a]}(v))$,
+and the translation commutes with the Boolean connectives, $\Box$ and
+$\Act$.
+\end{definition}
+
+\begin{theorem}
+\label{thm:q-agreement}
+For every $\varphi \in \Lang^\forall(\Pi)$, index $v$ and
+assignment $g$, $\Mod^\forall_{\T,I}, v, g \models \varphi$ if and
+only if $\tr{\varphi}_I^g(v)$. Consequently, if
+$\RWv{\Kl^\forall_{\mathrm{u}}} \varphi$, then
+$\tr{\varphi}_I^g(\at)$ is a theorem of $\T$ for every $I$ and $g$.
+Moreover, $\tr{\forall y\,\Act E!y}_I^g(v)$ holds if and only if
+$\mathrm{AC}(v)$.
+\end{theorem}
+
+\begin{proof}
+By induction on $\varphi$, generalizing over $v$ and $g$, as in
+Theorem~\ref{thm:agreement}; in the case of $\forall y\,\varphi$
+both sides range over the objects concrete at $v$. The last claim
+holds by the first and Theorem~\ref{thm:q-truths}(ii), since $E!y$ holds at $v$
+under $g$ exactly when $\Conc(v, g(y))$.
+\end{proof}
+
+The theory does not decide whether the domain of concrete objects
+varies. The model of the next section shows that it may.
+
 \section{A model of the theory}
 \label{sec:model}
 
@@ -991,7 +1089,9 @@ $S_b = \{p : b \in |p|\}$.
   \{\alpha_S : S \subseteq \Pty\}$. The elements $\iota_b$ are the
   \emph{indices} and the elements $\alpha_S$ are the \emph{abstract
   objects}.
-\item $\Conc(w,x)$ holds if and only if $x$ is an index.
+\item $\Conc(w,\iota_b)$ holds if and only if $w = \iota_0$ or
+  $b = 1$, and $\Conc(w,\alpha_S)$ never holds. Thus only $\iota_1$
+  is concrete at $\at$, and both indices are concrete at $\iota_0$.
   $\Enc(\iota_b, F)$ never holds, $\Enc(\alpha_S, F)$ holds if and only
   if $F \in S$, and $\Encp(x,p)$ holds if and only if $\Enc(x,p)$.
 \item $x \models p$ if and only if $\Encp(x,p)$; thus
@@ -1021,7 +1121,7 @@ associative.
 \ref{ax:encoding} holds by definition.
 \ref{ax:obtains} holds because, for fixed $v$, $\Obt(v,\cdot)$ is
 membership of a fixed valuation, and because $\VAC$ is the identity.
-For~\ref{ax:abstract}: every index is concrete at every index, hence
+For~\ref{ax:abstract}: every index is concrete at $\iota_0$, hence
 ordinary, and encodes no property; no $\alpha_S$ is concrete at any
 index, so every $\alpha_S$ is abstract. Comprehension for a condition
 $\varphi$ is witnessed by $\alpha_{\{F : \varphi(F)\}}$, and abstract
@@ -1043,7 +1143,9 @@ In $\N$:
 \item there are both ordinary and abstract objects;
 \item the propositions $c$ and $c' = (\{1\}, 1)$ are distinct but
   necessarily equivalent, and the possible situation $\alpha_{\{c\}}$
-  makes $c$ true but not $c'$.
+  makes $c$ true but not $c'$;
+\item the domain of concrete objects grows: $\iota_0$ is concrete at
+  $\iota_0$ but not at $\at$.
 \end{enumerate}
 \end{theorem}
 
@@ -1060,6 +1162,7 @@ consistent, and hence not possible by Theorem~\ref{thm:worlds}(iv).
 (vi) $c$ and $c'$ differ in their tag, and $\Obt(v, c)$ and
 $\Obt(v, c')$ both depend only on $\{1\}$. The situation
 $\alpha_{\{c\}}$ makes only $c$ true, and $c$ obtains at $\iota_1$.
+(vii) is immediate from the definition of $\Conc$.
 \end{proof}
 
 By part~(vi), the identities~\ref{ax:boolean} do not make the
@@ -1133,6 +1236,26 @@ situations may be partial, there is more than one world, and ordinary
 and abstract objects coexist. By Proposition~\ref{prop:collapse}, no
 model of $\T^-$ has two distinct worlds.
 
+\begin{corollary}
+\label{cor:q-contingent-truth}
+In $\N$, ``everything concrete is actually concrete'' holds at $\at$,
+but its necessitation fails, and so does the necessitation of the
+commutation $\mathrm{CC}$: the object $\iota_0$ is concrete at
+$\iota_0$ but not actually concrete.
+\end{corollary}
+
+\begin{proof}
+By Theorem~\ref{thm:theory-quantified} and
+Theorem~\ref{thm:nondegenerate}(vii).
+\end{proof}
+
+The domains of concrete objects in $\N$ are those of the model
+$\mathfrak{G}$ of Section~\ref{sec:quantified}, with $\iota_b$ in place
+of $b$. As there, the failure of necessitation in
+Corollary~\ref{cor:q-contingent-truth} owes nothing to which
+propositions obtain: it is produced by the variation of the domain
+alone.
+
 \section{Related work}
 \label{sec:related}
 
@@ -1197,13 +1320,17 @@ Although the propositional identities hold, the theory does not make
 propositions intensional: its model has distinct but necessarily
 equivalent propositions, and situations that distinguish them.
 
-Two directions remain. The domain of $\T$ is constant, so the
-quantified contingent truths of Section~\ref{sec:quantified} do not
-arise within it; a version of $\T$ with a domain of concrete objects
-varying across indices would bring them into the theory. And with a
-primitive exemplification relation satisfying $\beta$-conversion, the
-remaining postulate on vacuous properties should become derivable, as
-it is in Zalta's theory.
+The domain of $\T$ is constant, but concreteness is relative to an
+index, and actualist quantification over the concrete objects at an
+index is definable. With it, $\T$ is a model of quantified modal logic
+with variable domains, and the quantified contingent truths of
+Section~\ref{sec:quantified} arise within the theory: ``everything
+concrete is actually concrete'' holds at the actual index, and in the
+model of $\T$ it is not necessary. No postulate is needed for this.
+
+One direction remains. With a primitive exemplification relation
+satisfying $\beta$-conversion, the remaining postulate on vacuous
+properties should become derivable, as it is in Zalta's theory.
 
 \appendix
 
@@ -1220,7 +1347,9 @@ The logics of Sections~\ref{sec:logic} and~\ref{sec:quantified} are
 formalized as deep embeddings, and the results of
 Sections~\ref{sec:results} and~\ref{sec:quantified} are proved for an
 arbitrary class of models using only the logic of the proof assistant.
-The theory $\T$ is formalized as a shallow embedding in which the sorts,
+The theory $\T$, including the actualist quantification of
+Section~\ref{sec:theory-quantified}, is formalized as a shallow
+embedding in which the sorts,
 the primitive vocabulary and the axioms~\ref{ax:boolean}--\ref{ax:abstract}
 are postulated; there are 34 postulates in all. Objects, situations,
 the actual world, meet and join are defined, as in
@@ -1262,9 +1391,17 @@ Proposition~\ref{prop:empty} & \texttt{tautological\_worldhood\_empty} \\
 Theorem~\ref{thm:theory-actuality} & \texttt{actuality\_truth}, \texttt{box\_actuality\_truth\_iff}, \\
  & \texttt{contingent\_actuality\_truth\_not\_necessary} \\
 Theorem~\ref{thm:agreement} & \texttt{sat\_theoryModel}, \texttt{rwValid\_holds\_actually} \\
+Theorem~\ref{thm:theory-quantified} & \texttt{everythingActuallyConcrete\_actual}, \texttt{concreteCommute\_actual}, \\
+ & \texttt{box\_everythingConcrete}, \texttt{box\_everythingActuallyConcrete\_iff}, \\
+ & \texttt{everythingActuallyConcrete\_not\_necessary}, \\
+ & \texttt{concreteCommute\_not\_necessary} \\
+Theorem~\ref{thm:q-agreement} & \texttt{sat\_quantTheoryModel}, \texttt{rwValid\_holds\_actually\_quantified}, \\
+ & \texttt{sat\_allActual\_theory} \\
 Theorems~\ref{thm:model} and~\ref{thm:nondegenerate} & \texttt{Model/Satisfiable.lean}, \texttt{Model.nondegenerate}, \\
  & \texttt{Model.hyperintensional} \\
 Corollary~\ref{cor:contingent-truth} & \texttt{Model.contingent\_logical\_truth} \\
+Corollary~\ref{cor:q-contingent-truth} & \texttt{Model.quantified\_contingent\_logical\_truth}, \\
+ & \texttt{Model.growing\_domain} \\
 \bottomrule
 \end{tabular}
 \caption{Formal counterparts of the main results.}
