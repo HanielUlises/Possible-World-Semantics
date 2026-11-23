@@ -36,6 +36,7 @@ flowchart TD
         Inf["Infimum · meet ∧"]
         Wld["Worlds"]
         Act["Actuality · 𝒜"]
+        QAct["QuantifiedActuality · ∀ over concreta"]
     end
     Fr --> Op
     Ont --> Obj --> Tru --> Abs --> Ext --> Par --> Dep
@@ -44,6 +45,8 @@ flowchart TD
     Abs --> Def --> Inf --> Wld
     Def --> Act
     AL --> Act
+    Act --> QAct
+    QA --> QAct
     subgraph X["Model — consistency"]
         Sat["Satisfiable · every axiom proved"]
     end
@@ -163,7 +166,17 @@ Zalta (1988) argued that a modal language with an actuality operator has logical
 | Neither is generally valid, nor is its necessitation real-world valid, in any class containing a two-world model with a growing domain | `commute_not_gValid`, `allActual_not_gValid`, `box_allActual_not_rwValid` |
 | "Everything exists", `∀x E!x`, is generally valid | `allExist_gValid` |
 
-**The model** (`Model/Satisfiable.lean`). The theory does not decide whether anything is contingent. `Model.contingent_logical_truth` shows that in a model of *all* the axioms, the actuality truth for a contingent proposition holds at the actual world while its necessitation fails.
+**Quantification in the theory** (`Situation/QuantifiedActuality.lean`). The quantifiers of the theory, like Zalta's, range over the single domain `World`. Concreteness, however, is relative to an index (`Concrete v x`), so the objects concrete at an index form a domain that can vary. `AllConcrete` defines actualist quantification over that domain, with no new axiom:
+
+| Result | Theorem |
+|---|---|
+| "Everything concrete is actually concrete" holds at the actual index | `everythingActuallyConcrete_actual` |
+| Its necessitation holds exactly when nothing could be concrete without actually being concrete | `box_everythingActuallyConcrete_iff` |
+| If something could be concrete without actually being so, neither it nor the commutation of `𝒜` with the quantifier is necessary | `everythingActuallyConcrete_not_necessary`, `concreteCommute_not_necessary` |
+| "Everything concrete is concrete" is necessary | `box_everythingConcrete` |
+| The theory is a model of the quantified deep embedding, with the concrete objects at an index as its domain; every real-world valid formula holds actually | `sat_quantTheoryModel`, `rwValid_holds_actually_quantified`, `sat_allActual_theory` |
+
+**The model** (`Model/Satisfiable.lean`). The theory does not decide whether anything is contingent, or whether the domain of concrete objects varies. `Model.contingent_logical_truth` shows that in a model of *all* the axioms, the actuality truth for a contingent proposition holds at the actual world while its necessitation fails. `Model.quantified_contingent_logical_truth` does the same for "everything concrete is actually concrete", since the model's domain grows at the non-actual index (`Model.growing_domain`).
 
 A paper describing these results is in [`paper/`](paper/).
 
@@ -205,7 +218,8 @@ The structure is small:
 - two valuations, `true` (actual) and `false`, serve as indices;
 - a proposition is a set of valuations with a tag bit; the connectives are Boolean operations on the sets and take the disjunction of the tags, and obtaining ignores the tag;
 - properties are propositions, and `VAC` is the identity;
-- objects are either indices, which are concrete and encode nothing (the ordinary objects), or abstract objects, one per set of properties (the situations);
+- objects are either indices, which encode nothing (the ordinary objects), or abstract objects, one per set of properties (the situations);
+- abstract objects are concrete nowhere; only `idx true` is concrete at the actual index, while both indices are concrete at `idx false`, so the domain of concrete objects grows;
 - `abs S ⊨ p` holds iff `p ∈ S`, and `Obtains v p` evaluates `p` at the valuation of `v`;
 - the actual index is `idx true`, and the actual world, defined by comprehension as in the development, is the abstract object encoding what holds at `true` (`actualWorld_eq`).
 
@@ -219,6 +233,7 @@ The structure is small:
 | Possible situations that are not worlds | `emptySituation` |
 | An impossible situation | `trivialSituation`, which makes everything true |
 | Ordinary and abstract objects | `idx true`, `actualWorld` |
+| An object that could be concrete but is not actually concrete | `idx false` (`growing_domain`) |
 
 `Model.hyperintensional` shows that the axioms do not make propositions intensional, although the propositional identities hold. `contingentProp` and `variantProp` differ only in their tag, so they obtain at the same indices but are distinct, and the possible situation `singletonSituation` makes the first true but not the second.
 
