@@ -26,7 +26,7 @@ COPIED_DEFS = [
     "R", "Box", "Diamond", "OrdinaryObject", "AbstractObject", "Object",
     "Situation", "PartOf", "Agree", "ExtEq", "actualWorld", "Actual",
     "Possible", "Worldhood", "Maximal₁", "Partial₁", "Consistent",
-    "Actually",
+    "Actually", "AllConcrete", "EverythingActuallyConcrete",
 ]
 
 # Notations that occur in axiom statements.

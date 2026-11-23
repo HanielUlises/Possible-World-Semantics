@@ -6,3 +6,4 @@ import Situation.Infimum
 import Situation.Worlds
 import Situation.Actuality
 import Situation.Variants
+import Situation.QuantifiedActuality

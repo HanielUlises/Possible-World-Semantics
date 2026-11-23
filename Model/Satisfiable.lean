@@ -5,7 +5,8 @@
   development holds, and in which the theory is not degenerate: there
   are two distinct worlds, a contingent proposition, a partial
   situation strictly below a world, an impossible situation, and an
-  ordinary object alongside abstract ones.  Propositions are
+  ordinary object alongside abstract ones, and an object that could
+  have been concrete without actually being so.  Propositions are
   hyperintensional: there are distinct but necessarily equivalent
   propositions, and a situation that makes one true but not the other.
 
@@ -30,9 +31,12 @@
     necessarily equivalent (`hyperintensional`).
   * Properties are propositions and `VAC` is the identity, so every
     property is propositional.
-  * Objects are either modal indices `idx v`, which are concrete and
-    encode nothing (the ordinary objects), or abstract objects
-    `abs S`, one for each set S of properties (the situations).
+  * Objects are either modal indices `idx v`, which encode nothing
+    (the ordinary objects), or abstract objects `abs S`, one for each
+    set S of properties (the situations).  Abstract objects are
+    concrete nowhere.  At the actual index only `idx true` is
+    concrete; at the non-actual index both indices are, so the domain
+    of concrete objects grows (`growing_domain`).
   * Situated truth is encoding, so `abs S ⊨ p` iff `p ∈ S`: partial
     in general.  Obtaining is evaluation at the index's valuation,
     with abstract objects evaluated at the actual valuation.
@@ -104,8 +108,8 @@ def Obtains : World → Propn → Prop
   | idx v, p => p.holds v
   | abs _, p => p.holds true
 
-def Concrete (_ : World) : World → Prop
-  | idx _ => True
+def Concrete (w : World) : World → Prop
+  | idx b => w = idx false ∨ b = true
   | abs _ => False
 
 def actualIndex : World := idx true
@@ -174,6 +178,12 @@ def Actually (p : World → Prop) : World → Prop :=
 
 notation "𝒜" => Actually
 
+def AllConcrete (φ : World → World → Prop) : World → Prop :=
+  fun v => ∀ x : World, Concrete v x → φ x v
+
+def EverythingActuallyConcrete : World → Prop :=
+  AllConcrete (fun x => 𝒜 (fun v => Concrete v x))
+
 /-! ## Helper lemmas -/
 
 theorem diamond_intro {p : World → Prop} {w : World} (v : World)
@@ -185,7 +195,7 @@ theorem diamond_elim {p : World → Prop} {w : World}
   Classical.byContradiction fun hne => h (fun v _ hpv => hne ⟨v, hpv⟩)
 
 theorem idx_ordinary (b : Val) : O! (idx b) :=
-  diamond_intro (idx b) trivial
+  diamond_intro (idx false) (Or.inl rfl)
 
 theorem abs_abstract (S : Property → Prop) : A! (abs S) :=
   fun h => h (fun _ _ hc => hc)
@@ -406,6 +416,23 @@ theorem contingent_logical_truth :
     ¬ □ (fun w => Obtains w contingentProp ↔
       𝒜 (fun v => Obtains v contingentProp) w) actualIndex :=
   ⟨Iff.rfl, fun h => Bool.noConfusion ((h (idx false) trivial).mpr rfl)⟩
+
+/-- The domain of concrete objects varies: `idx false` is concrete at
+    the non-actual index but not at the actual one. -/
+theorem growing_domain :
+    Concrete (idx false) (idx false) ∧ ¬ Concrete actualIndex (idx false) :=
+  ⟨Or.inl rfl, fun h => h.elim (fun h' => Bool.noConfusion (World.idx.inj h'))
+    (fun h' => Bool.noConfusion h')⟩
+
+/-- A quantified contingent logical truth in a model of the whole
+    theory: everything concrete is actually concrete at the actual
+    index, as it is in every model, but not necessarily, since
+    `idx false` could have been concrete without actually being so. -/
+theorem quantified_contingent_logical_truth :
+    EverythingActuallyConcrete actualIndex ∧
+    ¬ □ EverythingActuallyConcrete actualIndex :=
+  ⟨fun _ h => h,
+   fun h => growing_domain.2 (h (idx false) trivial (idx false) growing_domain.1)⟩
 
 /-- A proposition necessarily equivalent to `contingentProp` but
     distinct from it. -/
