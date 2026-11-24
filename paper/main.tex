@@ -1065,6 +1065,42 @@ holds by the first and Theorem~\ref{thm:q-truths}(ii), since $E!y$ holds at $v$
 under $g$ exactly when $\Conc(v, g(y))$.
 \end{proof}
 
+The possibilist quantifier of $\T$ commutes with $\Box$: for every
+binary condition $\varphi$ and index $w$,
+$\forall x\,(\Box\varphi(x))(w) \leftrightarrow
+\Box(\lambda v.\,\forall x\,\varphi(x,v))(w)$, so both the Barcan
+formula \cite{barcan1946} and its converse hold for it. For the
+actualist quantifier they are conditions on the domains. Let
+$\mathrm{BF}_\varphi(w)$ be
+$\forall^{\Conc}(\lambda x.\,\Box\varphi(x))(w) \to
+(\Box\forall^{\Conc}\varphi)(w)$ and let $\mathrm{CBF}_\varphi(w)$ be
+its converse.
+
+\begin{proposition}
+\label{prop:barcan}
+In $\T$, for every index $w$:
+\begin{enumerate}[label=(\roman*)]
+\item $\mathrm{BF}_\varphi(w)$ holds for every $\varphi$ if and only if
+  $\Conc(v,x) \to \Conc(w,x)$ for all $v$ and $x$;
+\item $\mathrm{CBF}_\varphi(w)$ holds for every $\varphi$ if and only if
+  $\Conc(w,x) \to \Conc(v,x)$ for all $v$ and $x$.
+\end{enumerate}
+\end{proposition}
+
+\begin{proof}
+(i) Suppose that every possible domain is included in the domain at
+$w$, and that $\Box\varphi(x)$ holds at $w$ for every $x$ concrete at
+$w$. If $x$ is concrete at an index $v$, then $x$ is concrete at $w$,
+so $\varphi(x,v)$; this gives $\Box\forall^{\Conc}\varphi$ at $w$. Conversely, take
+$\varphi(x,v) = \Conc(w,x)$: the antecedent holds trivially, and the
+consequent is the inclusion. (ii) If the domain at $w$ is included in
+every domain, then $\Box\forall^{\Conc}\varphi$ yields $\varphi(x)$ at
+every index for every $x$ concrete at $w$. Conversely, take
+$\varphi = \Conc'$: the antecedent holds by
+Theorem~\ref{thm:theory-quantified}(i), and the consequent is the
+inclusion.
+\end{proof}
+
 The theory does not decide whether the domain of concrete objects
 varies. The model of the next section shows that it may.
 
@@ -1249,6 +1285,13 @@ By Theorem~\ref{thm:theory-quantified} and
 Theorem~\ref{thm:nondegenerate}(vii).
 \end{proof}
 
+By Proposition~\ref{prop:barcan}, both Barcan formulas fail in $\N$
+for the actualist quantifier: $\mathrm{BF}$ fails at $\at$, for
+$\varphi(x,v) = \Conc(\at,x)$, because $\iota_0$ could be concrete
+without being actually concrete, and $\mathrm{CBF}$ fails at
+$\iota_0$, for $\varphi = \Conc'$, because $\iota_0$ is concrete there
+but not at $\at$. Both hold for the possibilist quantifier.
+
 The domains of concrete objects in $\N$ are those of the model
 $\mathfrak{G}$ of Section~\ref{sec:quantified}, with $\iota_b$ in place
 of $b$. As there, the failure of necessitation in
@@ -1293,6 +1336,22 @@ models, in characterizing exactly when the actuality biconditional is
 necessary, and in exhibiting the phenomenon in a model of a theory of
 situations that separates truth in a situation from truth at an index.
 
+Linsky and Zalta \cite{linsky1994} defended the simplest quantified
+modal logic, with a constant domain, the Barcan formula and its
+converse, by reading the contingency of existence as the contingency of
+concreteness: what could have been concrete is not thereby a merely
+possible object, but a necessarily existing object that is contingently
+nonconcrete. The treatment of quantification in
+Section~\ref{sec:theory-quantified} formalizes this reading. The
+quantifiers of $\T$ range over a constant domain and satisfy both
+Barcan formulas, while actualist quantification is quantification
+restricted to the concrete objects at an index; for it, the Barcan
+formulas are conditions on how the domains vary
+(Proposition~\ref{prop:barcan}), and both fail in $\N$. The quantified
+contingent logical truths of Section~\ref{sec:quantified} then arise,
+as Linsky and Zalta's reading predicts, from contingent concreteness
+alone (Corollary~\ref{cor:q-contingent-truth}).
+
 \section{Conclusion}
 \label{sec:conclusion}
 
@@ -1326,7 +1385,11 @@ index is definable. With it, $\T$ is a model of quantified modal logic
 with variable domains, and the quantified contingent truths of
 Section~\ref{sec:quantified} arise within the theory: ``everything
 concrete is actually concrete'' holds at the actual index, and in the
-model of $\T$ it is not necessary. No postulate is needed for this.
+model of $\T$ it is not necessary. The possibilist quantifiers satisfy
+both Barcan formulas, as in the simplest quantified modal logic of
+Linsky and Zalta, while for the actualist quantifier the Barcan
+formulas are conditions on the domains, and both fail in the model. No
+postulate is needed for this.
 
 One direction remains. With a primitive exemplification relation
 satisfying $\beta$-conversion, the remaining postulate on vacuous
@@ -1395,6 +1458,8 @@ Theorem~\ref{thm:theory-quantified} & \texttt{everythingActuallyConcrete\_actual
  & \texttt{box\_everythingConcrete}, \texttt{box\_everythingActuallyConcrete\_iff}, \\
  & \texttt{everythingActuallyConcrete\_not\_necessary}, \\
  & \texttt{concreteCommute\_not\_necessary} \\
+Proposition~\ref{prop:barcan} & \texttt{possibilist\_barcan}, \texttt{barcan\_iff}, \texttt{converseBarcan\_iff}, \\
+ & \texttt{Model.barcan\_fails}, \texttt{Model.converseBarcan\_fails} \\
 Theorem~\ref{thm:q-agreement} & \texttt{sat\_quantTheoryModel}, \texttt{rwValid\_holds\_actually\_quantified}, \\
  & \texttt{sat\_allActual\_theory} \\
 Theorems~\ref{thm:model} and~\ref{thm:nondegenerate} & \texttt{Model/Satisfiable.lean}, \texttt{Model.nondegenerate}, \\

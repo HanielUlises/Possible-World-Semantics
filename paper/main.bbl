@@ -7,6 +7,10 @@
 \providecommand{\href}[2]{#2}
 \begin{thebibliography}{10}
 
+\bibitem{barcan1946}
+Ruth~C. Barcan, \emph{A functional calculus of first order based on strict
+  implication}, The Journal of Symbolic Logic \textbf{11} (1946), no.~1, 1--16.
+
 \bibitem{benzmuller2013}
 Christoph Benzm{\"u}ller and Lawrence~C. Paulson, \emph{Quantified multimodal
   logics in simple type theory}, Logica Universalis \textbf{7} (2013), no.~1,
@@ -47,6 +51,10 @@ Daniel Kirchner, Christoph Benzm{\"u}ller, and Edward~N. Zalta, \emph{Computer
 \bibitem{kirchner2020}
 \bysame, \emph{Mechanizing {Principia Logico-Metaphysica} in functional
   type-theory}, The Review of Symbolic Logic \textbf{13} (2020), no.~1.
+
+\bibitem{linsky1994}
+Bernard Linsky and Edward~N. Zalta, \emph{In defense of the simplest quantified
+  modal logic}, Philosophical Perspectives \textbf{8} (1994), 431--458.
 
 \bibitem{nelson2012}
 Michael Nelson and Edward~N. Zalta, \emph{A defense of contingent logical
