@@ -13,7 +13,7 @@ A Lean 4 formalization of possible-world and situation semantics, following the 
 
 ## Architecture
 
-The development is layered: an ontological **Grounding** core fixes the primitives and their algebra, a **Modality** layer defines `□` and `◊` over an accessibility relation and derives S5, and a **Situation** layer builds worlds and their meet-semilattice on top. A separate **Model** proves every axiom true in a concrete structure.
+The development is layered: an ontological **Grounding** core fixes the primitives and their algebra, a **Modality** layer defines `□` and `◊` over an accessibility relation and derives S5, and a **Situation** layer builds worlds and their meet-semilattice on top. A separate **Model** proves every axiom true in a concrete structure, and **Spec** bundles the axioms into one structure against which Lean checks both.
 
 ```mermaid
 flowchart TD
@@ -54,6 +54,11 @@ flowchart TD
     Sat -. "models" .-> G
     Sat -. "models" .-> M
     Sat -. "models" .-> S
+    subgraph P["Spec — the axioms as a structure"]
+        Th["Theory · one field per axiom"]
+    end
+    G -. "developmentTheory" .-> Th
+    Sat -. "Model.theory" .-> Th
 ```
 
 ## Getting Started
@@ -66,7 +71,7 @@ cd Possible-World-Semantics
 lake build
 ```
 
-`lake build` compiles the three libraries, the model in `Model/` and the tests in `Tests/`. `scripts/check.sh` does the same from a clean state, treating every warning (including `sorry`) as an error, and then runs `scripts/check_model.py`, which confirms that the model still matches every axiom. CI runs `scripts/check.sh` on every push to `main` and on every pull request.
+`lake build` compiles the three libraries, the specification in `Spec/`, the model in `Model/` and the tests in `Tests/`. `scripts/check.sh` does the same from a clean state, treating every warning (including `sorry`) as an error. Among the tests, `Tests/Specification.lean` checks that every axiom is a field of `Spec.Theory`, and `Tests/Model.lean` checks that the model is built from Lean's own logic alone (see [Consistency and a Model](#consistency-and-a-model)). CI runs `scripts/check.sh` on every push to `main` and on every pull request.
 
 To see which axioms a theorem rests on, open a file and use `#print axioms`:
 
@@ -213,7 +218,23 @@ Formerly postulated, now derived: `situation_is_object`, `Enc_VAC_complete` (`Gr
 
 ## Consistency and a Model
 
-`Model/Satisfiable.lean` builds a concrete structure in which every axiom holds. It imports nothing from the development. Each primitive gets a concrete definition under its original name, each definition that an axiom mentions is copied verbatim, and each axiom is restated verbatim as a theorem and proved using only Lean's own logic. `scripts/check_model.py` confirms that the statements, definitions and notations match the development exactly, so the model cannot silently drift from the axioms. Since every axiom is true in the model, no contradiction is derivable from them.
+`Spec/Theory.lean` bundles the primitives and axioms into a structure, `Spec.Theory`, with one field per axiom, and defines the derived notions (`Situation`, `Worldhood`, `Actually`, `Barcan`, …) once over an arbitrary theory. It imports nothing. Lean checks the model against the axioms through this structure, with nothing compared textually:
+
+```mermaid
+flowchart LR
+    Dev["the axioms<br/>Grounding · Modality · Situation"]
+    Spec["Spec.Theory<br/>one field per axiom"]
+    Mod["Model/Satisfiable.lean<br/>Lean's logic only"]
+    Dev -- "developmentTheory<br/>each field := the axiom of its name" --> Spec
+    Mod -- "Model.theory<br/>each field proved" --> Spec
+```
+
+- `developmentTheory` (`Situation/Specification.lean`) fills every field with the axiom of the same name, so Lean checks that each axiom has exactly the statement of its field.
+- `#check_axioms_are_fields` (`Spec/Check.lean`, run in `Tests/Specification.lean`) checks the converse. Every `axiom` in `Grounding/`, `Modality/` and `Situation/` must be a field, every field must be filled by its own axiom, and every source file must be imported, so a new axiom cannot be missed.
+- `Model.theory` (`Model/Satisfiable.lean`) is a second instance, built from a concrete structure. The file imports only `Spec.Theory`, nothing from the development. `#check_only_core_axioms` (run in `Tests/Model.lean`) fails unless it uses nothing beyond `propext`, `Classical.choice` and `Quot.sound`: no `sorry` and no axiom of the development.
+- `rfl` lemmas on both sides (`Specification.*_eq`, `Model.Spec.*_eq`) show that the definitions each side uses coincide with those of `Spec.Theory`, so the results about the model below mean what they say in the development.
+
+Since every axiom is true in the model, no contradiction is derivable from them (`Model.consistent`).
 
 The structure is small:
 
@@ -344,7 +365,6 @@ Contributions are welcome, especially new proofs. Good entry points:
 | Item | Where | What it needs |
 |---|---|---|
 | Frame correspondence | `Modality/` | Generalise `R` to an arbitrary relation and prove that T, 4, B and 5 correspond to reflexive, transitive, symmetric and euclidean frames, justifying the universal `R`. |
-| Mechanised model link | `Model/` | Bundle the primitives and axioms into a structure so that the model is checked against the axioms by Lean itself, rather than textually by `check_model.py`. |
 | Dependence and modality | `Grounding/Dependence.lean` | State and prove modal facts about ≺ and ⊴, such as rigidity of parthood. |
 
 **Ground rules.**
@@ -352,7 +372,7 @@ Contributions are welcome, especially new proofs. Good entry points:
 - No new axioms without discussion. If a proof genuinely needs a postulate, open an issue first — the whole point of the [Axiom Inventory](#axiom-inventory) is that it stays complete and honest.
 - `scripts/check.sh` must pass: no errors, no warnings and no `sorry`. CI enforces this on every pull request.
 - Record a proof you cannot finish as a row in [Open Proof Obligations](#open-proof-obligations) and keep the `sorry` on a branch; when you close one, delete its row and (if it unblocks others) update the dependent entries.
-- If you add or change an axiom, update `Model/Satisfiable.lean` so that it still proves every axiom; `scripts/check_model.py` must pass.
+- If you add or change an axiom, add or change its field in `Spec/Theory.lean` and in both `developmentTheory` and `Model.theory`; the build fails until all three agree.
 
 To get started: pick an item above, open an issue to claim it, then send a PR. Questions and partial attempts are just as welcome as finished proofs.
 
