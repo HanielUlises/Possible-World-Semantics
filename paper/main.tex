@@ -1418,11 +1418,18 @@ are postulated; there are 34 postulates in all. Objects, situations,
 the actual world, meet and join are defined, as in
 Section~\ref{sec:theory}. Propositions
 \ref{prop:collapse} and~\ref{prop:empty} are proved with the additional
-assumptions of the variant theories as explicit hypotheses. The model
-$\N$ is formalized independently of the postulates of $\T$: each axiom
-is restated in the model with the same statement and proved there, and
-a separate check confirms that the restated statements coincide with the
-postulates. Table~\ref{tab:mech} lists the formal counterparts of the
+assumptions of the variant theories as explicit hypotheses. The
+primitives and axioms of $\T$ are also bundled into a single structure,
+with one field for each postulate. The postulates themselves are shown
+to form an instance of it, each field being filled by the postulate of
+the same name, and a check run by the proof assistant confirms that
+every postulate is a field. The model $\N$ is formalized independently
+of the postulates of $\T$, as a second instance of the same structure,
+using only the logic of the proof assistant. The proof assistant thus
+checks that each axiom holds in $\N$ with exactly the statement it has
+in $\T$, and that the notions in terms of which
+Theorem~\ref{thm:nondegenerate} and its corollaries are stated
+coincide with those of $\T$. Table~\ref{tab:mech} lists the formal counterparts of the
 main results.
 
 \begin{table}[ht]
@@ -1462,7 +1469,8 @@ Proposition~\ref{prop:barcan} & \texttt{possibilist\_barcan}, \texttt{barcan\_if
  & \texttt{Model.barcan\_fails}, \texttt{Model.converseBarcan\_fails} \\
 Theorem~\ref{thm:q-agreement} & \texttt{sat\_quantTheoryModel}, \texttt{rwValid\_holds\_actually\_quantified}, \\
  & \texttt{sat\_allActual\_theory} \\
-Theorems~\ref{thm:model} and~\ref{thm:nondegenerate} & \texttt{Model/Satisfiable.lean}, \texttt{Model.nondegenerate}, \\
+Theorems~\ref{thm:model} and~\ref{thm:nondegenerate} & \texttt{Spec.Theory}, \texttt{developmentTheory}, \texttt{Model.theory}, \\
+ & \texttt{Model.consistent}, \texttt{Model.nondegenerate}, \\
  & \texttt{Model.hyperintensional} \\
 Corollary~\ref{cor:contingent-truth} & \texttt{Model.contingent\_logical\_truth} \\
 Corollary~\ref{cor:q-contingent-truth} & \texttt{Model.quantified\_contingent\_logical\_truth}, \\
