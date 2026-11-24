@@ -2,6 +2,7 @@
 
 > A machine-checked theory of possible worlds, situations, and modal necessity — formalizing *what could have been*, and proving it, in Lean 4.
 
+[![CI](https://github.com/HanielUlises/Possible-World-Semantics/actions/workflows/ci.yml/badge.svg)](https://github.com/HanielUlises/Possible-World-Semantics/actions/workflows/ci.yml)
 [![Documentation](https://img.shields.io/badge/Documentation-Online-blue)](https://hanielulises.github.io/Possible-World-Semantics/)
 [![Lean](https://img.shields.io/badge/Lean-4.26.0-4a3f2f)](https://leanprover.github.io/)
 [![Proof obligations](https://img.shields.io/badge/proof_obligations-0_open_·_6_closed-brightgreen)](#open-proof-obligations)
@@ -65,7 +66,7 @@ cd Possible-World-Semantics
 lake build
 ```
 
-`lake build` compiles the three libraries, the model in `Model/` and the tests in `Tests/`. `scripts/check.sh` does the same from a clean state and then runs `scripts/check_model.py`, which confirms that the model still matches every axiom.
+`lake build` compiles the three libraries, the model in `Model/` and the tests in `Tests/`. `scripts/check.sh` does the same from a clean state, treating every warning (including `sorry`) as an error, and then runs `scripts/check_model.py`, which confirms that the model still matches every axiom. CI runs `scripts/check.sh` on every push to `main` and on every pull request.
 
 To see which axioms a theorem rests on, open a file and use `#print axioms`:
 
@@ -256,7 +257,7 @@ Earlier versions of the axioms collapsed in four ways. All four are repaired, an
 
 ## Open Proof Obligations
 
-None. Every `sorry` must correspond to exactly one row here; the codebase currently has none.
+None. `main` is kept free of `sorry`, and CI rejects any. An open obligation is recorded here and worked on in an issue or a branch; it lands on `main` only once it is closed.
 
 ## Resolved Proof Obligations
 
@@ -349,8 +350,8 @@ Contributions are welcome, especially new proofs. Good entry points:
 **Ground rules.**
 
 - No new axioms without discussion. If a proof genuinely needs a postulate, open an issue first — the whole point of the [Axiom Inventory](#axiom-inventory) is that it stays complete and honest.
-- Every `sorry` must correspond to exactly one row in [Open Proof Obligations](#open-proof-obligations); if you close one, delete its row and (if it unblocks others) update the dependent entries.
-- `lake build` must pass with no errors, no warnings and no new `sorry`.
+- `scripts/check.sh` must pass: no errors, no warnings and no `sorry`. CI enforces this on every pull request.
+- Record a proof you cannot finish as a row in [Open Proof Obligations](#open-proof-obligations) and keep the `sorry` on a branch; when you close one, delete its row and (if it unblocks others) update the dependent entries.
 - If you add or change an axiom, update `Model/Satisfiable.lean` so that it still proves every axiom; `scripts/check_model.py` must pass.
 
 To get started: pick an item above, open an issue to claim it, then send a PR. Questions and partial attempts are just as welcome as finished proofs.
