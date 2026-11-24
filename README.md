@@ -174,9 +174,10 @@ Zalta (1988) argued that a modal language with an actuality operator has logical
 | Its necessitation holds exactly when nothing could be concrete without actually being concrete | `box_everythingActuallyConcrete_iff` |
 | If something could be concrete without actually being so, neither it nor the commutation of `𝒜` with the quantifier is necessary | `everythingActuallyConcrete_not_necessary`, `concreteCommute_not_necessary` |
 | "Everything concrete is concrete" is necessary | `box_everythingConcrete` |
+| The possibilist quantifier satisfies the Barcan formula and its converse; for the actualist quantifier, the Barcan formula holds at an index exactly when no possible domain exceeds its domain, and the converse exactly when its domain is included in every possible domain | `possibilist_barcan`, `barcan_iff`, `converseBarcan_iff` |
 | The theory is a model of the quantified deep embedding, with the concrete objects at an index as its domain; every real-world valid formula holds actually | `sat_quantTheoryModel`, `rwValid_holds_actually_quantified`, `sat_allActual_theory` |
 
-**The model** (`Model/Satisfiable.lean`). The theory does not decide whether anything is contingent, or whether the domain of concrete objects varies. `Model.contingent_logical_truth` shows that in a model of *all* the axioms, the actuality truth for a contingent proposition holds at the actual world while its necessitation fails. `Model.quantified_contingent_logical_truth` does the same for "everything concrete is actually concrete", since the model's domain grows at the non-actual index (`Model.growing_domain`).
+**The model** (`Model/Satisfiable.lean`). The theory does not decide whether anything is contingent, or whether the domain of concrete objects varies. `Model.contingent_logical_truth` shows that in a model of *all* the axioms, the actuality truth for a contingent proposition holds at the actual world while its necessitation fails. `Model.quantified_contingent_logical_truth` does the same for "everything concrete is actually concrete", since the model's domain grows at the non-actual index (`Model.growing_domain`); for the same reason both Barcan formulas fail there for the actualist quantifier (`Model.barcan_fails`, `Model.converseBarcan_fails`). This is the reading of contingent existence that Linsky and Zalta (1994) give for the simplest quantified modal logic: a constant domain, with contingency carried by concreteness.
 
 A paper describing these results is in [`paper/`](paper/).
 
@@ -363,6 +364,10 @@ Zalta, E. "Logical and Analytic Truths That Are Not Necessary." *Journal of Phil
 Crossley, J. N. and Humberstone, I. L. "The Logic of 'Actually'." *Reports on Mathematical Logic* 8, 1977.
 
 Davies, M. and Humberstone, L. "Two Notions of Necessity." *Philosophical Studies* 38, 1980.
+
+Linsky, B. and Zalta, E. "In Defense of the Simplest Quantified Modal Logic." *Philosophical Perspectives* 8, 1994.
+
+Barcan, R. C. "A Functional Calculus of First Order Based on Strict Implication." *Journal of Symbolic Logic* 11(1), 1946.
 
 Fine, K. "Ontological Dependence." *Proceedings of the Aristotelian Society*, 1995.
 
