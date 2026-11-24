@@ -4,6 +4,9 @@ open Lake DSL
 package possibleWorldsSemantics
 
 @[default_target]
+lean_lib Spec
+
+@[default_target]
 lean_lib Grounding
 
 @[default_target]

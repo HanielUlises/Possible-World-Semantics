@@ -1,3 +1,5 @@
+import Spec.Theory
+
 /-
   A MODEL OF THE AXIOMS
 
@@ -10,17 +12,22 @@
   hyperintensional: there are distinct but necessarily equivalent
   propositions, and a situation that makes one true but not the other.
 
-  The file imports nothing from the development.  Each primitive is
-  given a concrete definition under its original name, each defined
-  notion that occurs in an axiom is copied verbatim, and each axiom is
-  restated verbatim as a theorem and proved.  `scripts/check_model.py`
-  verifies that every axiom and copied definition in the development
-  matches its counterpart here character for character (up to
-  whitespace), so the model cannot silently drift from the axioms.
+  The file imports nothing from the development, only the structure
+  `Spec.Theory` that bundles its primitives and axioms.  Each primitive
+  is given a concrete definition under its original name, and each
+  axiom is proved as a theorem.  `theory` assembles them into a
+  `Spec.Theory`, so Lean checks that every theorem here has exactly
+  the statement of the corresponding axiom; and the development's own
+  instance, `developmentTheory`, checks that every axiom has exactly
+  the statement of its field.  The `rfl` lemmas in `Model.Spec` show
+  that the definitions used here coincide with those of `Spec.Theory`,
+  so the results about the model mean what they say in the
+  development.
 
   Since every axiom is true in this structure, no contradiction is
   derivable from them: the axiom set is consistent relative to Lean's
-  own logic.
+  own logic.  `#print axioms Model.theory` lists only Lean's own
+  axioms.
 
   The structure:
   * `Val := Bool` indexes two valuations; `true` is the actual one.
@@ -115,7 +122,7 @@ def Concrete (w : World) : World → Prop
 def actualIndex : World := idx true
 
 
-/-! ## Definitions copied verbatim from the development -/
+/-! ## Defined notions, as in the development and in `Spec.Theory` -/
 
 def R (_ _ : World) : Prop := True
 
@@ -212,7 +219,7 @@ theorem not_abstract_idx (b : Val) : ¬ A! (idx b) :=
 theorem abs_situation (S : Property → Prop) : Situation (abs S) :=
   ⟨abs_abstract S, fun F _ => ⟨F, rfl⟩⟩
 
-/-! ## The axioms, restated verbatim and proved -/
+/-! ## The axioms, proved -/
 
 theorem bic_def :
   ∀ p q : Propn, bic p q = conj (impl p q) (impl q p) :=
@@ -323,6 +330,78 @@ theorem abstract_extensionality :
     cases y with
     | idx b => exact absurd hy (not_abstract_idx b)
     | abs T => exact congrArg abs (funext fun F => propext (h F))
+
+/-! ## The model as a theory -/
+
+/-- The model, as an instance of `Spec.Theory`. -/
+noncomputable def theory : Spec.Theory where
+  World := World
+  Property := Property
+  Propn := Propn
+  Enc := Enc
+  Encp := Encp
+  VAC := VAC
+  Concrete := Concrete
+  neg := neg
+  conj := conj
+  disj := disj
+  impl := impl
+  bic := bic
+  bic_def := bic_def
+  neg_neg := neg_neg
+  deMorgan_conj := deMorgan_conj
+  deMorgan_disj := deMorgan_disj
+  impl_as_disj := impl_as_disj
+  conj_comm := conj_comm
+  disj_comm := disj_comm
+  conj_assoc := conj_assoc
+  disj_assoc := disj_assoc
+  TrueIn := TrueIn
+  Encp_def := Encp_def
+  TrueIn_def := TrueIn_def
+  Obtains := Obtains
+  Obtains_neg := Obtains_neg
+  Obtains_conj := Obtains_conj
+  Obtains_disj := Obtains_disj
+  Obtains_impl := Obtains_impl
+  VAC_congr := VAC_congr
+  ordinary_no_encoding := ordinary_no_encoding
+  Comprehension := Comprehension
+  abstract_extensionality := abstract_extensionality
+  actualIndex := actualIndex
+
+/-- The axioms have a model. -/
+theorem consistent : Nonempty Spec.Theory := ⟨theory⟩
+
+/-! ## The definitions used here are those of `Spec.Theory` -/
+
+namespace Spec
+
+theorem R_eq : (R : World → World → Prop) = _root_.Spec.R := rfl
+theorem Box_eq : (Box : (World → Prop) → World → Prop) = _root_.Spec.Box := rfl
+theorem Diamond_eq : (Diamond : (World → Prop) → World → Prop) = _root_.Spec.Diamond := rfl
+theorem OrdinaryObject_eq : OrdinaryObject = _root_.Spec.OrdinaryObject Concrete := rfl
+theorem AbstractObject_eq : AbstractObject = _root_.Spec.AbstractObject Concrete := rfl
+theorem Object_eq : Object = _root_.Spec.Object Concrete := rfl
+theorem Situation_eq : Situation = theory.Situation := rfl
+theorem PartOf_eq : PartOf = theory.PartOf := rfl
+theorem Agree_eq : Agree = theory.Agree := rfl
+theorem ExtEq_eq : ExtEq = theory.ExtEq := rfl
+theorem actualWorld_eq' : actualWorld = theory.actualWorld := rfl
+theorem Actual_eq : Actual = theory.Actual := rfl
+theorem Possible_eq : Possible = theory.Possible := rfl
+theorem Worldhood_eq : Worldhood = theory.Worldhood := rfl
+theorem Maximal₁_eq : Maximal₁ = theory.Maximal₁ := rfl
+theorem Partial₁_eq : Partial₁ = theory.Partial₁ := rfl
+theorem Consistent_eq : Consistent = theory.Consistent := rfl
+theorem Actually_eq : Actually = theory.Actually := rfl
+theorem AllConcrete_eq : AllConcrete = theory.AllConcrete := rfl
+theorem EverythingActuallyConcrete_eq :
+    EverythingActuallyConcrete = theory.EverythingActuallyConcrete := rfl
+theorem Barcan_eq : Barcan = theory.Barcan := rfl
+theorem ConverseBarcan_eq : ConverseBarcan = theory.ConverseBarcan := rfl
+
+end Spec
 
 /-! ## Non-degeneracy
 
