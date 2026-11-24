@@ -184,6 +184,12 @@ def AllConcrete (φ : World → World → Prop) : World → Prop :=
 def EverythingActuallyConcrete : World → Prop :=
   AllConcrete (fun x => 𝒜 (fun v => Concrete v x))
 
+def Barcan (φ : World → World → Prop) : World → Prop :=
+  fun w => (∀ x : World, Concrete w x → □ (φ x) w) → □ (AllConcrete φ) w
+
+def ConverseBarcan (φ : World → World → Prop) : World → Prop :=
+  fun w => □ (AllConcrete φ) w → ∀ x : World, Concrete w x → □ (φ x) w
+
 /-! ## Helper lemmas -/
 
 theorem diamond_intro {p : World → Prop} {w : World} (v : World)
@@ -433,6 +439,22 @@ theorem quantified_contingent_logical_truth :
     ¬ □ EverythingActuallyConcrete actualIndex :=
   ⟨fun _ h => h,
    fun h => growing_domain.2 (h (idx false) trivial (idx false) growing_domain.1)⟩
+
+/-- The Barcan formula fails at the actual index: everything actually
+    concrete is necessarily actually concrete, but `idx false` could
+    be concrete without being actually concrete. -/
+theorem barcan_fails :
+    ¬ Barcan (fun x _ => Concrete actualIndex x) actualIndex :=
+  fun h => growing_domain.2
+    (h (fun _ hx _ _ => hx) (idx false) trivial (idx false) growing_domain.1)
+
+/-- The converse Barcan formula fails at the non-actual index: necessarily
+    everything concrete is concrete, but `idx false`, concrete there, is
+    not concrete at the actual index. -/
+theorem converseBarcan_fails :
+    ¬ ConverseBarcan (fun x v => Concrete v x) (idx false) :=
+  fun h => growing_domain.2
+    (h (fun _ _ _ hx => hx) (idx false) growing_domain.1 actualIndex trivial)
 
 /-- A proposition necessarily equivalent to `contingentProp` but
     distinct from it. -/

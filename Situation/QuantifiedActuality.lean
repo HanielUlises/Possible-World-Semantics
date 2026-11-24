@@ -28,6 +28,12 @@ import Situation.Actuality
     quantifier (`concreteCommute_actual`,
     `concreteCommute_not_necessary`), whereas "everything concrete is
     concrete" is necessary (`box_everythingConcrete`);
+  * the possibilist quantifier satisfies the Barcan formula and its
+    converse (`possibilist_barcan`), whereas for the actualist
+    quantifier the Barcan formula holds exactly when no possible
+    domain exceeds the domain at the index (`barcan_iff`), and the
+    converse exactly when the domain at the index is included in every
+    possible domain (`converseBarcan_iff`);
   * `quantTheoryModel` reads the development as a model of the
     quantified deep embedding, with the concrete objects at an index
     as its domain, and `sat_quantTheoryModel` shows that the two
@@ -36,7 +42,9 @@ import Situation.Actuality
   The theory does not decide whether the domain varies.
   `Model/Satisfiable.lean` exhibits a model of all the axioms in which
   something could have been concrete that is not actually concrete, so
-  there the necessitation fails (`Model.quantified_contingent_logical_truth`).
+  there the necessitation fails (`Model.quantified_contingent_logical_truth`),
+  and both Barcan formulas fail (`Model.barcan_fails`,
+  `Model.converseBarcan_fails`).
 -/
 
 /-- Actualist universal quantification: φ holds, at the index v, of
@@ -113,6 +121,68 @@ theorem concreteCommute_not_necessary (w : World)
     ¬ □ (ConcreteCommute (fun y u => Concrete u y)) w := by
   obtain ⟨v, x, hx, hnx⟩ := h
   exact fun hbox => concreteCommute_fails v x hx hnx (hbox v trivial)
+
+/-! ## The Barcan formulas
+
+  The possibilist quantifier over `World` satisfies both the Barcan
+  formula and its converse, as in the simplest quantified modal logic
+  defended by Linsky and Zalta.  For the actualist quantifier each
+  formula corresponds to a condition on the domains of concrete
+  objects: the Barcan formula to every possible domain being included
+  in the domain at the index, and the converse to the domain at the
+  index being included in every possible domain.
+-/
+
+/-- The Barcan formula for the actualist quantifier:
+    `∀ᶜx □φ → □∀ᶜx φ`. -/
+def Barcan (φ : World → World → Prop) : World → Prop :=
+  fun w => (∀ x : World, Concrete w x → □ (φ x) w) → □ (AllConcrete φ) w
+
+/-- The converse Barcan formula for the actualist quantifier:
+    `□∀ᶜx φ → ∀ᶜx □φ`. -/
+def ConverseBarcan (φ : World → World → Prop) : World → Prop :=
+  fun w => □ (AllConcrete φ) w → ∀ x : World, Concrete w x → □ (φ x) w
+
+/-- The possibilist quantifier commutes with □: both the Barcan formula
+    and its converse hold. -/
+theorem possibilist_barcan (φ : World → World → Prop) (w : World) :
+    (∀ x : World, □ (φ x) w) ↔ □ (fun v => ∀ x : World, φ x v) w :=
+  ⟨fun h v hv x => h x v hv, fun h x v hv => h v hv x⟩
+
+/-- The Barcan formula holds at w for every condition exactly when
+    whatever could be concrete is concrete at w. -/
+theorem barcan_iff (w : World) :
+    (∀ φ : World → World → Prop, Barcan φ w) ↔
+      ∀ v x : World, Concrete v x → Concrete w x := by
+  constructor
+  · intro h v x hx
+    exact h (fun y _ => Concrete w y) (fun _ hy _ _ => hy) v trivial x hx
+  · intro h φ hφ v _ x hx
+    exact hφ x (h v x hx) v trivial
+
+/-- The converse Barcan formula holds at w for every condition exactly
+    when whatever is concrete at w is concrete at every index. -/
+theorem converseBarcan_iff (w : World) :
+    (∀ φ : World → World → Prop, ConverseBarcan φ w) ↔
+      ∀ v x : World, Concrete w x → Concrete v x := by
+  constructor
+  · intro h v x hx
+    exact h (fun y u => Concrete u y) (box_everythingConcrete w) x hx v trivial
+  · intro h φ hφ x hx v _
+    exact hφ v trivial x (h v x hx)
+
+/-- If something could be concrete without being concrete at w, the
+    Barcan formula fails at w for the condition of being concrete at w. -/
+theorem barcan_fails (w v x : World) (hx : Concrete v x) (hnx : ¬ Concrete w x) :
+    ¬ Barcan (fun y _ => Concrete w y) w :=
+  fun h => hnx (h (fun _ hy _ _ => hy) v trivial x hx)
+
+/-- If something concrete at w could fail to be concrete, the converse
+    Barcan formula fails at w for concreteness. -/
+theorem converseBarcan_fails (w v x : World) (hx : Concrete w x)
+    (hnx : ¬ Concrete v x) :
+    ¬ ConverseBarcan (fun y u => Concrete u y) w :=
+  fun h => hnx (h (box_everythingConcrete w) x hx v trivial)
 
 /-! ## The development as a model of quantified modal logic -/
 

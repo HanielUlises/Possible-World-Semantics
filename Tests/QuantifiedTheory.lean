@@ -22,6 +22,24 @@ example (I : Nat → World → List World → Prop) (g : Nat → World) :
   rwValid_holds_actually_quantified _
     (QuantifiedActuality.allActual_rwValid _) I g
 
+-- The possibilist quantifier satisfies the Barcan formulas; for the
+-- actualist quantifier they correspond to conditions on the domains.
+example (φ : World → World → Prop) (w : World) :
+    (∀ x : World, □ (φ x) w) ↔ □ (fun v => ∀ x : World, φ x v) w :=
+  possibilist_barcan φ w
+
+example (w : World) :
+    (∀ φ : World → World → Prop, Barcan φ w) ↔
+      ∀ v x : World, Concrete v x → Concrete w x :=
+  barcan_iff w
+
+example (w : World) :
+    (∀ φ : World → World → Prop, ConverseBarcan φ w) ↔
+      ∀ v x : World, Concrete w x → Concrete v x :=
+  converseBarcan_iff w
+
 -- No axiom beyond the primitives is used.
+#print axioms barcan_iff
+#print axioms converseBarcan_iff
 #print axioms everythingActuallyConcrete_not_necessary
 #print axioms sat_quantTheoryModel

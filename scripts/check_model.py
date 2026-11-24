@@ -27,6 +27,7 @@ COPIED_DEFS = [
     "Situation", "PartOf", "Agree", "ExtEq", "actualWorld", "Actual",
     "Possible", "Worldhood", "Maximal₁", "Partial₁", "Consistent",
     "Actually", "AllConcrete", "EverythingActuallyConcrete",
+    "Barcan", "ConverseBarcan",
 ]
 
 # Notations that occur in axiom statements.
